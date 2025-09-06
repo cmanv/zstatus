@@ -38,8 +38,7 @@ proc zstatus::music::update {} {
 	if {$music(valid) == 0} { return }
 	set state [mpd::state]
 	if {$state > 1} {
-		set value $mpdstates($state)
-		$musicframe configure -text $::remixicons($value)
+		$musicframe configure -text $::remix($mpdstates($state))
 		if {!$music_active} {
 			pack $musicframe -after $musicpos -side $musicside
 			pack $musicsep -after $musicframe -fill y -padx 5 -side $musicside

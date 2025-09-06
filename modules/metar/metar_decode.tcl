@@ -552,7 +552,7 @@ proc zstatus::metar::decode::get_weather_icon {} {
 		set code $current(precip_code)
 		array set precip_code $precip_codes($code)
 		set icon $precip_codes(icon)
-		return $::remixicons($icon)
+		return $::remix($icon)
 	}
 
 	variable station
@@ -571,9 +571,9 @@ proc zstatus::metar::decode::get_weather_icon {} {
 		} else {
 			set icon "$cloud_code(icon)_$suffix"
 		}
-		return $::remixicons($icon)
+		return $::remix($icon)
 	}
-	return  $::remixicons(nometar)
+	return  $::remix(nometar)
 }
 
 proc zstatus::metar::decode::get_report {lang} {

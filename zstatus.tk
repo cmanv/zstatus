@@ -9,23 +9,24 @@ package require zstatus::metar
 package require zstatus::music
 package require zstatus::sysbsd
 
-# Unicode codes from remixicons
-array set remixicons {
+# Unicodes characters from remixicons
+array set remix {
 	clear_day	\uf1bf	clear_night	\uef75\
 	cloud1_day	\uf1be	cloud1_night	\uef74\
 	cloud2_day	\uf1bb	cloud2_night	\uef71\
-	crystal		\uf574	disk 		\uf251\
-	download 	\uec5a	dust		\ueba1\
+	crystal		\uf574	dust		\ueba1\
 	fog		\ued50	hail		\ueded\
 	mail 		\ueef3	mixer 		\uf2a1\
 	nometar		\ueb9f	overcast	\ueba3\
 	pause 		\uf507	play 		\uef82\
-	printer 	\uf029	rain1		\uf056\
-	rain2		\uec68	rain3		\uee15\
-	sdcard 		\uf0c9	snow		\uf15e\
+	rain1		\uf056	rain2		\uec68\
+	rain3		\uee15	snow		\uf15e\
 	squall		\ueb9d	thunder		\uf209\
-	tornado		\uf21c	upload 		\uf250\
-	video		\uf51e }
+	tornado		\uf21c }
+
+# Other unicode characters
+set arrowup	\u2191
+set arrowdown	\u2193
 
 namespace eval zstatus {
 	variable currenttheme	none
@@ -175,14 +176,14 @@ proc zstatus::set_netin {} {
 	variable netin_interface
 	set inval [sysbsd::getnetin $netin_interface]
 	variable netin
-	set netin "$::remixicons(download)[join [lindex $inval 0]] "
+	set netin "$::arrowdown[join [lindex $inval 0]] "
 }
 
 proc zstatus::set_netout {} {
 	variable netout_interface
 	set outval [sysbsd::getnetout $netout_interface]
 	variable netout
-	set netout "$::remixicons(upload)[join [lindex $outval 0]] "
+	set netout "$::arrowup[join [lindex $outval 0]] "
 }
 
 proc zstatus::set_datetime {} {
@@ -194,7 +195,7 @@ proc zstatus::set_datetime {} {
 
 proc zstatus::set_mixer {} {
 	variable mixer
-	set mixer "$::remixicons(mixer) [sysbsd::getmixervol]"
+	set mixer "$::remix(mixer) [sysbsd::getmixervol]"
 }
 
 proc zstatus::send_message {msg} {

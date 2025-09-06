@@ -41,7 +41,7 @@ proc zstatus::mail::update {} {
 		set newmail [llength [glob -nocomplain -dir "$mailbox(path)/new" *]]
 		if {$newmail && $newmail != $mailbox(newmail)} {
 			set mailbox(newmail) $newmail
-			$mailframe.$index configure -text "$::remixicons(mail) ($newmail)"
+			$mailframe.$index configure -text "$::remix(mail) ($newmail)"
 			if {!$mailbox(visible)} {
 				if {![string length [pack slaves $mailframe]]} {
 					pack $mailframe -after $mailpos \
