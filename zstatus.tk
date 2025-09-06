@@ -9,7 +9,7 @@ package require zstatus::metar
 package require zstatus::music
 package require zstatus::sysbsd
 
-# Unicodes characters from remixicons
+# Unicodes characters from remixicons v4.6.0
 array set remix {
 	clear_day	\uf1bf	clear_night	\uef75\
 	cloud1_day	\uf1be	cloud1_night	\uef74\

@@ -186,7 +186,6 @@ Clicking on it opens a window showing current weather conditions.
 > Options:
 > - _code_: The 4 characters code of the METAR station.
 > - _delay_: Time between updates in minutes. (Default 10)
-> - _geometry_: Position of the metar popup window.
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
