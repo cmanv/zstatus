@@ -11,22 +11,20 @@ package require zstatus::sysbsd
 
 # Unicode codes from remixicons
 array set remixicons {
-	arrowdown	\uea4e	arrowup         \uea78\
-	cloud0_day	\uf1bf	cloud0_night	\uef75\
+	clear_day	\uf1bf	clear_night	\uef75\
 	cloud1_day	\uf1be	cloud1_night	\uef74\
 	cloud2_day	\uf1bb	cloud2_night	\uef71\
-	crystal		\yf574	udisk 		\uf251\
+	crystal		\uf574	disk 		\uf251\
 	download 	\uec5a	dust		\ueba1\
 	fog		\ued50	hail		\ueded\
 	mail 		\ueef3	mixer 		\uf2a1\
-	overcast	\ueba3	pause 		\uf507\
-	play 		\uef82	printer 	\uf029\
-	rain1		\uf056	rain2		\uec68\
-	sdcard 		\uf0c9  shower		\uee15\
-	snow		\uf15e	squall		\ueb90\
-	sunrise 	\uedff	sunset 		\uee00\
-	thunder		\uf209	tornado		\uf21d\
-	unknown		\ueb9f	upload 		\uf250\
+	nometar		\ueb9f	overcast	\ueba3\
+	pause 		\uf507	play 		\uef82\
+	printer 	\uf029	rain1		\uf056\
+	rain2		\uec68	rain3		\uee15\
+	sdcard 		\uf0c9	snow		\uf15e\
+	squall		\ueb9d	thunder		\uf209\
+	tornado		\uf21c	upload 		\uf250\
 	video		\uf51e }
 
 namespace eval zstatus {

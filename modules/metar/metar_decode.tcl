@@ -30,17 +30,17 @@ namespace eval zstatus::metar::decode {
 		DZ	{C drizzle fr bruine} icon rain1\
 		FZDZ	{C {freezing drizzle} fr {bruine verglaçante} icon rain1}\
 		RA	{C rain fr pluie icon rain2}\
-		+RA	{C {heavy rain} fr {pluie forte} icon shower}\
+		+RA	{C {heavy rain} fr {pluie forte} icon rain3}\
 		-RA	{C {light rain} fr {pluie légère} icon rain1}\
-		SHRA	{C {rain showers} fr {averses de pluie} icon shower}\
+		SHRA	{C {rain showers} fr {averses de pluie} icon rain3}\
 		-SHRA	{C {light rain showers} fr {légères averses de pluie} icon rain2}\
-		+SHRA	{C {heavy rain showers} fr {fortes averses de pluie} icon shower}\
+		+SHRA	{C {heavy rain showers} fr {fortes averses de pluie} icon rain3}\
 		TSRA	{C {thunderstorms} fr {orages} icon thunder}\
 		-TSRA	{C {light thunderstorms} fr {orages faibles} icon thunder}\
 		+TSRA	{C {heavy thunderstorms} fr {orages forts} icon thunder}\
 		FZRA	{C {freezing rain} fr {pluie verglacante} icon rain2}\
 		-FZRA	{C {light freezing rain} fr {faible pluie verglaçante} icon rain1}\
-		+FZRA	{C {heavy freezing rain} fr {forte pluie verglaçante} icon shower}\
+		+FZRA	{C {heavy freezing rain} fr {forte pluie verglaçante} icon rain3}\
 		SN	{C snow fr neige icon snow}\
 		+SN	{C {heavy snow} fr {neige forte} icon snow}\
 		-SN	{C {light snow} fr {neige légère} icon snow}\
@@ -56,7 +56,7 @@ namespace eval zstatus::metar::decode {
 		+GR	{C {heavy hail} fr {grêle forte} icon hail}\
 		-GR	{C {light hail} fr {grêle légère} icon hail}\
 		GS	{C {small hail} fr {petite grêle} icon hail}\
-		UP	{C {unknown precipitations} fr {précipitations inconnues} icon unknown}\
+		UP	{C {unknown precipitations} fr {précipitations inconnues} icon nometar}\
 		BR	{C mist fr brume icon fog}\
 		FG	{C fog fr brouillard icon fog}\
 		BCFG	{C {patches of fog} fr {bancs de brouillard} icon fog}\
@@ -80,14 +80,14 @@ namespace eval zstatus::metar::decode {
 		DS	{C {dust storm} fr {tempête de poussière} icon dust} }
 
 	array set cloud_codes {\
-		SKC	{C {Clear sky} fr {Ciel dégagé} icon cloud0}\
+		SKC	{C {Clear sky} fr {Ciel dégagé} icon clear}\
 		FEW	{C {Few clouds} fr {Quelques nuages} icon cloud1}\
 		SCT	{C {Scattered clouds} fr {Nuages dispersés} icon cloud2}\
 		BKN	{C {Broken clouds} fr {Éclaircies} icon cloud2}\
 		OVC	{C {Overcast} fr {Couvert} icon overcast}\
-		CLR	{C {No low clouds} fr {Aucun nuage bas} icon cloud0}\
-		NSC	{C {No low clouds} fr {Aucun nuage bas} icon cloud0}\
-		NCD	{C {No clouds} fr {Aucun nuage} icon cloud0}\
+		CLR	{C {No low clouds} fr {Aucun nuage bas} icon clear}\
+		NSC	{C {No low clouds} fr {Aucun nuage bas} icon clear}\
+		NCD	{C {No clouds} fr {Aucun nuage} icon clear}\
 		VV	{C {Darkened sky} fr {Ciel obscurci} icon overcast} }
 
 	array set cloud_types {\
@@ -573,7 +573,7 @@ proc zstatus::metar::decode::get_weather_icon {} {
 		}
 		return $::remixicons($icon)
 	}
-	return  $::remixicons(unknown)
+	return  $::remixicons(nometar)
 }
 
 proc zstatus::metar::decode::get_report {lang} {
