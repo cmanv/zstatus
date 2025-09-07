@@ -1,4 +1,5 @@
 package require Tcl 9.0
+package require json
 
 namespace eval zstatus::metar::decode {
 	variable  metar_api 		https://aviationweather.gov/api/data/metar
@@ -162,35 +163,8 @@ proc zstatus::metar::decode::fetch_station_info {code} {
 		return {KO}
 	}
 
-	regsub {^\[\{} $message {} message
-	regsub {\}\]$} $message {} message
-	regsub -all {\"} $message {} message
-
-	set pairs {}
-	set incomplete 0
-	foreach token [split $message ","] {
-		if {$incomplete} {
-			set frag [join [list $frag $token] ","]
-			if [regexp {[A-Z]+]$} $token] {
-				set incomplete 0
-				lappend pairs $frag
-			}
-			continue
-		}
-		if [regexp {\[[A-Z]+$} $token] {
-			set incomplete 1
-			set frag $token
-			continue
-		}
-		lappend pairs $token
-	}
-
 	variable station
-	array set station {}
-	foreach pair $pairs {
-		lassign [split $pair ":"] key value
-		set station($key) $value
-	}
+	array set station {*}[json::json2dict $message]
 
 	if {![info exists station(lat)] || ![info exists station(lon)]} {
 		return {KO}
