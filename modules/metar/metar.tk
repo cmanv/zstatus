@@ -52,11 +52,10 @@ proc zstatus::metar::show_tooltip {} {
 	wm attributes $window -type dialog
 	wm overrideredirect $window 1
 
-	set width [string length zstatus::metar::report(tooltip)]
-	pack [label $window.text -font $ttip1(font) -width $width\
+	pack [label $window.text -font $ttip1(font)\
 		-fg $ttip1($theme) -bg $statusbar($theme)\
 		-textvar zstatus::metar::report(tooltip)]\
-		-side left -padx 1 -pady 3
+		-side left -padx 5 -pady 3
 
 	bind $window <Map> { zstatus::map_window .metartooltip }
 }
@@ -210,7 +209,6 @@ proc zstatus::metar::update_grid {grid} {
 			foreach line $lines {
 				set width [tcl::mathfunc::max [string length $line] $width]
 			}
-			incr width
 			$grid.clouds_val insert 1.0 $report(clouds)
 			$grid.clouds_val configure -height $height -width $width
 			grid $grid.clouds $grid.clouds_val
@@ -228,7 +226,6 @@ proc zstatus::metar::update_grid {grid} {
 			foreach line $lines {
 				set width [tcl::mathfunc::max [string length $line] $width]
 			}
-			incr width
 			$grid.precips_val insert 1.0 $report(precips)
 			$grid.precips_val configure -height $height -width $width
 			grid $grid.precips $grid.precips_val
