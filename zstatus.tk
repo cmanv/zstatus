@@ -175,7 +175,7 @@ proc zstatus::set_arcsize {} {
 proc zstatus::set_netin {} {
 	variable netin
 	array set widget $::widgetarray(netin)
-	set inval [sysbsd::getnetin $$widget(interface)]
+	set inval [sysbsd::getnetin $widget(interface)]
 	set netin "$::arrowdown[join [lindex $inval 0]] "
 }
 
