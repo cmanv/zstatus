@@ -1,5 +1,4 @@
 #!/usr/bin/env tclsh9.0
-package require zstatus::utils
 namespace eval zstatus::config {
 	if [info exists ::env(XDG_CONFIG_HOME)] {
 		set config_prefix $::env(XDG_CONFIG_HOME)
@@ -83,7 +82,7 @@ proc zstatus::config::get {key configfile} {
 
 	if [file exists $configfile] {
 		set context ""
-		set lines [zstatus::utils::read_file $configfile]
+		set lines [zstatus::read_file $configfile]
 		foreach line $lines {
 			if ![string length $line] { continue }
 			if [regexp {^#} $line] { continue }
@@ -128,7 +127,7 @@ proc zstatus::config::read {configfile} {
 	if [file exists $configfile] {
 		set index 0
 		set context ""
-		set lines [split [zstatus::utils::read_file $configfile] "\n"]
+		set lines [split [zstatus::read_file $configfile] "\n"]
 		foreach line $lines {
 			if ![string length $line] { continue }
 			if [regexp {^#} $line] { continue }

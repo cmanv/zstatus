@@ -1,6 +1,4 @@
 package require Tk 9.0
-package require fileutil
-package require zstatus::utils
 package require zstatus::metar::decode
 
 namespace eval zstatus::metar {
@@ -453,6 +451,6 @@ proc zstatus::metar::setup {bar widget} {
 	bind $bar.$widget <Leave> { zstatus::metar::hide_tooltip }
 
 	set delay [expr $metar(delay) * 60000]
-	zstatus::utils::every $delay zstatus::metar::update
+	zstatus::every $delay zstatus::metar::update
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

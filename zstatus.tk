@@ -1,7 +1,6 @@
 #!/usr/bin/env wish9.0
 package require cmdline
 package require unix_sockets
-package require zstatus::utils
 package require zstatus::config
 package require zstatus::devices
 package require zstatus::mail
@@ -45,6 +44,19 @@ namespace eval zstatus {
 	    metar_update {widget metar action metar::update arg 0}\
 	    music_update {widget music action music::update arg 0}\
 	    set_theme {widget none action set_theme arg 1}}
+}
+
+proc zstatus::every {ms cmd} {
+	after $ms [namespace code [info level 0]]
+	eval $cmd
+}
+
+proc zstatus::read_file {filename} {
+	set content ""
+	set file [open $filename r]
+	catch {set content [chan read $file]}
+	chan close $file
+	return $content
 }
 
 proc zstatus::map_window {window} {
@@ -376,7 +388,7 @@ proc zstatus::setup {} {
 		set theme "light"
 	}
 	set_theme $theme
-	zstatus::utils::every $::config(delay) zstatus::update
+	zstatus::every $::config(delay) zstatus::update
 }
 
 # Treat command line options
