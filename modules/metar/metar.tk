@@ -266,7 +266,7 @@ proc zstatus::metar::setup_header { header } {
 	variable issued_label
 	variable status_label
 
-	pack [frame $header] -anchor w -padx 10 -pady 10 -side top
+	pack [frame $header] -padx 10 -pady 10 -side top -anchor w
 	pack [frame $header.keys] -side left
 	pack [frame $header.keys.station] -side top -anchor w
 	pack [label $header.keys.station.text -font $header2(font)\
@@ -303,7 +303,7 @@ proc zstatus::metar::setup_summary { summary } {
 	variable sunrise_label
 	variable sunset_label
 
-	pack [frame $summary] -anchor w -padx 10 -side top
+	pack [frame $summary] -padx 10 -side top -anchor w
 	pack [frame $summary.temp] -side left
 	pack [frame $summary.temp.status] -side top -anchor w
 	pack [label $summary.temp.status.icon -font $icons(font)\
@@ -353,7 +353,7 @@ proc zstatus::metar::setup_grid { grid } {
 	variable precips_label
 
 	set row 0
-	pack [frame $grid] -padx 10 -pady 10 -side top
+	pack [frame $grid] -padx 10 -pady 10 -side top -anchor w
 	label $grid.title -font $header1(font) -text $weather_label($locale)
 	grid configure $grid.title -columnspan 2 -row $row -column 0\
 		 -pady 5 -sticky w
