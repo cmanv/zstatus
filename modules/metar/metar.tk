@@ -66,7 +66,7 @@ proc zstatus::metar::hide_tooltip {} {
 proc zstatus::metar::toggle_window {} {
 	variable station
 	variable metarwin
-	if ![info exists station(code)] { return }
+	if ![info exists station(icaoId)] { return }
 
 	variable state_visible
 	if {$state_visible} {
@@ -157,7 +157,7 @@ proc zstatus::metar::set_theme_grid { grid } {
 
 proc zstatus::metar::set_theme {newtheme} {
 	variable station
-	if ![info exists station(code)] { return }
+	if ![info exists station(icaoId)] { return }
 
 	variable statusbar
 	variable metarwin
@@ -241,7 +241,7 @@ proc zstatus::metar::update {} {
 	variable report
 	variable locale
 
-	if ![info exists station(code)] {
+	if ![info exists station(icaoId)] {
 		set status [decode::fetch_station_info $metar(station)]
 		if {$status == {KO}} {
 			set report(statusbar) "<?>"

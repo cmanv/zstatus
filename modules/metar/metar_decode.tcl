@@ -166,10 +166,9 @@ proc zstatus::metar::decode::fetch_station_info {code} {
 	variable station
 	array set station {*}[json::json2dict $message]
 
-	if {![info exists station(lat)] || ![info exists station(lon)]} {
+	if ![info exists station(icaoId)] {
 		return {KO}
 	}
-	set station(code) $code
 
 	return {OK}
 }
@@ -458,7 +457,7 @@ proc zstatus::metar::decode::fetch_metar_report {} {
 
 	set request_status {OK}
 	if [catch {set message [exec -ignorestderr -- curl -s \
-			$metar_api?ids=$station(code)]}] {
+			$metar_api?ids=$station(icaoId)]}] {
 		set request_status {KO}
 		return
 	}
@@ -484,7 +483,7 @@ proc zstatus::metar::decode::decode_metar_report {message} {
 		if {$token == "RMK"} break
 		if {$token == "METAR"} continue
 		if {$token == "SPECI"} continue
-		if {$token == $station(code)} continue
+		if {$token == $station(icaoId)} continue
 
 		if [regexp {^([0-9]{6})Z$} $token -> datetime] {
 			decode_datetime $datetime
