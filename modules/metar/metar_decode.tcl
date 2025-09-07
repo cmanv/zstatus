@@ -452,30 +452,21 @@ proc zstatus::metar::decode::decode_precips { intensity qualifier precips } {
 
 proc zstatus::metar::decode::fetch_metar_report {} {
 	variable station
-	variable request_status
 	variable metar_api
 
-	set request_status {OK}
 	if [catch {set message [exec -ignorestderr -- curl -s \
 			$metar_api?ids=$station(icaoId)]}] {
-		set request_status {KO}
-		return
+		return {KO}
 	}
-	if {![string length $message]} {
-		set request_status {KO}
-		return
-	}
+	if {![string length $message]} { return {KO} }
 	return $message
 }
 
 proc zstatus::metar::decode::decode_metar_report {message} {
-	variable request_status
 	variable current
 	variable station
 
-	if {$request_status != {OK}} {
-		return
-	}
+	if {$message == {KO}} { return {KO} }
 	array unset current
 
 	set tokens [split $message " "]
@@ -515,6 +506,7 @@ proc zstatus::metar::decode::decode_metar_report {message} {
 			continue
 		}
 	}
+	return {OK}
 }
 
 proc zstatus::metar::decode::get_weather_icon {} {
@@ -550,7 +542,6 @@ proc zstatus::metar::decode::get_weather_icon {} {
 }
 
 proc zstatus::metar::decode::get_report {lang} {
-	variable request_status
 	variable current
 	variable report
 	variable station
@@ -562,13 +553,12 @@ proc zstatus::metar::decode::get_report {lang} {
 	variable failed_label
 
 	set locale $lang
-	decode_metar_report [fetch_metar_report]
-
 	set now [clock seconds]
 	set reporttime [clock format $now -format {%H:%M}\
 			 -timezone $::config(timezone)]
 
-	if {$request_status == {OK}} {
+	set status [decode_metar_report [fetch_metar_report]]
+	if {$status == {OK}} {
 		set report(date) $current(date)
 		set report(temperature) "$current(temp)°C"
 		set report(dew)  "$current(dew)°C"
@@ -649,11 +639,9 @@ proc zstatus::metar::decode::get_report {lang} {
 		set report(tooltip) "$current(daytime):  $report(summary)"
 
 		set report(request_message) "$success_label($locale) $reporttime"
-		set report(request_status) "OK"
 	} else {
 		set report(statusbar) \ueba4
 		set report(request_message) "$failed_label($locale) $reporttime"
-		set report(request_status) "KO"
 	}
 
 	return [array get report]
