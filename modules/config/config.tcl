@@ -50,9 +50,8 @@ namespace eval zstatus::config {
 			font normal light black dark LightGray }\
 	    memused { type var source zstatus::memused proc set_memused\
 			font normal light black dark LightGray }\
-	    metar { type var source zstatus::metar::report(statusbar)\
-			delay 10 geometry {-1+26}\
-			font normal light black dark LightGray }\
+	    metar { type widget source zstatus::metar::report(statusbar)\
+			delay 10 font normal light black dark LightGray }\
 	    mixer { type var source zstatus::mixer proc set_mixer\
 			font normal light black dark LightGray }\
 	    music { type transient proc music::update\

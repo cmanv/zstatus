@@ -91,7 +91,11 @@ proc zstatus::set_theme {theme} {
 	$bar configure -background $statusbar($currenttheme)
 	foreach item $widgetlist {
 		array set widget $::widgetarray($item)
-		if {$widget(type) == "transient"} {
+		if {$widget(type) == "widget"} {
+			$bar.$item configure -bg $statusbar($currenttheme)\
+					-fg $widget($currenttheme)
+			${item}::set_theme $currenttheme
+		} elseif {$widget(type) == "transient"} {
 			${item}::set_theme $currenttheme
 		} elseif {$widget(type) == "separator"} {
 			incr count
@@ -102,10 +106,6 @@ proc zstatus::set_theme {theme} {
 					-fg $widget($currenttheme)
 		}
 		array unset widget
-	}
-
-	if [winfo exists $bar.metar] {
-		metar::set_theme $currenttheme
 	}
 }
 
@@ -173,24 +173,24 @@ proc zstatus::set_arcsize {} {
 }
 
 proc zstatus::set_netin {} {
-	variable netin_interface
-	set inval [sysbsd::getnetin $netin_interface]
 	variable netin
+	array set widget $::widgetarray(netin)
+	set inval [sysbsd::getnetin $$widget(interface)]
 	set netin "$::arrowdown[join [lindex $inval 0]] "
 }
 
 proc zstatus::set_netout {} {
-	variable netout_interface
-	set outval [sysbsd::getnetout $netout_interface]
 	variable netout
+	array set widget $::widgetarray(netout)
+	set outval [sysbsd::getnetout $widget(interface)]
 	set netout "$::arrowup[join [lindex $outval 0]] "
 }
 
 proc zstatus::set_datetime {} {
 	variable datetime
-	variable datetime_format
+	array set widget $::widgetarray(datetime)
 	set datetime [clock format [clock seconds] \
-		-locale $::config(lang) -format $datetime_format]
+		-locale $::config(lang) -format $widget(format)]
 }
 
 proc zstatus::set_mixer {} {
@@ -303,6 +303,12 @@ proc zstatus::add_widgets {side} {
 			transient {
 				${item}::setup $bar $last $side
 			}
+			widget {
+				pack [label $bar.$item -font $widget(font)\
+					-textvar $widget(source)] -side $side
+				${item}::setup $bar $item
+				set last $item
+			}
 		}
 		if [info exists widget(proc)] {
 			lappend proclist $widget(proc)
@@ -327,22 +333,6 @@ proc zstatus::setup {} {
 	add_widgets left
 	add_widgets right
 
-	if [info exists ::widgetarray(netin)] {
-		variable netin_interface
-		array set widget $::widgetarray(netin)
-		set netin_interface $widget(interface)
-	}
-	if [info exists ::widgetarray(netout)] {
-		variable netout_interface
-		array set widget $::widgetarray(netout)
-		set netout_interface $widget(interface)
-	}
-	if [info exists ::widgetarray(datetime)] {
-		variable datetime_format
-		array set widget $::widgetarray(datetime)
-		set datetime_format $widget(format)
-	}
-
 	if [winfo exists $bar.deskmode] {
 		bind $bar.deskmode <MouseWheel> {
 			if {%D < 0} {
@@ -361,6 +351,7 @@ proc zstatus::setup {} {
 			}
 		}
 	}
+
 	if [winfo exists $bar.loadavg] {
 		bind $bar.loadavg <1> { exec xterm +sb -class top -e top & }
 	}
@@ -372,16 +363,6 @@ proc zstatus::setup {} {
 				exec mixer vol=+0.05
 			}
 			zstatus::set_mixer
-		}
-	}
-	if [winfo exists $bar.metar] {
-		metar::setup
-		array set metar $::widgetarray(metar)
-		if [info exists metar(station)] {
-			bind $bar.metar <1> { zstatus::metar::toggle_window }
-			bind $bar.metar <2> { zstatus::metar::update }
-			bind $bar.metar <Enter> { zstatus::metar::show_tooltip }
-			bind $bar.metar <Leave> { zstatus::metar::hide_tooltip }
 		}
 	}
 

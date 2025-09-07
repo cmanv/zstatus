@@ -66,16 +66,16 @@ proc zstatus::metar::hide_tooltip {} {
 
 proc zstatus::metar::toggle_window {} {
 	variable station
-	variable metarwin
+	variable popup
 	if ![info exists station(icaoId)] { return }
 
 	variable state_visible
 	if {$state_visible} {
-		wm state $metarwin withdrawn
+		wm state $popup withdrawn
 		set state_visible 0
 	} else {
-		wm state $metarwin normal
-		raise $metarwin
+		wm state $popup normal
+		raise $popup
 		set state_visible 1
 	}
 }
@@ -161,14 +161,14 @@ proc zstatus::metar::set_theme {newtheme} {
 	if ![info exists station(icaoId)] { return }
 
 	variable statusbar
-	variable metarwin
+	variable popup
 	variable theme
 
 	set theme $newtheme
-	$metarwin configure -background $statusbar($theme)
-	set_theme_header $metarwin.header
-	set_theme_summary $metarwin.summary
-	set_theme_grid $metarwin.grid
+	$popup configure -background $statusbar($theme)
+	set_theme_header $popup.header
+	set_theme_summary $popup.summary
+	set_theme_grid $popup.grid
 }
 
 proc zstatus::metar::update_grid {grid} {
@@ -235,7 +235,7 @@ proc zstatus::metar::update_grid {grid} {
 
 proc zstatus::metar::update {} {
 	variable metar
-	variable metarwin
+	variable popup
 	variable station
 	variable report
 	variable locale
@@ -250,7 +250,7 @@ proc zstatus::metar::update {} {
 	array set station [decode::calc_station_data]
 	array set report [decode::get_report $locale]
 
-	update_grid $metarwin.grid
+	update_grid $popup.grid
 }
 
 proc zstatus::metar::setup_header { header } {
@@ -408,15 +408,14 @@ proc zstatus::metar::setup_grid { grid } {
 	grid configure $grid.precips_val -row $row -column 1 -sticky w
 }
 
-proc zstatus::metar::setup {} {
+proc zstatus::metar::setup {bar widget} {
 	variable metar_locales
 	variable locale
 	variable theme
 	variable metar
-	variable metarwin
+	variable popup
 
 	array set metar $::widgetarray(metar)
-
 	if ![info exists metar(station)] {
 		variable report
 		set report(statusbar) "-"
@@ -435,19 +434,24 @@ proc zstatus::metar::setup {} {
 		set locale [lindex $metar_locales $index]
 	}
 
-	set metarwin [toplevel .metarreport -class Metar -bd 1 -relief solid]
-	setup_header $metarwin.header
-	setup_summary $metarwin.summary
-	setup_grid $metarwin.grid
+	set popup [toplevel .metarreport -class Metar -bd 1 -relief solid]
+	setup_header $popup.header
+	setup_summary $popup.summary
+	setup_grid $popup.grid
 
-	wm attributes $metarwin -type dialog
-	wm overrideredirect $metarwin 1
-	wm resizable $metarwin 0 0
-	wm title $metarwin {Metar Report}
-	wm state $metarwin withdrawn
+	wm attributes $popup -type dialog
+	wm overrideredirect $popup 1
+	wm resizable $popup 0 0
+	wm title $popup {Metar Report}
+	wm state $popup withdrawn
 
-	bind $metarwin <3> { zstatus::metar::toggle_window }
-	bind $metarwin <Map> { zstatus::map_window .metarreport }
+	bind $popup <3> { zstatus::metar::toggle_window }
+	bind $popup <Map> { zstatus::map_window .metarreport }
+	bind $bar.$widget <1> { zstatus::metar::toggle_window }
+	bind $bar.$widget <2> { zstatus::metar::update }
+	bind $bar.$widget <Enter> { zstatus::metar::show_tooltip }
+	bind $bar.$widget <Leave> { zstatus::metar::hide_tooltip }
+
 	set delay [expr $metar(delay) * 60000]
 	zstatus::utils::every $delay zstatus::metar::update
 }
