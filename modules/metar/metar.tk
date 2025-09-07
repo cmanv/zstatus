@@ -9,6 +9,14 @@ namespace eval zstatus::metar {
 	font create m_large -family Sans -size 13
 	font create m_icon -family Remix -size 16
 
+	array set title1 {font m_large light black dark gray80}
+	array set label1 {font m_italic light black dark gray80}
+	array set statn1 {font m_normal light DarkBlue dark CadetBlue3}
+	array set metar1 {font m_normal light DarkGreen dark PaleGreen3}
+	array set summ1 {font m_large light DarkGreen dark PaleGreen3}
+	array set icon1 {font m_icon light DarkGreen dark PaleGreen3}
+	array set ttip1 {font m_normal light black dark gray80}
+
 	set metar_locales {C fr}
 	array set weather_label {C "Weather conditions:"\
 				 fr "Conditions météorologiques :"}
@@ -27,12 +35,6 @@ namespace eval zstatus::metar {
 	array set sunrise_label {C "Sunrise:" fr "Lever :"}
 	array set sunset_label {C "Sunset:" fr "Coucher :"}
 
-	array set header1 { font m_large light black dark gray80 }
-	array set header2 { font m_italic light black dark gray80 }
-	array set value1 { font m_normal light DarkBlue dark CadetBlue3 }
-	array set value2 { font m_normal light DarkGreen dark PaleGreen3 }
-	array set icons { font m_icon light orange dark Gold }
-
 	array set station {}
 	variable  state_visible 0
 	namespace export setup update set_theme show_tooltip hide_tooltip
@@ -41,7 +43,7 @@ namespace eval zstatus::metar {
 proc zstatus::metar::show_tooltip {} {
 	variable statusbar
 	variable metar
-	variable header1
+	variable ttip1
 	variable theme
 
 	set window [toplevel .metartooltip -highlightthickness 0\
@@ -51,8 +53,8 @@ proc zstatus::metar::show_tooltip {} {
 	wm overrideredirect $window 1
 
 	set width [string length zstatus::metar::report(tooltip)]
-	pack [label $window.text -font $metar(font) -width $width\
-		-fg $header1($theme) -bg $statusbar($theme)\
+	pack [label $window.text -font $ttip1(font) -width $width\
+		-fg $ttip1($theme) -bg $statusbar($theme)\
 		-textvar zstatus::metar::report(tooltip)]\
 		-side left -padx 1 -pady 3
 
@@ -79,80 +81,80 @@ proc zstatus::metar::toggle_window {} {
 	}
 }
 
-proc zstatus::metar::set_theme_header { header } {
+proc zstatus::metar::set_theme_header {header} {
 	variable statusbar
-	variable header2
-	variable value1
+	variable label1
+	variable statn1
 	variable theme
 
 	$header configure -background $statusbar($theme)
 	$header.keys configure -background $statusbar($theme)
 	$header.keys.station configure -background $statusbar($theme)
-	$header.keys.station.text configure -bg $statusbar($theme) -fg $header2($theme)
+	$header.keys.station.text configure -bg $statusbar($theme) -fg $label1($theme)
 	$header.keys.date configure -background $statusbar($theme)
-	$header.keys.date.text configure -bg $statusbar($theme) -fg $header2($theme)
+	$header.keys.date.text configure -bg $statusbar($theme) -fg $label1($theme)
 	$header.keys.status configure -background $statusbar($theme)
-	$header.keys.status.text configure -bg $statusbar($theme) -fg $header2($theme)
+	$header.keys.status.text configure -bg $statusbar($theme) -fg $label1($theme)
 	$header.values configure -background $statusbar($theme)
 	$header.values.station configure -background $statusbar($theme)
-	$header.values.station.text configure -bg $statusbar($theme) -fg $value1($theme)
+	$header.values.station.text configure -bg $statusbar($theme) -fg $statn1($theme)
 	$header.values.date configure -background $statusbar($theme)
-	$header.values.date.text configure -bg $statusbar($theme) -fg $value1($theme)
+	$header.values.date.text configure -bg $statusbar($theme) -fg $statn1($theme)
 	$header.values.status configure -background $statusbar($theme)
-	$header.values.status.text configure -bg $statusbar($theme) -fg $value1($theme)
+	$header.values.status.text configure -bg $statusbar($theme) -fg $statn1($theme)
 }
 
-proc zstatus::metar::set_theme_summary { summary } {
+proc zstatus::metar::set_theme_summary {summary} {
 	variable statusbar
 	variable separator
-	variable header2
-	variable value1
-	variable value2
+	variable label1
+	variable statn1
+	variable summ1
 	variable icons
 	variable theme
 
 	$summary configure -background $statusbar($theme)
 	$summary.temp configure -background $statusbar($theme)
 	$summary.temp.status configure -background $statusbar($theme)
-	$summary.temp.status.icon configure -bg $statusbar($theme) -fg $value2($theme)
-	$summary.temp.status.text configure -bg $statusbar($theme) -fg $value2($theme)
+	$summary.temp.status.icon configure -bg $statusbar($theme) -fg $summ1($theme)
+	$summary.temp.status.text configure -bg $statusbar($theme) -fg $summ1($theme)
 	$summary.temp.remark configure -background $statusbar($theme)
-	$summary.temp.remark.key configure -bg $statusbar($theme) -fg $header2($theme)
-	$summary.temp.remark.value configure -bg $statusbar($theme) -fg $value2($theme)
+	$summary.temp.remark.key configure -bg $statusbar($theme) -fg $summ1($theme)
+	$summary.temp.remark.value configure -bg $statusbar($theme) -fg $summ1($theme)
 	$summary.separator configure -background $separator($theme)
 	$summary.sun configure -background $statusbar($theme)
-	$summary.sun.text configure -bg $statusbar($theme) -fg $header2($theme)
-	$summary.sun.sunrise_text configure -bg $statusbar($theme) -fg $header2($theme)
-	$summary.sun.sunrise_hour configure -bg $statusbar($theme) -fg $value1($theme)
-	$summary.sun.sunset_text configure -bg $statusbar($theme) -fg $header2($theme)
-	$summary.sun.sunset_hour configure -bg $statusbar($theme) -fg $value1($theme)
+	$summary.sun.text configure -bg $statusbar($theme) -fg $label1($theme)
+	$summary.sun.sunrise_text configure -bg $statusbar($theme) -fg $label1($theme)
+	$summary.sun.sunrise_hour configure -bg $statusbar($theme) -fg $statn1($theme)
+	$summary.sun.sunset_text configure -bg $statusbar($theme) -fg $label1($theme)
+	$summary.sun.sunset_hour configure -bg $statusbar($theme) -fg $statn1($theme)
 }
 
-proc zstatus::metar::set_theme_grid { grid } {
+proc zstatus::metar::set_theme_grid {grid} {
 	variable statusbar
-	variable header1
-	variable header2
-	variable value2
+	variable title1
+	variable label1
+	variable metar1
 	variable theme
 
 	$grid configure -background $statusbar($theme)
-	$grid.title configure -bg $statusbar($theme) -fg $header1($theme)
-	$grid.wind configure -bg $statusbar($theme) -fg $header2($theme)
-	$grid.wind_val configure -bg $statusbar($theme) -fg $value2($theme)
-	$grid.gust configure -bg $statusbar($theme) -fg $header2($theme)
-	$grid.gust_val configure -bg $statusbar($theme) -fg $value2($theme)
-	$grid.dew configure -bg $statusbar($theme) -fg $header2($theme)
-	$grid.dew_val configure -bg $statusbar($theme) -fg $value2($theme)
-	$grid.rhumidity configure -bg $statusbar($theme) -fg $header2($theme)
-	$grid.rhumidity_val configure -bg $statusbar($theme) -fg $value2($theme)
-	$grid.pressure configure -bg $statusbar($theme) -fg $header2($theme)
-	$grid.pressure_val configure -bg $statusbar($theme) -fg $value2($theme)
-	$grid.visibility configure -bg $statusbar($theme) -fg $header2($theme)
-	$grid.visibility_val configure -bg $statusbar($theme) -fg $value2($theme)
-	$grid.clouds configure -bg $statusbar($theme) -fg $header2($theme)
-	$grid.clouds_val configure -bg $statusbar($theme) -fg $value2($theme)
-	$grid.precips configure -bg $statusbar($theme) -fg $header2($theme)
-	$grid.precips_val configure -bg $statusbar($theme) -fg $value2($theme)
+	$grid.title configure -bg $statusbar($theme) -fg $title1($theme)
+	$grid.wind configure -bg $statusbar($theme) -fg $label1($theme)
+	$grid.wind_val configure -bg $statusbar($theme) -fg $metar1($theme)
+	$grid.gust configure -bg $statusbar($theme) -fg $label1($theme)
+	$grid.gust_val configure -bg $statusbar($theme) -fg $metar1($theme)
+	$grid.dew configure -bg $statusbar($theme) -fg $label1($theme)
+	$grid.dew_val configure -bg $statusbar($theme) -fg $metar1($theme)
+	$grid.rhumidity configure -bg $statusbar($theme) -fg $label1($theme)
+	$grid.rhumidity_val configure -bg $statusbar($theme) -fg $metar1($theme)
+	$grid.pressure configure -bg $statusbar($theme) -fg $label1($theme)
+	$grid.pressure_val configure -bg $statusbar($theme) -fg $metar1($theme)
+	$grid.visibility configure -bg $statusbar($theme) -fg $label1($theme)
+	$grid.visibility_val configure -bg $statusbar($theme) -fg $metar1($theme)
+	$grid.clouds configure -bg $statusbar($theme) -fg $label1($theme)
+	$grid.clouds_val configure -bg $statusbar($theme) -fg $metar1($theme)
+	$grid.precips configure -bg $statusbar($theme) -fg $label1($theme)
+	$grid.precips_val configure -bg $statusbar($theme) -fg $metar1($theme)
 }
 
 proc zstatus::metar::set_theme {newtheme} {
@@ -170,7 +172,7 @@ proc zstatus::metar::set_theme {newtheme} {
 	set_theme_grid $metarwin.grid
 }
 
-proc zstatus::metar::update_grid { grid } {
+proc zstatus::metar::update_grid {grid} {
 	variable report
 
 	if {![string length $report(wind)]} {
@@ -242,15 +244,13 @@ proc zstatus::metar::update {} {
 	variable locale
 
 	if ![info exists station(icaoId)] {
-		set status [decode::fetch_station_info $metar(station)]
-		if {$status == {KO}} {
+		if ![decode::fetch_station $metar(station)] {
 			set report(statusbar) "<?>"
 			return
 		}
 	}
 
-
-	array set station [decode::update_station]
+	array set station [decode::calc_station_data]
 	array set report [decode::get_report $locale]
 
 	update_grid $metarwin.grid
@@ -258,8 +258,8 @@ proc zstatus::metar::update {} {
 
 proc zstatus::metar::setup_header { header } {
 	variable theme
-	variable header2
-	variable value1
+	variable label1
+	variable statn1
 	variable report
 	variable locale
 	variable station_label
@@ -269,33 +269,32 @@ proc zstatus::metar::setup_header { header } {
 	pack [frame $header] -padx 10 -pady 10 -side top -anchor w
 	pack [frame $header.keys] -side left
 	pack [frame $header.keys.station] -side top -anchor w
-	pack [label $header.keys.station.text -font $header2(font)\
+	pack [label $header.keys.station.text -font $label1(font)\
 			-text $station_label($locale) ]
 	pack [frame $header.keys.date]  -side top -anchor w
-	pack [label $header.keys.date.text -font $header2(font)\
+	pack [label $header.keys.date.text -font $label1(font)\
 			-text $issued_label($locale)]
 	pack [frame $header.keys.status] -side top -anchor w
-	pack [label $header.keys.status.text -font $header2(font)\
+	pack [label $header.keys.status.text -font $label1(font)\
 			-text $status_label($locale)]
 	pack [frame $header.values] -padx 5 -side left -anchor w
 	pack [frame $header.values.station] -side top -anchor w
-	pack [label $header.values.station.text -font $value1(font)\
+	pack [label $header.values.station.text -font $statn1(font)\
 		-textvar zstatus::metar::station(site)]
 	pack [frame $header.values.date] -side top -anchor w
-	pack [label $header.values.date.text -font $value1(font)\
+	pack [label $header.values.date.text -font $statn1(font)\
 		-textvar zstatus::metar::report(date)]
 	pack [frame $header.values.status] -side top -anchor w
-	pack [label $header.values.status.text -font $value1(font)\
+	pack [label $header.values.status.text -font $statn1(font)\
 		-textvar zstatus::metar::report(request_message)]
 }
 
 proc zstatus::metar::setup_summary { summary } {
 	variable theme
-	variable header1
-	variable header2
-	variable value1
-	variable value2
-	variable icons
+	variable icon1
+	variable summ1
+	variable label1
+	variable statn1
 	variable report
 	variable station
 	variable locale
@@ -306,26 +305,26 @@ proc zstatus::metar::setup_summary { summary } {
 	pack [frame $summary] -padx 10 -side top -anchor w
 	pack [frame $summary.temp] -side left
 	pack [frame $summary.temp.status] -side top -anchor w
-	pack [label $summary.temp.status.icon -font $icons(font)\
+	pack [label $summary.temp.status.icon -font $icon1(font)\
 		-textvar zstatus::metar::report(weather_icon) ] -side left
-	pack [label $summary.temp.status.text -font $header1(font)\
+	pack [label $summary.temp.status.text -font $summ1(font)\
 		-textvar zstatus::metar::report(summary) ] -side left -padx 5
 	pack [frame $summary.temp.remark] -side top -anchor w
-	pack [label $summary.temp.remark.key -font $header2(font)\
+	pack [label $summary.temp.remark.key -font $summ1(font)\
 		-textvar zstatus::metar::report(note) ] -side left
-	pack [label $summary.temp.remark.value -font $value2(font)\
+	pack [label $summary.temp.remark.value -font $summ1(font)\
 		-textvar zstatus::metar::report(note_val) ] -side left -padx 5
 	pack [frame $summary.separator -width 1] -padx 10 -fill y -side left
 
 	pack [frame $summary.sun] -anchor w -side left
-	label $summary.sun.text -font $header2(font) -text $sun_label($locale)
-	label $summary.sun.sunrise_text -font $header2(font)\
+	label $summary.sun.text -font $label1(font) -text $sun_label($locale)
+	label $summary.sun.sunrise_text -font $label1(font)\
 		 -text $sunrise_label($locale)
-	label $summary.sun.sunrise_hour -font $value1(font)\
+	label $summary.sun.sunrise_hour -font $statn1(font)\
 		 -textvar zstatus::metar::station(sunrise)
-	label $summary.sun.sunset_text -font $header2(font)\
+	label $summary.sun.sunset_text -font $label1(font)\
 		 -text $sunset_label($locale)
-	label $summary.sun.sunset_hour -font $value1(font)\
+	label $summary.sun.sunset_hour -font $statn1(font)\
 		-textvar zstatus::metar::station(sunset)
 
 	grid configure $summary.sun.text -columnspan 2 -row 0 -column 0
@@ -337,9 +336,9 @@ proc zstatus::metar::setup_summary { summary } {
 
 proc zstatus::metar::setup_grid { grid } {
 	variable theme
-	variable header1
-	variable header2
-	variable value2
+	variable title1
+	variable label1
+	variable metar1
 	variable report
 	variable locale
 	variable weather_label
@@ -354,59 +353,59 @@ proc zstatus::metar::setup_grid { grid } {
 
 	set row 0
 	pack [frame $grid] -padx 10 -pady 10 -side top -anchor w
-	label $grid.title -font $header1(font) -text $weather_label($locale)
+	label $grid.title -font $title1(font) -text $weather_label($locale)
 	grid configure $grid.title -columnspan 2 -row $row -column 0\
 		 -pady 5 -sticky w
 
 	incr row
-	label $grid.wind -font $header2(font) -text $wind_label($locale)
-	label $grid.wind_val -font $value2(font) -textvar zstatus::metar::report(wind)
+	label $grid.wind -font $label1(font) -text $wind_label($locale)
+	label $grid.wind_val -font $metar1(font) -textvar zstatus::metar::report(wind)
 	grid configure $grid.wind -row $row -column 0 -sticky w
 	grid configure $grid.wind_val -row $row -column 1 -sticky w
 
 	incr row
-	label $grid.gust -font $header2(font) -text $gust_label($locale)
-	label $grid.gust_val -font $value2(font) -textvar zstatus::metar::report(gust)
+	label $grid.gust -font $label1(font) -text $gust_label($locale)
+	label $grid.gust_val -font $metar1(font) -textvar zstatus::metar::report(gust)
 	grid configure $grid.gust -row $row -column 0 -sticky w
 	grid configure $grid.gust_val -row $row -column 1 -sticky w
 
 	incr row
-	label $grid.dew -font $header2(font) -text $dew_label($locale)
-	label $grid.dew_val -font $value2(font) -textvar zstatus::metar::report(dew)
+	label $grid.dew -font $label1(font) -text $dew_label($locale)
+	label $grid.dew_val -font $metar1(font) -textvar zstatus::metar::report(dew)
 	grid configure $grid.dew -row $row -column 0 -sticky w
 	grid configure $grid.dew_val -row $row -column 1 -sticky w
 
 	incr row
-	label $grid.rhumidity -font $header2(font) -text $rhumidity_label($locale)
-	label $grid.rhumidity_val -font $value2(font) \
+	label $grid.rhumidity -font $label1(font) -text $rhumidity_label($locale)
+	label $grid.rhumidity_val -font $metar1(font) \
 		-textvar zstatus::metar::report(rel_humidity)
 	grid configure $grid.rhumidity -row $row -column 0 -sticky w
 	grid configure $grid.rhumidity_val -row $row -column 1 -sticky w
 
 	incr row
-	label $grid.pressure -font $header2(font) -text $pressure_label($locale)
-	label $grid.pressure_val -font $value2(font) \
+	label $grid.pressure -font $label1(font) -text $pressure_label($locale)
+	label $grid.pressure_val -font $metar1(font) \
 		-textvar zstatus::metar::report(pressure)
 	grid configure $grid.pressure -row $row -column 0 -sticky w
 	grid configure $grid.pressure_val -row $row -column 1 -sticky w
 
 	incr row
-	label $grid.visibility -font $header2(font) -text $visibility_label($locale)
-	label $grid.visibility_val -font $value2(font) \
+	label $grid.visibility -font $label1(font) -text $visibility_label($locale)
+	label $grid.visibility_val -font $metar1(font) \
 		-textvar zstatus::metar::report(visibility)
 	grid configure $grid.visibility -row $row -column 0 -sticky w
 	grid configure $grid.visibility_val -row $row -column 1 -sticky w
 
 	incr row
-	label $grid.clouds -font $header2(font) -text $clouds_label($locale)
-	text $grid.clouds_val -font $value2(font) -borderwidth 0\
+	label $grid.clouds -font $label1(font) -text $clouds_label($locale)
+	text $grid.clouds_val -font $metar1(font) -borderwidth 0\
 		 -highlightthickness 0 -wrap none
 	grid configure $grid.clouds -row $row -column 0 -sticky nw
 	grid configure $grid.clouds_val -row $row -column 1 -sticky w
 
 	incr row
-	label $grid.precips -font $header2(font) -text $precips_label($locale)
-	text $grid.precips_val -font $value2(font) -borderwidth 0\
+	label $grid.precips -font $label1(font) -text $precips_label($locale)
+	text $grid.precips_val -font $metar1(font) -borderwidth 0\
 		 -highlightthickness 0 -wrap none
 	grid configure $grid.precips -row $row -column 0 -sticky nw
 	grid configure $grid.precips_val -row $row -column 1 -sticky w

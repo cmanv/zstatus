@@ -11,6 +11,7 @@ namespace eval zstatus::metar::decode {
 	array set humidex_label {C {Humidex:} fr {Humidex :}}
 	array set success_label {C {Request completed at} fr {Requête complétée à}}
 	array set failed_label {C {Request failed at} fr {Requête échouée à}}
+	array set nodesc_label {C {No description for} fr {Description manquante pour}}
 
 	array set const {\
 		pi			3.14159265358979\
@@ -116,7 +117,7 @@ namespace eval zstatus::metar::decode {
 		{340}	{C NNW fr NNO}	{350}	{C N fr N}\
 		{360}	{C N fr N}}
 
-	namespace export fetch_station_info update_station get_report
+	namespace export fetch_station calc_station_data get_report
 }
 
 proc zstatus::metar::decode::current_day {} {
@@ -152,28 +153,20 @@ proc zstatus::metar::decode::calc_timezone_offset {} {
 	return $tzoffset
 }
 
-proc zstatus::metar::decode::fetch_station_info {code} {
+proc zstatus::metar::decode::fetch_station {code} {
 	variable station_api
 
 	if [catch {set message [exec -ignorestderr -- curl -s \
-		$station_api?ids=$code]}] {
-		return {KO}
-	}
-	if ![string length $message] {
-		return {KO}
-	}
+		$station_api?ids=$code]}] {return 0}
+	if ![string length $message] {return 0}
 
 	variable station
 	array set station {*}[json::json2dict $message]
-
-	if ![info exists station(icaoId)] {
-		return {KO}
-	}
-
-	return {OK}
+	if ![info exists station(icaoId)] {return 0}
+	return 1
 }
 
-proc zstatus::metar::decode::update_station {} {
+proc zstatus::metar::decode::calc_station_data {} {
 	variable station
 	variable const
 
@@ -265,7 +258,7 @@ proc zstatus::metar::decode::update_station {} {
 	return [array get station]
 }
 
-proc zstatus::metar::decode::calc_windchill { temperature windspeed } {
+proc zstatus::metar::decode::calc_windchill {temperature windspeed} {
 	if {$windspeed < 4.0} {
 		set windchill [expr $temperature + 0.2 * (0.1345 * $temperature -1.59)\
 				* $windspeed]
@@ -282,7 +275,7 @@ proc zstatus::metar::decode::calc_windchill { temperature windspeed } {
 	return $windchill
 }
 
-proc zstatus::metar::decode::calc_rel_humidity { temperature dew } {
+proc zstatus::metar::decode::calc_rel_humidity {temperature dew} {
 	# Utilise l'équation de Buck pour calculer les pressions saturantes de vapeur d'eau
 	set p1 [expr 0.01121 * exp((18.678 - $temperature/234.5) \
 		* ($temperature/(257.14 + $temperature)))]
@@ -290,7 +283,7 @@ proc zstatus::metar::decode::calc_rel_humidity { temperature dew } {
 	set rel_humidity [expr round(100 * $p2/$p1)]
 }
 
-proc zstatus::metar::decode::calc_humidex { temperature dew } {
+proc zstatus::metar::decode::calc_humidex {temperature dew} {
 	set humidex [expr $temperature + 0.5555 * (6.11 * exp( 5417.753 * \
 		(1/273.16 - 1/($dew + 273.16))) - 10.0)]
 	if {$humidex > 24} {
@@ -301,7 +294,7 @@ proc zstatus::metar::decode::calc_humidex { temperature dew } {
 	return $humidex
 }
 
-proc zstatus::metar::decode::decode_datetime { datetime } {
+proc zstatus::metar::decode::decode_datetime {datetime} {
 	variable station
 	variable current
 	variable locale
@@ -320,7 +313,7 @@ proc zstatus::metar::decode::decode_datetime { datetime } {
 			 -locale $locale -timezone $::config(timezone)]
 }
 
-proc zstatus::metar::decode::decode_wind { wdir wspeed wgust } {
+proc zstatus::metar::decode::decode_wind {wdir wspeed wgust} {
 	variable const
 	variable current
 	variable direction
@@ -334,12 +327,12 @@ proc zstatus::metar::decode::decode_wind { wdir wspeed wgust } {
 	set current(direction) $winddir($locale)
 }
 
-proc zstatus::metar::decode::decode_lightwind { wspeed } {
+proc zstatus::metar::decode::decode_lightwind {wspeed} {
 	variable current
 	set current(speed) [expr round($wspeed * 1.852)]
 }
 
-proc zstatus::metar::decode::decode_temp { m1 tcode m2 dcode } {
+proc zstatus::metar::decode::decode_temp {m1 tcode m2 dcode} {
 	variable current
 	if {[string length $m1]} {
 		set current(temp) [expr round(-[scan $tcode %d])]
@@ -353,7 +346,7 @@ proc zstatus::metar::decode::decode_temp { m1 tcode m2 dcode } {
 	}
 }
 
-proc zstatus::metar::decode::decode_visibility { vcode } {
+proc zstatus::metar::decode::decode_visibility {vcode} {
 	variable const
 	variable current
 	set divider [expr [string first "/" $vcode]]
@@ -371,14 +364,14 @@ proc zstatus::metar::decode::decode_visibility { vcode } {
 	}
 }
 
-proc zstatus::metar::decode::decode_pressure { pcode } {
+proc zstatus::metar::decode::decode_pressure {pcode} {
 	variable const
 	variable current
 	set current(pressure) [format {%0.1f} [expr round([scan $pcode %d] \
 				* $const(cm_inch) * $const(kp_mmhg))/10.0]]
 }
 
-proc zstatus::metar::decode::decode_clouds { code alt type } {
+proc zstatus::metar::decode::decode_clouds {code alt type} {
 	variable cloud_codes
 	variable cloud_types
 	variable const
@@ -410,7 +403,7 @@ proc zstatus::metar::decode::decode_clouds { code alt type } {
 	}
 }
 
-proc zstatus::metar::decode::decode_precips { intensity qualifier precips } {
+proc zstatus::metar::decode::decode_precips {intensity qualifier precips} {
 	variable precip_codes
 	variable precip_notes
 	variable locale
@@ -432,13 +425,14 @@ proc zstatus::metar::decode::decode_precips { intensity qualifier precips } {
 		break
 	}
 
+	variable nodesc_label
 	foreach pcode $codes {
 		set fullcode "${intensity}${qualifier}${pcode}"
 		array set pdesc $precip_codes($fullcode)
 		if [info exists pdesc($locale)] {
 			set description "$pdesc($locale) $suffix"
 		} else {
-			set description "No description for $fullcode"
+			set description "$nodesc_label($locale) $fullcode"
 		}
 		if {![info exists current(precips)]} {
 			set current(precips) $description
@@ -455,10 +449,8 @@ proc zstatus::metar::decode::fetch_metar_report {} {
 	variable metar_api
 
 	if [catch {set message [exec -ignorestderr -- curl -s \
-			$metar_api?ids=$station(icaoId)]}] {
-		return {KO}
-	}
-	if {![string length $message]} { return {KO} }
+			$metar_api?ids=$station(icaoId)]}] {return 0}
+	if {![string length $message]} {return 0}
 	return $message
 }
 
@@ -466,9 +458,8 @@ proc zstatus::metar::decode::decode_metar_report {message} {
 	variable current
 	variable station
 
-	if {$message == {KO}} { return {KO} }
+	if {$message == 0} {return 0}
 	array unset current
-
 	set tokens [split $message " "]
 	foreach token $tokens {
 		if {$token == "RMK"} break
@@ -501,12 +492,12 @@ proc zstatus::metar::decode::decode_metar_report {message} {
 			decode_clouds $descr $altitude $type
 			continue
 		} elseif [regexp {^(-|[+]|RE|VC)?(BC|DR|BL|FZ|MI|PR|SH|TS)?([A-Z+]{2,9})$}\
-			$token -> intensity quality precips] {
-			decode_precips $intensity $quality $precips
+			$token -> intensity qualifier precips] {
+			decode_precips $intensity $qualifier $precips
 			continue
 		}
 	}
-	return {OK}
+	return 1
 }
 
 proc zstatus::metar::decode::get_weather_icon {} {
@@ -557,8 +548,7 @@ proc zstatus::metar::decode::get_report {lang} {
 	set reporttime [clock format $now -format {%H:%M}\
 			 -timezone $::config(timezone)]
 
-	set status [decode_metar_report [fetch_metar_report]]
-	if {$status == {OK}} {
+	if [decode_metar_report [fetch_metar_report]] {
 		set report(date) $current(date)
 		set report(temperature) "$current(temp)°C"
 		set report(dew)  "$current(dew)°C"
@@ -640,7 +630,7 @@ proc zstatus::metar::decode::get_report {lang} {
 
 		set report(request_message) "$success_label($locale) $reporttime"
 	} else {
-		set report(statusbar) \ueba4
+		set report(statusbar) $::remix(failed)
 		set report(request_message) "$failed_label($locale) $reporttime"
 	}
 

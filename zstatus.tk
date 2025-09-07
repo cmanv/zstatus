@@ -15,14 +15,14 @@ array set remix {
 	cloud1_day	\uf1be	cloud1_night	\uef74\
 	cloud2_day	\uf1bb	cloud2_night	\uef71\
 	crystal		\uf574	dust		\ueba1\
-	fog		\ued50	hail		\ueded\
-	mail 		\ueef3	mixer 		\uf2a1\
-	nometar		\ueb9f	overcast	\ueba3\
-	pause 		\uf507	play 		\uef82\
-	rain1		\uf056	rain2		\uec68\
-	rain3		\uee15	snow		\uf15e\
-	squall		\ueb9d	thunder		\uf209\
-	tornado		\uf21c }
+	failed		\uebad	fog		\ued50\
+	hail		\ueded	mail 		\ueef3\
+	mixer 		\uf2a1	nometar		\ueb9f\
+	overcast	\ueba3	pause 		\uf507\
+	play 		\uef82	rain1		\uf056\
+	rain2		\uec68	rain3		\uee15\
+	snow		\uf15e	squall		\ueb9d\
+	thunder		\uf209	tornado		\uf21c }
 
 # Other unicode characters
 set arrowup	\u2191
