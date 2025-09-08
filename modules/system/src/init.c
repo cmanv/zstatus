@@ -1,8 +1,8 @@
 #include "config.h"
-#include "sysbsd.h"
+#include "freebsd.h"
 
 EXTERN int
-Sysbsd_Init(Tcl_Interp *interp)
+Freebsd_Init(Tcl_Interp *interp)
 {
 	Tcl_Namespace *namespace;
 
@@ -14,64 +14,64 @@ Sysbsd_Init(Tcl_Interp *interp)
 		return TCL_ERROR;
 	}
 
-	if (Tcl_PkgProvide(interp, PACKAGE_NAME, PACKAGE_VERSION) != TCL_OK) {
+	if (Tcl_PkgProvide(interp, LIBRARY_PROVIDE, PACKAGE_VERSION) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
-	namespace = Tcl_CreateNamespace(interp, PACKAGE_NAME, (ClientData)NULL,
+	namespace = Tcl_CreateNamespace(interp, LIBRARY_PROVIDE, (ClientData)NULL,
 					(Tcl_NamespaceDeleteProc *)NULL);
 
 	Tcl_CreateObjCommand(	interp,
-				"zstatus::sysbsd::getloadavg",
-				SysBSD_GetLoadAvgObjCmd,
+				"zstatus::system::freebsd::getloadavg",
+				FreeBSD_GetLoadAvgObjCmd,
 				(ClientData) NULL,
 				(Tcl_CmdDeleteProc*) NULL);
 
 	Tcl_CreateObjCommand(	interp,
-				"zstatus::sysbsd::getmemstats",
-				SysBSD_GetMemStatsObjCmd,
+				"zstatus::system::freebsd::getmemstats",
+				FreeBSD_GetMemStatsObjCmd,
 				(ClientData) NULL,
 				(Tcl_CmdDeleteProc*) NULL);
 
 	Tcl_CreateObjCommand(	interp,
-				"zstatus::sysbsd::getarcstats",
-				SysBSD_GetArcStatsObjCmd,
+				"zstatus::system::freebsd::getarcstats",
+				FreeBSD_GetArcStatsObjCmd,
 				(ClientData) NULL,
 				(Tcl_CmdDeleteProc*) NULL);
 
 	Tcl_CreateObjCommand(	interp,
-				"zstatus::sysbsd::getacpitemp",
-				SysBSD_GetAcpiTempObjCmd,
+				"zstatus::system::freebsd::getacpitemp",
+				FreeBSD_GetAcpiTempObjCmd,
 				(ClientData) NULL,
 				(Tcl_CmdDeleteProc*) NULL);
 
 	Tcl_CreateObjCommand(	interp,
-				"zstatus::sysbsd::getcputemp",
-				SysBSD_GetCpuTempObjCmd,
+				"zstatus::system::freebsd::getcputemp",
+				FreeBSD_GetCpuTempObjCmd,
 				(ClientData) NULL,
 				(Tcl_CmdDeleteProc*) NULL);
 
 	Tcl_CreateObjCommand(	interp,
-				"zstatus::sysbsd::getcpufreq",
-				SysBSD_GetCpuFreqObjCmd,
+				"zstatus::system::freebsd::getcpufreq",
+				FreeBSD_GetCpuFreqObjCmd,
 				(ClientData) NULL,
 				(Tcl_CmdDeleteProc*) NULL);
 
 	Tcl_CreateObjCommand(	interp,
-				"zstatus::sysbsd::getnetin",
-				SysBSD_GetNetInObjCmd,
+				"zstatus::system::freebsd::getnetin",
+				FreeBSD_GetNetInObjCmd,
 				(ClientData) NULL,
 				(Tcl_CmdDeleteProc*) NULL);
 
 	Tcl_CreateObjCommand(	interp,
-				"zstatus::sysbsd::getnetout",
-				SysBSD_GetNetOutObjCmd,
+				"zstatus::system::freebsd::getnetout",
+				FreeBSD_GetNetOutObjCmd,
 				(ClientData) NULL,
 				(Tcl_CmdDeleteProc*) NULL);
 
 	Tcl_CreateObjCommand(	interp,
-				"zstatus::sysbsd::getmixervol",
-				SysBSD_GetMixerVolObjCmd,
+				"zstatus::system::freebsd::getmixervol",
+				FreeBSD_GetMixerVolObjCmd,
 				(ClientData) NULL,
 				(Tcl_CmdDeleteProc*) NULL);
 

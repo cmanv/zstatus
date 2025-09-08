@@ -12,12 +12,12 @@ set(TCL_INCLUDE_PATH "/usr/local/include/tcl9.0")
 include(GNUInstallDirs)
 
 # Add modules
+add_subdirectory(modules/config)
 add_subdirectory(modules/devices)
 add_subdirectory(modules/mail)
 add_subdirectory(modules/metar)
 add_subdirectory(modules/music)
-add_subdirectory(modules/sysbsd)
-add_subdirectory(modules/config)
+add_subdirectory(modules/system)
 
 # Substitute some variable names
 set(LIBDIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})

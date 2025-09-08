@@ -10,9 +10,9 @@
 #include <net/if.h>
 #include <ifaddrs.h>
 #include "config.h"
-#include "sysbsd.h"
+#include "freebsd.h"
 
-int SysBSD_GetLoadAvgObjCmd( ClientData clientData, Tcl_Interp *interp,
+int FreeBSD_GetLoadAvgObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
@@ -30,7 +30,7 @@ int SysBSD_GetLoadAvgObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-int SysBSD_GetMemStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
+int FreeBSD_GetMemStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
@@ -109,7 +109,7 @@ int SysBSD_GetMemStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-int SysBSD_GetArcStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
+int FreeBSD_GetArcStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
@@ -209,7 +209,7 @@ int SysBSD_GetArcStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-int SysBSD_GetAcpiTempObjCmd( ClientData clientData, Tcl_Interp *interp,
+int FreeBSD_GetAcpiTempObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
@@ -230,7 +230,7 @@ int SysBSD_GetAcpiTempObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-int SysBSD_GetCpuTempObjCmd( ClientData clientData, Tcl_Interp *interp,
+int FreeBSD_GetCpuTempObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
@@ -251,7 +251,7 @@ int SysBSD_GetCpuTempObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-int SysBSD_GetCpuFreqObjCmd( ClientData clientData, Tcl_Interp *interp,
+int FreeBSD_GetCpuFreqObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
@@ -272,7 +272,7 @@ int SysBSD_GetCpuFreqObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-int SysBSD_GetNetOutObjCmd( ClientData clientData, Tcl_Interp *interp,
+int FreeBSD_GetNetOutObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
@@ -317,7 +317,7 @@ int SysBSD_GetNetOutObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-int SysBSD_GetNetInObjCmd( ClientData clientData, Tcl_Interp *interp,
+int FreeBSD_GetNetInObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
@@ -362,7 +362,7 @@ int SysBSD_GetNetInObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-int SysBSD_GetMixerVolObjCmd( ClientData clientData, Tcl_Interp *interp,
+int FreeBSD_GetMixerVolObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);

@@ -31,7 +31,8 @@ namespace eval zstatus::config {
 
 	# Array of available widgets
 	array set widgets {\
-	    arcsize { type var source zstatus::arcsize proc set_arcsize\
+	    arcsize { type widget source zstatus::system::arcsize\
+			proc system::set_arcsize setup system::setup settheme nop\
 			font normal light black dark LightGray }\
 	    datetime { type var source zstatus::datetime proc set_datetime\
 			format {%d %b %H:%M} font normal light black dark LightGray}\
@@ -41,24 +42,33 @@ namespace eval zstatus::config {
 			font normal light black dark LightGray }\
 	    deskname { type var source zstatus::deskname\
 			font normal light black dark LightGray }\
-	    devices { type transient proc devices::update\
+	    devices { type transient proc devices::update setup devices::setup\
+			settheme devices::set_theme\
 			font normal light black dark LightGray }\
-	    loadavg { type var source zstatus::loadavg proc set_loadavg\
+	    loadavg { type widget source zstatus::system::loadavg\
+			proc system::set_loadavg setup system::setup settheme nop\
 			font normal light black dark LightGray }\
 	    mail { type transient proc zstatus::mail::update\
+			setup mail::setup settheme mail::set_theme\
 			font normal light black dark LightGray }\
-	    memused { type var source zstatus::memused proc set_memused\
+	    memused { type widget source zstatus::system::memused\
+			proc system::set_memused setup system::setup settheme nop\
 			font normal light black dark LightGray }\
 	    metar { type widget source zstatus::metar::report(statusbar)\
-			delay 10 font normal light black dark LightGray }\
-	    mixer { type var source zstatus::mixer proc set_mixer\
+			setup metar::setup settheme metar::set_theme delay 10\
+			font normal light black dark LightGray }\
+	    mixer { type widget source zstatus::system::mixer proc system::set_mixer\
+			setup system::setup settheme nop\
 			font normal light black dark LightGray }\
 	    music { type transient proc music::update\
+			setup music::setup settheme music::set_theme\
 			font normal light black dark LightGray }\
-	    netin { type var source zstatus::netin proc set_netin\
-			interface em0 font normal light black dark LightGray }\
-	    netout { type var source zstatus::netout proc set_netout\
-			interface em0 font normal light black dark LightGray }\
+	    netin { type widget source zstatus::system::netin proc system::set_netin\
+			setup system::setup settheme nop interface em0\
+			font normal light black dark LightGray }\
+	    netout { type widget source zstatus::system::netout proc system::set_netout\
+			setup system::setup settheme nop interface em0\
+			font normal light black dark LightGray }\
 	    separator { type separator light black dark gray }\
 	    statusbar { type bar light gray90 dark gray20 }\
 	    wintitle { type text ref wintitle font normal\
@@ -113,7 +123,7 @@ proc zstatus::config::read {configfile} {
 		netin netout separator statusbar wintitle}
 
 	# Cant change these from config file
-	set immutables {type source ref proc}
+	set immutables {type source ref proc setup settheme}
 
 	if {$configfile == {default}} {
 		set configfile $defaultfile

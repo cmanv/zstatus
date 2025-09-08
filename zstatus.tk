@@ -6,7 +6,7 @@ package require zstatus::devices
 package require zstatus::mail
 package require zstatus::metar
 package require zstatus::music
-package require zstatus::sysbsd
+package require zstatus::system
 
 # Unicodes characters from remixicons v4.6.0
 array set remix {
@@ -39,7 +39,7 @@ namespace eval zstatus {
 	    desktop_list {widget desklist action set_desklist arg 1}\
 	    desktop_mode {widget deskmode action set_deskmode arg 1}\
 	    desktop_name {widget deskname action set_deskname arg 1}\
-	    mixer_volume {widget mixer action set_mixer arg 0}\
+	    mixer_volume {widget mixer action system::set_mixer arg 0}\
 	    metar_window {widget metar action metar::toggle_window arg 0}\
 	    metar_update {widget metar action metar::update arg 0}\
 	    music_update {widget music action music::update arg 0}\
@@ -51,10 +51,14 @@ proc zstatus::every {ms cmd} {
 	eval $cmd
 }
 
+proc zstatus::nop {arg} {}
+
 proc zstatus::read_file {filename} {
-	set content ""
-	set file [open $filename r]
-	catch {set content [chan read $file]}
+	if [catch {open $filename} file] {
+		puts $file
+		return ""
+	}
+	set content [chan read $file]
 	chan close $file
 	return $content
 }
@@ -89,7 +93,11 @@ proc zstatus::map_window {window} {
 	wm geometry $window +$xpos+$ypos
 }
 
-# Set the theme on the alements of the bar
+proc zstatus::update {} {
+	variable proclist
+	foreach p $proclist { $p }
+}
+
 proc zstatus::set_theme {theme} {
 	variable currenttheme
 	if {$theme == $currenttheme} { return }
@@ -106,9 +114,9 @@ proc zstatus::set_theme {theme} {
 		if {$widget(type) == "widget"} {
 			$bar.$item configure -bg $statusbar($currenttheme)\
 					-fg $widget($currenttheme)
-			${item}::set_theme $currenttheme
+			$widget(settheme) $currenttheme
 		} elseif {$widget(type) == "transient"} {
-			${item}::set_theme $currenttheme
+			$widget(settheme) $currenttheme
 		} elseif {$widget(type) == "separator"} {
 			incr count
 			$bar.$item$count configure\
@@ -163,51 +171,11 @@ proc zstatus::set_deskname {value} {
 	set deskname $value
 }
 
-proc zstatus::set_loadavg {} {
-	variable loadavg
-	set loadavg "C: [sysbsd::getloadavg] "
-}
-
-proc zstatus::set_memused {} {
-	variable memused
-	set memstats [sysbsd::getmemstats]
-	set memused "M: [join [lindex $memstats 0]] "
-	set swap [join [lindex $memstats 1]]
-	if {[string length $swap]} {
-		set memused "$memused\($swap\) "
-	}
-}
-
-proc zstatus::set_arcsize {} {
-	variable arcsize
-	set arcstats [sysbsd::getarcstats]
-	set arcsize "ARC: [join [lindex $arcstats 0]] "
-}
-
-proc zstatus::set_netin {} {
-	variable netin
-	array set widget $::widgetarray(netin)
-	set inval [sysbsd::getnetin $widget(interface)]
-	set netin "$::arrowdown[join [lindex $inval 0]] "
-}
-
-proc zstatus::set_netout {} {
-	variable netout
-	array set widget $::widgetarray(netout)
-	set outval [sysbsd::getnetout $widget(interface)]
-	set netout "$::arrowup[join [lindex $outval 0]] "
-}
-
 proc zstatus::set_datetime {} {
 	variable datetime
 	array set widget $::widgetarray(datetime)
 	set datetime [clock format [clock seconds] \
 		-locale $::config(lang) -format $widget(format)]
-}
-
-proc zstatus::set_mixer {} {
-	variable mixer
-	set mixer "$::remix(mixer) [sysbsd::getmixervol]"
 }
 
 proc zstatus::send_message {msg} {
@@ -259,12 +227,6 @@ proc zstatus::read_message {channel} {
 	}
 }
 
-# Periodic update
-proc zstatus::update {} {
-	variable proclist
-	foreach p $proclist { $p }
-}
-
 proc zstatus::add_widgets {side} {
 	variable bar
 	variable widgetlist
@@ -313,12 +275,12 @@ proc zstatus::add_widgets {side} {
 				set last $item$sepcount
 			}
 			transient {
-				${item}::setup $bar $last $side
+				$widget(setup) $bar $last $side
 			}
 			widget {
 				pack [label $bar.$item -font $widget(font)\
 					-textvar $widget(source)] -side $side
-				${item}::setup $bar $item
+				$widget(setup) $bar $item
 				set last $item
 			}
 		}
@@ -361,20 +323,6 @@ proc zstatus::setup {} {
 			} else {
 				zstatus::send_message "desktop-switch-prev"
 			}
-		}
-	}
-
-	if [winfo exists $bar.loadavg] {
-		bind $bar.loadavg <1> { exec xterm +sb -class top -e top & }
-	}
-	if [winfo exists $bar.mixer] {
-		bind $bar.mixer <MouseWheel> {
-			if {%D < 0} {
-				exec mixer vol=-0.05
-			} else {
-				exec mixer vol=+0.05
-			}
-			zstatus::set_mixer
 		}
 	}
 
