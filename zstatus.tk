@@ -260,7 +260,6 @@ proc zstatus::add_widgets {side widgets} {
 	}
 }
 
-# Setup the statusbar
 proc zstatus::setup {} {
 	variable bar
 	variable widgetlist

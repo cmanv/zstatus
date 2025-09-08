@@ -29,7 +29,7 @@ namespace eval zstatus::metar::decode {
 		RE	{C {(recent)} fr {(récent)}} }
 
 	array set precip_codes {\
-		DZ	{C drizzle fr bruine} icon rain1\
+		DZ	{C drizzle fr bruine icon rain1}\
 		FZDZ	{C {freezing drizzle} fr {bruine verglaçante} icon rain1}\
 		RA	{C rain fr pluie icon rain2}\
 		+RA	{C {heavy rain} fr {pluie forte} icon rain3}\
@@ -507,7 +507,7 @@ proc zstatus::metar::decode::get_weather_icon {} {
 	if {[info exists current(precip_code)]} {
 		set code $current(precip_code)
 		array set precip_code $precip_codes($code)
-		set icon $precip_codes(icon)
+		set icon $precip_code(icon)
 		return $::remix($icon)
 	}
 
