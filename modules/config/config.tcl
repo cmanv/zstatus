@@ -32,10 +32,11 @@ namespace eval zstatus::config {
 	# Array of available widgets
 	array set widgets {\
 	    arcsize { type widget source zstatus::system::arcsize\
-			proc system::set_arcsize setup system::setup settheme nop\
+			proc system::set_arcsize setup system::setup\
 			font normal light black dark LightGray }\
-	    datetime { type var source zstatus::datetime proc set_datetime\
-			format {%d %b %H:%M} font normal light black dark LightGray}\
+	    datetime { type var source zstatus::datetime\
+			proc set_datetime format {%d %b %H:%M}\
+			font normal light black dark LightGray}\
 	    desklist { type var source zstatus::desklist\
 			font normal light black dark LightGray }\
 	    deskmode { type var source zstatus::deskmode\
@@ -46,35 +47,45 @@ namespace eval zstatus::config {
 			settheme devices::set_theme\
 			font normal light black dark LightGray }\
 	    loadavg { type widget source zstatus::system::loadavg\
-			proc system::set_loadavg setup system::setup settheme nop\
+			proc system::set_loadavg setup system::setup\
 			font normal light black dark LightGray }\
 	    mail { type transient proc zstatus::mail::update\
 			setup mail::setup settheme mail::set_theme\
 			font normal light black dark LightGray }\
 	    memused { type widget source zstatus::system::memused\
-			proc system::set_memused setup system::setup settheme nop\
+			proc system::set_memused setup system::setup\
 			font normal light black dark LightGray }\
 	    metar { type widget source zstatus::metar::report(statusbar)\
 			setup metar::setup settheme metar::set_theme delay 10\
 			font normal light black dark LightGray }\
-	    mixer { type widget source zstatus::system::mixer proc system::set_mixer\
-			setup system::setup settheme nop\
+	    mixer { type widget source zstatus::system::mixer\
+			proc system::set_mixer setup system::setup\
 			font normal light black dark LightGray }\
 	    music { type transient proc music::update\
 			setup music::setup settheme music::set_theme\
 			font normal light black dark LightGray }\
-	    netin { type widget source zstatus::system::netin proc system::set_netin\
-			setup system::setup settheme nop interface em0\
+	    netin { type widget source zstatus::system::netin\
+			proc system::set_netin setup system::setup interface em0\
 			font normal light black dark LightGray }\
-	    netout { type widget source zstatus::system::netout proc system::set_netout\
-			setup system::setup settheme nop interface em0\
+	    netout { type widget source zstatus::system::netout\
+			proc system::set_netout setup system::setup interface em0\
 			font normal light black dark LightGray }\
 	    separator { type separator light black dark gray }\
 	    statusbar { type bar light gray90 dark gray20 }\
-	    wintitle { type text ref wintitle font normal\
-			maxlength 110 font normal light black dark LightGray }}
+	    wintitle { type text ref wintitle maxlength 110\
+			font normal light black dark LightGray }}
 
 	namespace export read get
+}
+
+proc zstatus::config::read_file {filename} {
+	if [catch {open $filename} file] {
+		puts $file
+		return ""
+	}
+	set content [chan read $file]
+	chan close $file
+	return $content
 }
 
 proc zstatus::config::get {key configfile} {
@@ -92,7 +103,7 @@ proc zstatus::config::get {key configfile} {
 
 	if [file exists $configfile] {
 		set context ""
-		set lines [zstatus::read_file $configfile]
+		set lines [read_file $configfile]
 		foreach line $lines {
 			if ![string length $line] { continue }
 			if [regexp {^#} $line] { continue }

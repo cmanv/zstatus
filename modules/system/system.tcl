@@ -14,8 +14,8 @@ proc zstatus::system::set_loadavg {} {
 proc zstatus::system::set_memused {} {
 	variable memused
 	set memstats [freebsd::getmemstats]
-	set memused "M: [join [lindex $memstats 0]] "
-	set swap [join [lindex $memstats 1]]
+	set memused "M: [lindex $memstats 0] "
+	set swap [lindex $memstats 1]
 	if {[string length $swap]} {
 		set memused "$memused\($swap\) "
 	}
@@ -23,22 +23,19 @@ proc zstatus::system::set_memused {} {
 
 proc zstatus::system::set_arcsize {} {
 	variable arcsize
-	set arcstats [freebsd::getarcstats]
-	set arcsize "ARC: [join [lindex $arcstats 0]] "
+	set arcsize "ARC: [lindex [freebsd::getarcstats] 0] "
 }
 
 proc zstatus::system::set_netin {} {
 	variable netin
-	variable interface_in
-	set inval [freebsd::getnetin $interface_in]
-	set netin "$::arrowdown[join [lindex $inval 0]] "
+	variable if_in
+	set netin "$::arrowdown[lindex [freebsd::getnetin $if_in] 0] "
 }
 
 proc zstatus::system::set_netout {} {
 	variable netout
-	variable interface_out
-	set outval [freebsd::getnetout $interface_out]
-	set netout "$::arrowup[join [lindex $outval 0]] "
+	variable if_out
+	set netout "$::arrowup[lindex [freebsd::getnetout $if_out] 0] "
 }
 
 proc zstatus::system::set_mixer {} {
@@ -47,8 +44,8 @@ proc zstatus::system::set_mixer {} {
 }
 
 proc zstatus::system::setup {bar item} {
-	variable interface_in 
-	variable interface_out
+	variable if_in
+	variable if_out
 	switch $item {
 		arcsize { }
 		loadavg {
@@ -67,11 +64,11 @@ proc zstatus::system::setup {bar item} {
 		}
 		netin {
 			array set widget $::widgetarray(netin)
-			set interface_in $widget(interface) 
+			set if_in $widget(interface)
 		}
 		netout {
 			array set widget $::widgetarray(netout)
-			set interface_out $widget(interface) 
+			set if_out $widget(interface)
 		}
 	}
 }

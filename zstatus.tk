@@ -51,8 +51,6 @@ proc zstatus::every {ms cmd} {
 	eval $cmd
 }
 
-proc zstatus::nop {arg} {}
-
 proc zstatus::read_file {filename} {
 	if [catch {open $filename} file] {
 		puts $file
@@ -114,9 +112,13 @@ proc zstatus::set_theme {theme} {
 		if {$widget(type) == "widget"} {
 			$bar.$item configure -bg $statusbar($currenttheme)\
 					-fg $widget($currenttheme)
-			$widget(settheme) $currenttheme
+			if [info exists widget(settheme)] {
+				$widget(settheme) $currenttheme
+			}
 		} elseif {$widget(type) == "transient"} {
-			$widget(settheme) $currenttheme
+			if [info exists widget(settheme)] {
+				$widget(settheme) $currenttheme
+			}
 		} elseif {$widget(type) == "separator"} {
 			incr count
 			$bar.$item$count configure\
@@ -227,17 +229,12 @@ proc zstatus::read_message {channel} {
 	}
 }
 
-proc zstatus::add_widgets {side} {
+proc zstatus::add_widgets {side widgets} {
 	variable bar
-	variable widgetlist
 	variable proclist
 	variable sepcount
+	variable widgetlist
 
-	if {$side == "left"} {
-		set widgets $::config(leftside)
-	} else {
-		set widgets $::config(rightside)
-	}
 	# Sanitize the provided list
 	regsub -all {\"} $widgets {} widgets
 	regsub -all {,} $widgets { } widgets
@@ -248,15 +245,15 @@ proc zstatus::add_widgets {side} {
 		array set widget $::widgetarray($item)
 		switch $widget(type) {
 			label {
-				pack [label $bar.$item -font $widget(font) \
+				pack [label $bar.$item -font $widget(font)\
 					-text $widget(source)] -side $side
 				set last $item
 			}
 			text {
 				variable $widget(ref)
-				set $widget(ref) [text $bar.$item \
-					-font $widget(font) \
-					-height 1 -borderwidth 0 \
+				set $widget(ref) [text $bar.$item\
+					-font $widget(font)\
+					-height 1 -borderwidth 0\
 					-highlightthickness 0 -wrap word]
 				$bar.$item tag configure emoji -font emoji
 				pack $bar.$item -side $side -expand 1
@@ -264,23 +261,27 @@ proc zstatus::add_widgets {side} {
 				set last $item
 			}
 			var {
-				pack [label $bar.$item -font $widget(font) \
+				pack [label $bar.$item -font $widget(font)\
 					-textvar $widget(source)] -side $side
 				set last $item
 			}
 			separator {
 				incr sepcount
-				pack [frame $bar.$item$sepcount -width 1] \
+				pack [frame $bar.$item$sepcount -width 1]\
 					-fill y -padx 5 -side $side
 				set last $item$sepcount
 			}
 			transient {
-				$widget(setup) $bar $last $side
+				if [info exists widget(setup)] {
+					$widget(setup) $bar $last $side
+				}
 			}
 			widget {
 				pack [label $bar.$item -font $widget(font)\
 					-textvar $widget(source)] -side $side
-				$widget(setup) $bar $item
+				if [info exists widget(setup)] {
+					$widget(setup) $bar $item
+				}
 				set last $item
 			}
 		}
@@ -304,8 +305,8 @@ proc zstatus::setup {} {
 
 	set sepcount 0
 	set widgetlist {}
-	add_widgets left
-	add_widgets right
+	add_widgets left $::config(leftside)
+	add_widgets right $::config(rightside)
 
 	if [winfo exists $bar.deskmode] {
 		bind $bar.deskmode <MouseWheel> {
