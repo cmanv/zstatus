@@ -443,7 +443,11 @@ proc zstatus::metar::setup {bar widget} {
 	wm title $popup {Metar Report}
 	wm state $popup withdrawn
 
+	set ::messagearray(metar_toggle) {action metar::toggle_window arg 0}
+	set ::messagearray(metar_update) {action metar::update arg 0}
+
 	bind $popup <3> { zstatus::metar::toggle_window }
+#	bind $popup <Escape> { zstatus::metar::toggle_window }
 	bind $popup <Map> { zstatus::map_window .metarreport }
 	bind $bar.$widget <1> { zstatus::metar::toggle_window }
 	bind $bar.$widget <2> { zstatus::metar::update }

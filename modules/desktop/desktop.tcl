@@ -49,34 +49,41 @@ proc zstatus::desktop::set_deskname {value} {
 
 proc zstatus::desktop::setup {bar item} {
 	switch $item {
-		wintitle {
-			array set widget $::widgetarray(wintitle)
-			variable wintitle
-			set wintitle [text $bar.$item\
-				-font $widget(font)\
-				-height 1 -borderwidth 0\
-				-highlightthickness 0 -wrap word]
-			$bar.$item tag configure emoji -font emoji
-			$bar.$item configure -state disabled
-		}
-		deskmode {
-			bind $bar.deskmode <MouseWheel> {
-				if {%D < 0} {
-					zstatus::send_message "desktop-mode-next"
-				} else {
-					zstatus::send_message "desktop-mode-prev"
-				}
-			}
-		}
-		desklist {
-			bind $bar.desklist <MouseWheel> {
-				if {%D < 0} {
-					zstatus::send_message "desktop-switch-next"
-				} else {
-					zstatus::send_message "desktop-switch-prev"
-				}
+	wintitle {
+		set ::messagearray(window_active) {action desktop::set_wintitle arg 1}
+		set ::messagearray(no_window_active)\
+			 {action desktop::unset_wintitle arg 1}
+		array set widget $::widgetarray(wintitle)
+		variable wintitle
+		set wintitle [text $bar.$item\
+			-font $widget(font)\
+			-height 1 -borderwidth 0\
+			-highlightthickness 0 -wrap word]
+		$bar.$item tag configure emoji -font emoji
+		$bar.$item configure -state disabled
+	}
+	deskmode {
+		set ::messagearray(desktop_mode) {action desktop::set_deskmode arg 1}
+		bind $bar.deskmode <MouseWheel> {
+			if {%D < 0} {
+				zstatus::send_message "desktop-mode-next"
+			} else {
+				zstatus::send_message "desktop-mode-prev"
 			}
 		}
 	}
+	desklist {
+		set ::messagearray(desktop_list) {action desktop::set_desklist arg 1}
+		bind $bar.desklist <MouseWheel> {
+			if {%D < 0} {
+				zstatus::send_message "desktop-switch-next"
+			} else {
+				zstatus::send_message "desktop-switch-prev"
+			}
+		}
+	}
+	deskname {
+		set ::messagearray(desktop_name) {action desktop::set_deskname arg 1}
+	}}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

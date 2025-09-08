@@ -81,6 +81,7 @@ proc zstatus::music::setup { widget position side } {
 	label $musicframe -font $music(font)
 	frame $musicsep -width 1
 
+	set ::messagearray(music_update) {action music::update arg 0}
 	bind $musicframe <Enter> { zstatus::music::show_tooltip }
 	bind $musicframe <Leave> { zstatus::music::hide_tooltip }
 	bind $musicframe <1> {

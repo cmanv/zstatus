@@ -44,32 +44,33 @@ proc zstatus::system::set_mixer {} {
 }
 
 proc zstatus::system::setup {bar item} {
-	variable if_in
-	variable if_out
 	switch $item {
-		arcsize { }
-		loadavg {
-			bind $bar.loadavg <1> { exec xterm +sb -class top -e top & }
-		}
-		memused { }
-		mixer {
-			bind $bar.mixer <MouseWheel> {
-				if {%D < 0} {
-					exec mixer vol=-0.05
-				} else {
-					exec mixer vol=+0.05
-				}
-				zstatus::system::set_mixer
+	arcsize { }
+	loadavg {
+		bind $bar.loadavg <1> { exec xterm +sb -class top -e top & }
+	}
+	memused { }
+	mixer {
+		set_mixer
+		set ::messagearray(mixer_volume) {action system::set_mixer arg 0}
+		bind $bar.mixer <MouseWheel> {
+			if {%D < 0} {
+				exec mixer vol=-0.05
+			} else {
+				exec mixer vol=+0.05
 			}
-		}
-		netin {
-			array set widget $::widgetarray(netin)
-			set if_in $widget(interface)
-		}
-		netout {
-			array set widget $::widgetarray(netout)
-			set if_out $widget(interface)
+			zstatus::system::set_mixer
 		}
 	}
+	netin {
+		variable if_in
+		array set widget $::widgetarray(netin)
+		set if_in $widget(interface)
+	}
+	netout {
+		variable if_out
+		array set widget $::widgetarray(netout)
+		set if_out $widget(interface)
+	}}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

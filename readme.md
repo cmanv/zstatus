@@ -112,7 +112,7 @@ The list of valid widgets are:
 
 > __arcsize__, __datetime__, __desklist__, __deskmode__, __deskname__, __devices__,
 > __loadavg__, __mail__, __memused__, __metar__, __mixer__, __music__, __netin__,
-> __netout__, __separator__, __wintitle__
+> __netout__, __sep__, __separator__, __wintitle__
 
 Each of these widgets can be customized in its own section:
 
@@ -223,7 +223,7 @@ it shows the currently playing track.
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
 
-- __[separator]__: Widget acting as vertical separators between two widgets.
+- __[separator]__ / __[sep]__: Widget acting as vertical separators between two widgets.
 
 > Options:
 > - _light_: color in light mode.
