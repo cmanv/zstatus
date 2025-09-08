@@ -1,4 +1,5 @@
 #!/usr/bin/env wish9.0
+package require fileutil
 package require mime
 
 namespace eval zstatus::mail {
@@ -187,7 +188,7 @@ proc zstatus::mail::new { index } {
 
 	set count 0
 	foreach file [lsort -decreasing [glob -nocomplain -dir "$mailbox(path)/new" *]] {
-		set mesg [zstatus::read_file $file]
+		set mesg [fileutil::cat $file]
 		if {[string length $mesg] < 2} {
 			continue
 		}

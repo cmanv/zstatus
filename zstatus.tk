@@ -51,16 +51,6 @@ proc zstatus::every {ms cmd} {
 	eval $cmd
 }
 
-proc zstatus::read_file {filename} {
-	if [catch {open $filename} file] {
-		puts $file
-		return ""
-	}
-	set content [chan read $file]
-	chan close $file
-	return $content
-}
-
 proc zstatus::map_window {window} {
 	set rwidth [winfo vrootwidth .]
 	set rheight [winfo vrootheight .]

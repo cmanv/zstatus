@@ -1,4 +1,6 @@
 #!/usr/bin/env tclsh9.0
+package require fileutil
+
 namespace eval zstatus::config {
 	if [info exists ::env(XDG_CONFIG_HOME)] {
 		set config_prefix $::env(XDG_CONFIG_HOME)
@@ -78,16 +80,6 @@ namespace eval zstatus::config {
 	namespace export read get
 }
 
-proc zstatus::config::read_file {filename} {
-	if [catch {open $filename} file] {
-		puts $file
-		return ""
-	}
-	set content [chan read $file]
-	chan close $file
-	return $content
-}
-
 proc zstatus::config::get {key configfile} {
 	variable defaultfile
 	variable config
@@ -103,7 +95,7 @@ proc zstatus::config::get {key configfile} {
 
 	if [file exists $configfile] {
 		set context ""
-		set lines [read_file $configfile]
+		set lines [fileutil::cat $configfile]
 		foreach line $lines {
 			if ![string length $line] { continue }
 			if [regexp {^#} $line] { continue }
@@ -148,7 +140,7 @@ proc zstatus::config::read {configfile} {
 	if [file exists $configfile] {
 		set index 0
 		set context ""
-		set lines [split [zstatus::read_file $configfile] "\n"]
+		set lines [split [fileutil::cat $configfile] "\n"]
 		foreach line $lines {
 			if ![string length $line] { continue }
 			if [regexp {^#} $line] { continue }
