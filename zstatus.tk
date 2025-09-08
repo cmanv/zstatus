@@ -2,6 +2,7 @@
 package require cmdline
 package require unix_sockets
 package require zstatus::config
+package require zstatus::desktop
 package require zstatus::devices
 package require zstatus::mail
 package require zstatus::metar
@@ -30,15 +31,14 @@ set arrowdown	\u2193
 namespace eval zstatus {
 	variable currenttheme	none
 	variable proclist	{}
-	array set modes {Monocle M VTiled V HTiled H Stacked S}
 
 	# Array of messages that can be accepted
 	array set messagearray {
-	    window_active {widget wintitle action set_wintitle arg 1}\
-	    no_window_active {widget wintitle action unset_wintitle arg 1}\
-	    desktop_list {widget desklist action set_desklist arg 1}\
-	    desktop_mode {widget deskmode action set_deskmode arg 1}\
-	    desktop_name {widget deskname action set_deskname arg 1}\
+	    window_active {widget wintitle action desktop::set_wintitle arg 1}\
+	    no_window_active {widget wintitle action desktop::unset_wintitle arg 1}\
+	    desktop_list {widget desklist action desktop::set_desklist arg 1}\
+	    desktop_mode {widget deskmode action desktop::set_deskmode arg 1}\
+	    desktop_name {widget deskname action desktop::set_deskname arg 1}\
 	    mixer_volume {widget mixer action system::set_mixer arg 0}\
 	    metar_window {widget metar action metar::toggle_window arg 0}\
 	    metar_update {widget metar action metar::update arg 0}\
@@ -99,13 +99,7 @@ proc zstatus::set_theme {theme} {
 	$bar configure -background $statusbar($currenttheme)
 	foreach item $widgetlist {
 		array set widget $::widgetarray($item)
-		if {$widget(type) == "widget"} {
-			$bar.$item configure -bg $statusbar($currenttheme)\
-					-fg $widget($currenttheme)
-			if [info exists widget(settheme)] {
-				$widget(settheme) $currenttheme
-			}
-		} elseif {$widget(type) == "transient"} {
+		if {$widget(type) == "transient"} {
 			if [info exists widget(settheme)] {
 				$widget(settheme) $currenttheme
 			}
@@ -116,51 +110,12 @@ proc zstatus::set_theme {theme} {
 		} elseif {$widget(type) != "bar"} {
 			$bar.$item configure -bg $statusbar($currenttheme)\
 					-fg $widget($currenttheme)
+			if [info exists widget(settheme)] {
+				$widget(settheme) $currenttheme
+			}
 		}
 		array unset widget
 	}
-}
-
-proc zstatus::set_wintitle {value} {
-	array set widget $::widgetarray(wintitle)
-	set length [tcl::mathfunc::min [string length $value] $widget(maxlength)]
-	variable wintitle
-	$wintitle configure -state normal
-	$wintitle delete 1.0 end
-	$wintitle configure -width $length
-	$wintitle insert 1.0 $value
-	foreach i [$wintitle search -all \
-		-regexp {[\u2000-\u28ff\U1f000-\U1faff]} 1.0 end] {
-		$wintitle tag add emoji $i
-	}
-	$wintitle configure -state disabled
-}
-
-proc zstatus::unset_wintitle {value} {
-	variable wintitle
-	$wintitle configure -state normal
-	$wintitle delete 1.0 end
-	$wintitle configure -state disabled
-}
-
-proc zstatus::set_desklist {value} {
-	variable desklist
-	set desklist $value
-}
-
-proc zstatus::set_deskmode {value} {
-	variable modes
-	variable deskmode
-	if [info exists modes($value)] {
-		set deskmode " $modes($value)"
-	} else {
-		set deskmode " $value"
-	}
-}
-
-proc zstatus::set_deskname {value} {
-	variable deskname
-	set deskname $value
 }
 
 proc zstatus::set_datetime {} {
@@ -180,11 +135,6 @@ proc zstatus::send_message {msg} {
 	}
 	puts $channel "$xscreen;$msg"
 	close $channel
-}
-
-proc zstatus::server_accept {channel} {
-	chan configure $channel -buffering none -blocking 0
-	chan event $channel readable [list zstatus::read_message $channel]
 }
 
 proc zstatus::read_message {channel} {
@@ -219,6 +169,11 @@ proc zstatus::read_message {channel} {
 	}
 }
 
+proc zstatus::server_accept {channel} {
+	chan configure $channel -buffering none -blocking 0
+	chan event $channel readable [list zstatus::read_message $channel]
+}
+
 proc zstatus::add_widgets {side widgets} {
 	variable bar
 	variable proclist
@@ -234,23 +189,25 @@ proc zstatus::add_widgets {side widgets} {
 		if ![info exists ::widgetarray($item)] { continue }
 		array set widget $::widgetarray($item)
 		switch $widget(type) {
-			label {
+			lwidget {
 				pack [label $bar.$item -font $widget(font)\
-					-text $widget(source)] -side $side
+					-textvar $widget(source)] -side $side
+				if [info exists widget(setup)] {
+					$widget(setup) $bar $item
+				}
 				set last $item
 			}
-			text {
-				variable $widget(ref)
-				set $widget(ref) [text $bar.$item\
-					-font $widget(font)\
-					-height 1 -borderwidth 0\
-					-highlightthickness 0 -wrap word]
-				$bar.$item tag configure emoji -font emoji
-				pack $bar.$item -side $side -expand 1
-				$bar.$item configure -state disabled
-				set last $item
+			twidget {
+				if [info exists widget(setup)] {
+					$widget(setup) $bar $item
+					pack $bar.$item -side $side -expand 1
+					set last $item
+				} else {
+					puts "No setup defined for $item!"
+					exit 1
+				}
 			}
-			var {
+			string {
 				pack [label $bar.$item -font $widget(font)\
 					-textvar $widget(source)] -side $side
 				set last $item
@@ -265,14 +222,6 @@ proc zstatus::add_widgets {side widgets} {
 				if [info exists widget(setup)] {
 					$widget(setup) $bar $last $side
 				}
-			}
-			widget {
-				pack [label $bar.$item -font $widget(font)\
-					-textvar $widget(source)] -side $side
-				if [info exists widget(setup)] {
-					$widget(setup) $bar $item
-				}
-				set last $item
 			}
 		}
 		if [info exists widget(proc)] {
@@ -297,25 +246,6 @@ proc zstatus::setup {} {
 	set widgetlist {}
 	add_widgets left $::config(leftside)
 	add_widgets right $::config(rightside)
-
-	if [winfo exists $bar.deskmode] {
-		bind $bar.deskmode <MouseWheel> {
-			if {%D < 0} {
-				zstatus::send_message "desktop-mode-next"
-			} else {
-				zstatus::send_message "desktop-mode-prev"
-			}
-		}
-	}
-	if [winfo exists $bar.desklist] {
-		bind $bar.desklist <MouseWheel> {
-			if {%D < 0} {
-				zstatus::send_message "desktop-switch-next"
-			} else {
-				zstatus::send_message "desktop-switch-prev"
-			}
-		}
-	}
 
 	set theme ""
 	if [info exists ::config(theme)] {

@@ -33,48 +33,51 @@ namespace eval zstatus::config {
 
 	# Array of available widgets
 	array set widgets {\
-	    arcsize { type widget source zstatus::system::arcsize\
+	    arcsize { type lwidget source zstatus::system::arcsize\
 			proc system::set_arcsize setup system::setup\
 			font normal light black dark LightGray }\
-	    datetime { type var source zstatus::datetime\
+	    datetime { type string source zstatus::datetime\
 			proc set_datetime format {%d %b %H:%M}\
 			font normal light black dark LightGray}\
-	    desklist { type var source zstatus::desklist\
+	    desklist { type lwidget source zstatus::desktop::desklist\
+			setup desktop::setup\
 			font normal light black dark LightGray }\
-	    deskmode { type var source zstatus::deskmode\
+	    deskmode { type lwidget source zstatus::desktop::deskmode\
+			setup desktop::setup\
 			font normal light black dark LightGray }\
-	    deskname { type var source zstatus::deskname\
+	    deskname { type lwidget source zstatus::desktop::deskname\
 			font normal light black dark LightGray }\
 	    devices { type transient proc devices::update setup devices::setup\
 			settheme devices::set_theme\
 			font normal light black dark LightGray }\
-	    loadavg { type widget source zstatus::system::loadavg\
+	    loadavg { type lwidget source zstatus::system::loadavg\
 			proc system::set_loadavg setup system::setup\
 			font normal light black dark LightGray }\
 	    mail { type transient proc zstatus::mail::update\
 			setup mail::setup settheme mail::set_theme\
 			font normal light black dark LightGray }\
-	    memused { type widget source zstatus::system::memused\
+	    memused { type lwidget source zstatus::system::memused\
 			proc system::set_memused setup system::setup\
 			font normal light black dark LightGray }\
-	    metar { type widget source zstatus::metar::report(statusbar)\
+	    metar { type lwidget source zstatus::metar::report(statusbar)\
 			setup metar::setup settheme metar::set_theme delay 10\
 			font normal light black dark LightGray }\
-	    mixer { type widget source zstatus::system::mixer\
+	    mixer { type lwidget source zstatus::system::mixer\
 			proc system::set_mixer setup system::setup\
 			font normal light black dark LightGray }\
 	    music { type transient proc music::update\
 			setup music::setup settheme music::set_theme\
 			font normal light black dark LightGray }\
-	    netin { type widget source zstatus::system::netin\
+	    netin { type lwidget source zstatus::system::netin\
 			proc system::set_netin setup system::setup interface em0\
 			font normal light black dark LightGray }\
-	    netout { type widget source zstatus::system::netout\
+	    netout { type lwidget source zstatus::system::netout\
 			proc system::set_netout setup system::setup interface em0\
 			font normal light black dark LightGray }\
+	    sep { type separator light black dark gray }\
 	    separator { type separator light black dark gray }\
 	    statusbar { type bar light gray90 dark gray20 }\
-	    wintitle { type text ref wintitle maxlength 110\
+	    wintitle { type twidget setup desktop::setup maxlength 110\
 			font normal light black dark LightGray }}
 
 	namespace export read get
@@ -126,7 +129,7 @@ proc zstatus::config::read {configfile} {
 		netin netout separator statusbar wintitle}
 
 	# Cant change these from config file
-	set immutables {type source ref proc setup settheme}
+	set immutables {type source proc setup settheme}
 
 	if {$configfile == {default}} {
 		set configfile $defaultfile

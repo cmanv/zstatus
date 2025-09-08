@@ -13,6 +13,7 @@ include(GNUInstallDirs)
 
 # Add modules
 add_subdirectory(modules/config)
+add_subdirectory(modules/desktop)
 add_subdirectory(modules/devices)
 add_subdirectory(modules/mail)
 add_subdirectory(modules/metar)
