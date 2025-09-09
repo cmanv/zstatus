@@ -18,7 +18,8 @@ namespace eval zstatus::metar {
 
 	set metar_locales {C fr}
 	set labeldict [dict create\
-		nostation {C "No METAR station" fr "Station METAR manquante"}\
+		nostation {C "METAR station invalid or missing"\
+			 fr "Station METAR non valide ou manquante"}\
 		weather {C "Weather conditions:" fr "Conditions météorologiques :"}\
 		station {C "Station:" fr "Station :"}\
 		issued {C "Issued on:" fr "Émis le :"}\

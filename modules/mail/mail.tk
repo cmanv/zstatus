@@ -20,96 +20,9 @@ proc zstatus::mail::set_theme { theme } {
 	variable mailboxes
 	$mailframe configure -background $bartheme
 	$mailsep configure -background $septheme
-	foreach index [array names mailboxes] {
-		array set mailbox $mailboxes($index)
-		$mailframe.$index configure -fg $mailbox($theme)\
-			 -bg $bartheme
-		array unset mailbox
-	}
-}
-
-# Look for new messages in the mailboxes
-proc zstatus::mail::update {} {
-	variable mailframe
-	variable mailsep
-	variable mailpos
-	variable mailside
-	variable mailboxes
-	variable mailicon
-
-	foreach index [array names mailboxes] {
-		array set mailbox $mailboxes($index)
-		set newmail [llength [glob -nocomplain -dir "$mailbox(path)/new" *]]
-		if {$newmail && $newmail != $mailbox(newmail)} {
-			set mailbox(newmail) $newmail
-			$mailframe.$index configure -text "$mailicon ($newmail)"
-			if {!$mailbox(visible)} {
-				if {![string length [pack slaves $mailframe]]} {
-					pack $mailframe -after $mailpos \
-						-side $mailside
-					pack $mailsep -after $mailframe \
-						-fill y -padx 5 -side $mailside
-				}
-				pack $mailframe.$index -side left
-				set mailbox(visible) 1
-			}
-			set mailboxes($index) [array get mailbox]
-		} else {
-			if {!$newmail && $mailbox(visible)} {
-				pack forget $mailframe.$index
-				if {![string length [pack slaves $mailframe]]} {
-					pack forget $mailframe $mailsep
-				}
-				set mailbox(newmail) 0
-				set mailbox(visible) 0
-				set mailboxes($index) [array get mailbox]
-			}
-		}
-		array unset mailbox
-	}
-}
-
-# Setup the mailboxes
-proc zstatus::mail::setup { base position side } {
-	variable mailfont
-	variable mailboxes
-	variable mailicon
-
-	array set mailboxes [dict get $::config mailboxes]
-
-	variable mailframe
-	variable mailsep
-	variable mailpos
-	variable mailside
-
-	set mailframe $base.mailframe
-	set mailsep $base.mailsep
-	set mailpos $base.$position
-	set mailside $side
-
-	set mailfont [dict get $::widgetdict mail font]
-	set mailicon $::remix(mail)
-
-	frame $mailframe
-	frame $mailsep -width 1
-
-	foreach index [array names mailboxes] {
-		array set mailbox $mailboxes($index)
-		set mailbox(visible) 0
-		set mailbox(newmail) 0
-		set mailboxes($index) [array get mailbox]
-
-		label $mailframe.$index -font normal -text ""
-		bind $mailframe.$index <Enter> "zstatus::mail::new $index"
-		bind $mailframe.$index <Leave> {
-			destroy .mailpopup
-			set zstatus::mail::activepopup 0
-		}
-		bind $mailframe.$index <1> {
-			exec emacsclient -c -e -F "((width . 120) (height . 30))" \
-				"(mu4e)" > /dev/null 2>@1 &
-		}
-		array unset mailbox
+	foreach index [dict keys $mailboxes] {
+		$mailframe.$index configure -bg $bartheme\
+			-fg [dict get $mailboxes $index $theme]
 	}
 }
 
@@ -123,7 +36,9 @@ proc zstatus::mail::convert_date { rfc822 } {
 }
 
 proc zstatus::mail::convert_header { header } {
-	set tokens [regexp -linestop -all -inline {(.*)=\?([\w\-]+)\?(.)\?(.*?)\?\=(.*)} $header]
+	set tokens [regexp -linestop -all -inline\
+			 {(.*)=\?([\w\-]+)\?(.)\?(.*?)\?\=(.*)} $header]
+
 	if { $tokens == {} } {
 		return $header
 	}
@@ -163,7 +78,6 @@ proc zstatus::mail::convert_header { header } {
 proc zstatus::mail::new { index } {
 	variable activepopup
 	variable mail
-	variable mailboxes
 	variable mailfont
 	variable mailtheme
 	variable bartheme
@@ -180,17 +94,19 @@ proc zstatus::mail::new { index } {
 	wm overrideredirect .mailpopup 1
 	wm geometry .mailpopup -10+27
 
-	array set mailbox $mailboxes($index)
-	pack [frame .mailpopup.$index -background $bartheme] \
+	variable mailboxes
+	set mailboxname [dict get $mailboxes $index name]
+	set mailboxpath [dict get $mailboxes $index path]
+	pack [frame .mailpopup.$index -background $bartheme]\
 		-expand 1 -fill x -side top
-	pack [label .mailpopup.$index.label -font bold -bg $bartheme \
-		-fg $mailtheme -text "-- $mailbox(name) --"] \
+	pack [label .mailpopup.$index.label -font bold -bg $bartheme\
+		-fg $mailtheme -text "-- [$mailboxname] =="] \
 		-expand 1 -side left
-	pack [frame .mailpopup.headersep -background $septheme \
+	pack [frame .mailpopup.headersep -background $septheme\
 		-height 1] -fill x -side top
 
 	set count 0
-	foreach file [lsort -decreasing [glob -nocomplain -dir "$mailbox(path)/new" *]] {
+	foreach file [lsort -decreasing [glob -nocomplain -dir "$mailboxpath/new" *]] {
 		set mesg [fileutil::cat $file]
 		if {[string length $mesg] < 2} {
 			continue
@@ -232,6 +148,81 @@ proc zstatus::mail::new { index } {
 		pack [frame .mailpopup.msgsep$count -background $septheme\
 			-height 1] -side top -fill x
 		incr count
+	}
+}
+
+proc zstatus::mail::update {} {
+	variable mailframe
+	variable mailsep
+	variable mailpos
+	variable mailside
+	variable mailboxes
+	variable mailicon
+
+	foreach index [dict keys $mailboxes] {
+		set newmail [dict get $mailboxes $index newmail]
+		set path [dict get $mailboxes $index path]
+		set inbox [llength [glob -nocomplain -dir "$path/new" *]]
+		if {$inbox && $newmail != $inbox} {
+			dict set mailboxes $index newmail $inbox
+			$mailframe.$index configure -text "$mailicon ($inbox)"
+			if ![dict get $mailboxes $index visible] {
+				if {![string length [pack slaves $mailframe]]} {
+					pack $mailframe -after $mailpos \
+						-side $mailside
+					pack $mailsep -after $mailframe \
+						-fill y -padx 5 -side $mailside
+				}
+				pack $mailframe.$index -side left
+				dict set mailboxes $index visible 1
+			}
+		} else {
+			if {!$inbox  && [dict get $mailboxes $index visible]} {
+				pack forget $mailframe.$index
+				if {![string length [pack slaves $mailframe]]} {
+					pack forget $mailframe $mailsep
+				}
+				dict set mailboxes $index newmail 0
+				dict set mailboxes $index visible 0
+			}
+		}
+	}
+}
+
+proc zstatus::mail::setup { base position side } {
+	variable mailframe
+	variable mailsep
+	variable mailpos
+	variable mailside
+	set mailframe $base.mailframe
+	set mailsep $base.mailsep
+	set mailpos $base.$position
+	set mailside $side
+
+	frame $mailframe
+	frame $mailsep -width 1
+
+	variable mailfont
+	variable mailicon
+	set mailfont [dict get $::widgetdict mail font]
+	set mailicon $::remix(mail)
+
+	variable mailboxes
+	set mailboxes [dict get $::config mailboxes]
+	foreach index [dict keys $mailboxes] {
+		dict set mailboxes $index visible 0
+		dict set mailboxes $index newmail 0
+
+		label $mailframe.$index -font normal -text ""
+		bind $mailframe.$index <Enter> "zstatus::mail::new $index"
+		bind $mailframe.$index <Leave> {
+			destroy .mailpopup
+			set zstatus::mail::activepopup 0
+		}
+		bind $mailframe.$index <1> {
+			exec emacsclient -c -e -F "((width . 120) (height . 30))" \
+				"(mu4e)" > /dev/null 2>@1 &
+		}
 	}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

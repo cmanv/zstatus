@@ -88,8 +88,8 @@ proc zstatus::config::read {configfile} {
 	dict set config leftside {deskmode separator desklist separator\
 					deskname separator wintitle}
 	dict set config rightside datetime
-	array set mailboxes {}
 
+	set mailboxes {}
 	if [file exists $configfile] {
 		set index 0
 		set context ""
@@ -114,12 +114,7 @@ proc zstatus::config::read {configfile} {
 				if {$context == "main"} {
 					dict set config $key $value
 				} elseif {$context == "maildir"} {
-					if [info exists mailboxes($index)] {
-						array set mailbox $mailboxes($index)
-					}
-					set mailbox($key) $value
-					set mailboxes($index) [array get mailbox]
-					array unset mailbox
+					dict set mailboxes $index $key $value
 				} else {
 					dict set ::widgetdict $context $key $value
 				}
@@ -128,22 +123,19 @@ proc zstatus::config::read {configfile} {
 	}
 
 	# Validate mailboxes
-	foreach index [array names mailboxes] {
-		array set mailbox $mailboxes($index)
-		if ![info exists mailbox(light)] {
-			set mailbox(light) black
+	foreach index [dict keys $mailboxes] {
+		if ![dict exists $mailboxes $index light] {
+			dict set mailboxes $index light black
 		}
-		if ![info exists mailbox(dark)] {
-			set mailbox(dark) LightGray
+		if ![dict exists $mailboxes $index dark] {
+			dict set mailboxes $index dark LightGray
 		}
-		if {![info exists mailbox(name)] || ![info exists mailbox(path)]} {
-			array unset mailboxes $index
-		} else {
-			set mailboxes($index) [array get mailbox]
+		if {![dict exists $mailboxes $index name]||\
+			 ![dict exists $mailboxes $index path]} {
+			dict unset mailboxes $index
 		}
-		array unset mailbox
 	}
-	dict set config mailboxes [array get mailboxes]
+	dict set config mailboxes $mailboxes
 
 	return $config
 }
