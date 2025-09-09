@@ -7,25 +7,23 @@ namespace eval zstatus::mail {
 	namespace export setup update set_theme
 }
 
-proc zstatus::mail::set_theme { newtheme } {
+proc zstatus::mail::set_theme { theme } {
+	variable bartheme
+	variable mailtheme 
+	variable septheme
+	set bartheme [dict get $::widgetdict statusbar $theme]
+	set mailtheme [dict get $::widgetdict mail $theme]
+	set septheme [dict get $::widgetdict separator $theme]
+
 	variable mailframe
 	variable mailsep
 	variable mailboxes
-
-	variable theme
-	set theme $newtheme
-
-	variable themebar
-	set themebar [dict get $::widgetdict statusbar $theme]
-	variable themesep
-	set themesep [dict get $::widgetdict separator $theme]
-
-	$mailframe configure -background $themebar
-	$mailsep configure -background $themesep
+	$mailframe configure -background $bartheme
+	$mailsep configure -background $septheme
 	foreach index [array names mailboxes] {
 		array set mailbox $mailboxes($index)
 		$mailframe.$index configure -fg $mailbox($theme)\
-			 -bg $themebar
+			 -bg $bartheme
 		array unset mailbox
 	}
 }
@@ -37,14 +35,14 @@ proc zstatus::mail::update {} {
 	variable mailpos
 	variable mailside
 	variable mailboxes
-	variable mail_icon
+	variable mailicon
 
 	foreach index [array names mailboxes] {
 		array set mailbox $mailboxes($index)
 		set newmail [llength [glob -nocomplain -dir "$mailbox(path)/new" *]]
 		if {$newmail && $newmail != $mailbox(newmail)} {
 			set mailbox(newmail) $newmail
-			$mailframe.$index configure -text "$mail_icon ($newmail)"
+			$mailframe.$index configure -text "$mailicon ($newmail)"
 			if {!$mailbox(visible)} {
 				if {![string length [pack slaves $mailframe]]} {
 					pack $mailframe -after $mailpos \
@@ -73,11 +71,10 @@ proc zstatus::mail::update {} {
 
 # Setup the mailboxes
 proc zstatus::mail::setup { base position side } {
-	variable mail
+	variable mailfont
 	variable mailboxes
-	variable mail_icon
+	variable mailicon
 
-	array set mail [dict get $::widgetdict mail]
 	array set mailboxes [dict get $::config mailboxes]
 
 	variable mailframe
@@ -90,7 +87,8 @@ proc zstatus::mail::setup { base position side } {
 	set mailpos $base.$position
 	set mailside $side
 
-	set mail_icon [dict get $::remix mail]
+	set mailfont [dict get $::widgetdict mail font]
+	set mailicon $::remix(mail)
 
 	frame $mailframe
 	frame $mailsep -width 1
@@ -166,9 +164,10 @@ proc zstatus::mail::new { index } {
 	variable activepopup
 	variable mail
 	variable mailboxes
-	variable themebar
-	variable themesep
-	variable theme
+	variable mailfont
+	variable mailtheme
+	variable bartheme
+	variable septheme
 
 	if {$activepopup} {
 		destroy .mailpopup
@@ -176,18 +175,18 @@ proc zstatus::mail::new { index } {
 		set activepopup 1
 	}
 
-	toplevel .mailpopup -background $themebar -class Newmail
+	toplevel .mailpopup -background $bartheme -class Newmail
 	wm attributes .mailpopup -type dialog
 	wm overrideredirect .mailpopup 1
 	wm geometry .mailpopup -10+27
 
 	array set mailbox $mailboxes($index)
-	pack [frame .mailpopup.$index -background $themebar] \
+	pack [frame .mailpopup.$index -background $bartheme] \
 		-expand 1 -fill x -side top
-	pack [label .mailpopup.$index.label -font bold -bg $themebar \
-		-fg $mail($theme) -text "-- $mailbox(name) --"] \
+	pack [label .mailpopup.$index.label -font bold -bg $bartheme \
+		-fg $mailtheme -text "-- $mailbox(name) --"] \
 		-expand 1 -side left
-	pack [frame .mailpopup.headersep -background $themesep \
+	pack [frame .mailpopup.headersep -background $septheme \
 		-height 1] -fill x -side top
 
 	set count 0
@@ -201,27 +200,27 @@ proc zstatus::mail::new { index } {
 		set from [convert_header [lindex [mime::getheader $tokens From] 0]]
 		set subject [convert_header [lindex [mime::getheader $tokens Subject] 0]]
 
-		pack [frame .mailpopup.date$count -background $themebar]\
+		pack [frame .mailpopup.date$count -background $bartheme]\
 			-expand 1 -fill x
 		pack [label .mailpopup.date$count.label -text $date\
-			-font $mail(font) -bg $themebar\
-			-fg $mail($theme)] -side left -padx 5
-		pack [frame .mailpopup.from$count -background $themebar]\
+			-font $mailfont -bg $bartheme\
+			-fg $mailtheme] -side left -padx 5
+		pack [frame .mailpopup.from$count -background $bartheme]\
 			-expand 1 -fill x
 		pack [label .mailpopup.from$count.label -text $from\
-			-font $mail(font) -bg $themebar\
-			-fg $mail($theme)] -side left -padx 5
-		pack [frame .mailpopup.subject$count -background $themebar]\
+			-font $mailfont -bg $bartheme\
+			-fg $mailtheme] -side left -padx 5
+		pack [frame .mailpopup.subject$count -background $bartheme]\
 			-expand 1 -fill x
 
 		set textlen [string length $subject]
 		set width [string length [lindex [split $subject "\n"] 0]]
 		set height [tcl::mathfunc::ceil [expr ($textlen / ($width + 0.0))]]
 
-		set tsubject [text .mailpopup.subject$count.text -font $mail(font)\
+		set tsubject [text .mailpopup.subject$count.text -font $mailfont\
 			-wrap word  -borderwidth 0 -highlightthickness 0\
-			-height $height -width $width -fg $mail($theme)\
-			-bg $themebar]
+			-height $height -width $width -fg $mailtheme\
+			-bg $bartheme]
 
 		pack $tsubject -side left -padx 5
 		$tsubject tag configure emoji -font emoji
@@ -230,7 +229,7 @@ proc zstatus::mail::new { index } {
 			$tsubject tag add emoji $i
 		}
 
-		pack [frame .mailpopup.msgsep$count -background $themesep \
+		pack [frame .mailpopup.msgsep$count -background $septheme\
 			-height 1] -side top -fill x
 		incr count
 	}

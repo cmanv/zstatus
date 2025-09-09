@@ -4,37 +4,35 @@ namespace eval zstatus::devices {
 	namespace export setup update set_theme
 }
 
-proc zstatus::devices::set_theme {newtheme} {
-	variable devices
+proc zstatus::devices::set_theme {theme} {
+	variable bartheme
+	variable devicetheme
+	set bartheme [dict get $::widgetdict statusbar $theme]
+	set devicetheme [dict get $::widgetdict devices $theme]
+
 	variable devframe
 	variable devsep
+	$devframe configure -background $bartheme
+	$devsep configure -background [dict get $::widgetdict separator $theme]
+
 	variable devicelist
-	variable theme
-
-	set theme $newtheme
-	variable themebar
-	set themebar [dict get $::widgetdict statusbar $theme]
-	set themesep [dict get $::widgetdict separator $theme]
-
-	$devframe configure -background $themebar
-	$devsep configure -background $themesep
 	foreach device $devicelist {
-		$devframe.$device configure -fg $devices($theme) -bg $themebar
+		$devframe.$device configure -bg $bartheme -fg $devicetheme
 	}
 }
 
 proc zstatus::devices::update {} {
-	variable devices
-	variable themebar
-	variable theme
-	variable searchlist
-	variable devicelist
+	variable bartheme
+	variable devicetheme
+	variable devicefont
 
 	variable devframe
 	variable devsep
 	variable devpos
 	variable devside
 
+	variable searchlist
+	variable devicelist
 	set currentlist {}
 	foreach pattern $searchlist {
 		lappend currentlist {*}[glob -nocomplain -tails -dir "/dev" $pattern]
@@ -47,10 +45,10 @@ proc zstatus::devices::update {} {
 				pack $devsep -after $devframe -fill y \
 					-padx 5 -side $devside
 			}
-			pack [label $devframe.$device -font $devices(font)\
+			pack [label $devframe.$device -font $devicefont\
 				 -text "$device"] -side left
-			$devframe.$device configure -fg $devices($theme)\
-				 -bg $themebar
+			$devframe.$device configure -fg $devicetheme\
+				 -bg $bartheme
 		}
 	}
 
@@ -66,16 +64,11 @@ proc zstatus::devices::update {} {
 }
 
 proc zstatus::devices::setup { base position side } {
-	variable devices
-	variable searchlist
-	variable themebar
-	variable separator
 	variable devframe
 	variable devsep
 	variable devpos
 	variable devside
 
-	array set devices [dict get $$::widgetdict devices]
 	set devframe $base.devices
 	set devsep $base.devivessep
 	set devpos $base.$position
@@ -84,15 +77,19 @@ proc zstatus::devices::setup { base position side } {
 	frame $devframe
 	frame $devsep -width 1
 
+	variable devicefont 
+	set devicefont [dict get $::widgetdict devices font]
+
 	variable devicelist
 	set devicelist {}
-	if [info exists devices(searchlist)] {
-		set value $devices(searchlist)
+
+	variable searchlist
+	if [dict exists $::widgetdict devices searchlist] {
+		set value [dict get $::widgetdict devices searchlist] 
 		regsub -all {\"} $value {} value
 		regsub -all {,} $value { } value
 		regsub -all {[ ]+} $value { } value
 		set searchlist [split $value]
 	}
 }
-
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

@@ -10,7 +10,7 @@ package require zstatus::music
 package require zstatus::system
 
 # Unicodes characters from remixicons v4.6.0
-set remix [dict create\
+array set remix {\
 	clear_day	\uf1bf	clear_night	\uef75\
 	cloud1_day	\uf1be	cloud1_night	\uef74\
 	cloud2_day	\uf1bb	cloud2_night	\uef71\
@@ -22,7 +22,7 @@ set remix [dict create\
 	play 		\uef82	rain1		\uf056\
 	rain2		\uec68	rain3		\uee15\
 	snow		\uf15e	squall		\ueb9d\
-	thunder		\uf209	tornado		\uf21c ]
+	thunder		\uf209	tornado		\uf21c }
 
 # Other unicode characters
 set arrowup	\u2191

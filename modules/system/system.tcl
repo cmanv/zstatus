@@ -53,7 +53,7 @@ proc zstatus::system::setup {bar item} {
 	memused { }
 	mixer {
 		variable mixer_icon
-		set mixer_icon [dict get $::remix mixer]
+		set mixer_icon $::remix(mixer)
 		set_mixer
 		bind $bar.mixer <MouseWheel> {
 			if {%D < 0} {
