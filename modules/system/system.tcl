@@ -40,7 +40,8 @@ proc zstatus::system::set_netout {} {
 
 proc zstatus::system::set_mixer {} {
 	variable mixer
-	set mixer "$::remix(mixer) [freebsd::getmixervol]"
+	variable mixer_icon
+	set mixer "$mixer_icon [freebsd::getmixervol]"
 }
 
 proc zstatus::system::setup {bar item} {
@@ -51,8 +52,9 @@ proc zstatus::system::setup {bar item} {
 	}
 	memused { }
 	mixer {
+		variable mixer_icon
+		set mixer_icon [dict get $::remix mixer]
 		set_mixer
-		set ::messagearray(mixer_volume) {action system::set_mixer arg 0}
 		bind $bar.mixer <MouseWheel> {
 			if {%D < 0} {
 				exec mixer vol=-0.05
@@ -61,16 +63,15 @@ proc zstatus::system::setup {bar item} {
 			}
 			zstatus::system::set_mixer
 		}
+		dict set ::messagedict mixer_volume {action system::set_mixer arg 0}
 	}
 	netin {
 		variable if_in
-		array set widget $::widgetarray(netin)
-		set if_in $widget(interface)
+		set if_in [dict get $::widgetdict netin interface]
 	}
 	netout {
 		variable if_out
-		array set widget $::widgetarray(netout)
-		set if_out $widget(interface)
+		set if_out [dict get $::widgetdict netout interface]
 	}}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

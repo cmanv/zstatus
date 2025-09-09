@@ -6,8 +6,8 @@ namespace eval zstatus::desktop {
 }
 
 proc zstatus::desktop::set_wintitle {value} {
-	array set widget $::widgetarray(wintitle)
-	set length [tcl::mathfunc::min [string length $value] $widget(maxlength)]
+	set maxlength [dict get $::widgetdict wintitle maxlength]
+	set length [tcl::mathfunc::min [string length $value] $maxlength]
 	variable wintitle
 	$wintitle configure -state normal
 	$wintitle delete 1.0 end
@@ -50,20 +50,20 @@ proc zstatus::desktop::set_deskname {value} {
 proc zstatus::desktop::setup {bar item} {
 	switch $item {
 	wintitle {
-		set ::messagearray(window_active) {action desktop::set_wintitle arg 1}
-		set ::messagearray(no_window_active)\
-			 {action desktop::unset_wintitle arg 1}
-		array set widget $::widgetarray(wintitle)
+		dict set ::messagedict window_active\
+				{action desktop::set_wintitle arg 1}
+		dict set ::messagedict no_window_active\
+				{action desktop::unset_wintitle arg 1}
 		variable wintitle
 		set wintitle [text $bar.$item\
-			-font $widget(font)\
+			-font [dict get $::widgetdict wintitle font]\
 			-height 1 -borderwidth 0\
 			-highlightthickness 0 -wrap word]
 		$bar.$item tag configure emoji -font emoji
 		$bar.$item configure -state disabled
 	}
 	deskmode {
-		set ::messagearray(desktop_mode) {action desktop::set_deskmode arg 1}
+		dict set ::messagedict desktop_mode {action desktop::set_deskmode arg 1}
 		bind $bar.deskmode <MouseWheel> {
 			if {%D < 0} {
 				zstatus::send_message "desktop-mode-next"
@@ -73,7 +73,7 @@ proc zstatus::desktop::setup {bar item} {
 		}
 	}
 	desklist {
-		set ::messagearray(desktop_list) {action desktop::set_desklist arg 1}
+		dict set ::messagedict desktop_list {action desktop::set_desklist arg 1}
 		bind $bar.desklist <MouseWheel> {
 			if {%D < 0} {
 				zstatus::send_message "desktop-switch-next"
@@ -83,7 +83,7 @@ proc zstatus::desktop::setup {bar item} {
 		}
 	}
 	deskname {
-		set ::messagearray(desktop_name) {action desktop::set_deskname arg 1}
+		dict set ::messagedict desktop_name {action desktop::set_deskname arg 1}
 	}}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

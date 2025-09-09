@@ -13,15 +13,18 @@ namespace eval zstatus::music {
 proc zstatus::music::set_theme { newtheme } {
 	variable musicframe
 	variable musicsep
-	variable statusbar
-	variable separator
 	variable music
 	variable theme
 
 	if {$music(valid) == 0} { return }
 	set theme $newtheme
-	$musicframe configure -bg $statusbar($theme) -fg $music($theme)
-	$musicsep configure -background $separator($theme)
+
+	variable themebar
+	set themebar [dict get $::widgetdict statusbar $theme]
+	set themesep [dict get $::widgetdict separator $theme]
+
+	$musicframe configure -bg $themebar -fg $music($theme)
+	$musicsep configure -background $themesep
 }
 
 # Show what is currently playing on MPD
@@ -38,7 +41,7 @@ proc zstatus::music::update {} {
 	if {$music(valid) == 0} { return }
 	set state [mpd::state]
 	if {$state > 1} {
-		$musicframe configure -text $::remix($mpdstates($state))
+		$musicframe configure -text [dict get $::remix $mpdstates($state)] 
 		if {!$music_active} {
 			pack $musicframe -after $musicpos -side $musicside
 			pack $musicsep -after $musicframe -fill y -padx 5 -side $musicside
@@ -61,17 +64,12 @@ proc zstatus::music::setup { widget position side } {
 	variable musicsep
 	variable musicpos
 	variable musicside
-	variable statusbar
-	variable separator
 	variable music
 
-	array set music $::widgetarray(music)
+	array set music [dict get $::widgetdict music]
 	if {![info exists music(socket)] && [info exists ::env(MPD_HOST)]} {
 		set music(socket) $::env(MPD_HOST)
 	}
-
-	array set statusbar $::widgetarray(statusbar)
-	array set separator $::widgetarray(separator)
 
 	set musicframe $widget.music
 	set musicsep $widget.musicsep
@@ -115,12 +113,11 @@ proc zstatus::music::show_tooltip {} {
 	variable tooltip_active
 	variable mpdtext
 	variable music
-	variable statusbar
-	variable theme
+	variable themebar
 
 	set tooltip_active 1
 	set tooltip [toplevel .musictooltip -highlightthickness 0\
-			-background $statusbar($theme)]
+			-background $themebar]
 	wm title $tooltip "Now Playing"
 	wm attributes $tooltip -type dialog
 	wm overrideredirect $tooltip 1
@@ -144,7 +141,7 @@ proc zstatus::music::hide_tooltip {} {
 proc zstatus::music::update_tooltip { } {
 	variable music
 	variable mpdtext
-	variable statusbar
+	variable themebar
 	variable theme
 
 	set mpdtitle [join [mpd::currenttitle]]
@@ -154,7 +151,7 @@ proc zstatus::music::update_tooltip { } {
 	}
 	$mpdtext delete 1.0 end
 	$mpdtext insert 1.0 $mpdtitle
-	$mpdtext configure -width $width -fg $music($theme) -bg $statusbar($theme)
+	$mpdtext configure -width $width -fg $music($theme) -bg $themebar
 }
 
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

@@ -10,7 +10,7 @@ package require zstatus::music
 package require zstatus::system
 
 # Unicodes characters from remixicons v4.6.0
-array set remix {
+set remix [dict create\
 	clear_day	\uf1bf	clear_night	\uef75\
 	cloud1_day	\uf1be	cloud1_night	\uef74\
 	cloud2_day	\uf1bb	cloud2_night	\uef71\
@@ -22,57 +22,55 @@ array set remix {
 	play 		\uef82	rain1		\uf056\
 	rain2		\uec68	rain3		\uee15\
 	snow		\uf15e	squall		\ueb9d\
-	thunder		\uf209	tornado		\uf21c }
+	thunder		\uf209	tornado		\uf21c ]
 
 # Other unicode characters
 set arrowup	\u2191
 set arrowdown	\u2193
 
-array set widgetarray {\
-    arcsize { type lwidget source zstatus::system::arcsize\
+set widgetdict [dict create\
+	arcsize {type lwidget source zstatus::system::arcsize\
 		proc system::set_arcsize setup system::setup\
-		font normal light black dark LightGray }\
-    datetime { type string source zstatus::datetime proc set_datetime\
+		font normal light black dark LightGray}\
+	datetime {type string source zstatus::datetime proc set_datetime\
 		format {%d %b %H:%M} font normal light black dark LightGray}\
-    desklist { type lwidget source zstatus::desktop::desklist setup desktop::setup\
-		font normal light black dark LightGray }\
-    deskmode { type lwidget source zstatus::desktop::deskmode setup desktop::setup\
-		font normal light black dark LightGray }\
-    deskname { type lwidget source zstatus::desktop::deskname setup desktop::setup\
-		font normal light black dark LightGray }\
-    devices { type transient proc devices::update setup devices::setup\
-		settheme devices::set_theme\
-		font normal light black dark LightGray }\
-    loadavg { type lwidget source zstatus::system::loadavg\
+	desklist {type lwidget source zstatus::desktop::desklist\
+		setup desktop::setup font normal light black dark LightGray}\
+	deskmode {type lwidget source zstatus::desktop::deskmode\
+		setup desktop::setup font normal light black dark LightGray}\
+	deskname {type lwidget source zstatus::desktop::deskname\
+		setup desktop::setup font normal light black dark LightGray}\
+	devices {type transient proc devices::update setup devices::setup\
+		settheme devices::set_theme font normal light black dark LightGray}\
+	loadavg {type lwidget source zstatus::system::loadavg\
 		proc system::set_loadavg setup system::setup\
-		font normal light black dark LightGray }\
-    mail { type transient proc zstatus::mail::update\
+		font normal light black dark LightGray}\
+	mail {type transient proc zstatus::mail::update\
 		setup mail::setup settheme mail::set_theme\
-		font normal light black dark LightGray }\
-    memused { type lwidget source zstatus::system::memused\
+		font normal light black dark LightGray}\
+	memused {type lwidget source zstatus::system::memused\
 		proc system::set_memused setup system::setup\
-		font normal light black dark LightGray }\
-    metar { type lwidget source zstatus::metar::report(statusbar)\
+		font normal light black dark LightGray}\
+	metar {type lwidget source zstatus::metar::report(statusbar)\
 		setup metar::setup settheme metar::set_theme delay 10\
-		font normal light black dark LightGray }\
-    mixer { type lwidget source zstatus::system::mixer setup system::setup\
-		font normal light black dark LightGray }\
-    music { type transient proc music::update setup music::setup\
-		settheme music::set_theme\
-		font normal light black dark LightGray }\
-    netin { type lwidget source zstatus::system::netin proc system::set_netin\
-		setup system::setup interface em0\
-		font normal light black dark LightGray }\
-    netout { type lwidget source zstatus::system::netout proc system::set_netout\
-		setup system::setup interface em0\
-		font normal light black dark LightGray }\
-    sep { type separator light black dark gray }\
-    separator { type separator light black dark gray }\
-    statusbar { type bar light gray90 dark gray20 }\
-    wintitle { type twidget setup desktop::setup maxlength 110\
-		font normal light black dark LightGray }}
+		font normal light black dark LightGray}\
+	mixer {type lwidget source zstatus::system::mixer setup system::setup\
+		font normal light black dark LightGray}\
+	music {type transient proc music::update setup music::setup\
+		settheme music::set_theme font normal light black dark LightGray}\
+	netin {type lwidget source zstatus::system::netin\
+		proc system::set_netin setup system::setup interface em0\
+		font normal light black dark LightGray}\
+	netout {type lwidget source zstatus::system::netout\
+		proc system::set_netout setup system::setup interface em0\
+		font normal light black dark LightGray}\
+	sep {type separator light black dark gray}\
+	separator {type separator light black dark gray}\
+	statusbar {type bar light gray90 dark gray20}\
+	wintitle {type twidget setup desktop::setup maxlength 110\
+		font normal light black dark LightGray}]
 
-array set messagearray {set_theme {action set_theme arg 1}}
+set messagedict [dict create set_theme {action set_theme arg 1}]
 
 namespace eval zstatus {
 	variable currenttheme	none
@@ -126,41 +124,45 @@ proc zstatus::set_theme {theme} {
 
 	variable bar
 	variable widgetlist
-	array set statusbar $::widgetarray(statusbar)
+	set themebar [dict get $::widgetdict statusbar $currenttheme]
 
 	set count 0
-	$bar configure -background $statusbar($currenttheme)
+	$bar configure -background $themebar
 	foreach item $widgetlist {
-		array set widget $::widgetarray($item)
-		if {$widget(type) == "transient"} {
-			if [info exists widget(settheme)] {
-				$widget(settheme) $currenttheme
-			}
-		} elseif {$widget(type) == "separator"} {
-			incr count
-			$bar.$item$count configure\
-				-background $widget($currenttheme)
-		} elseif {$widget(type) != "bar"} {
-			$bar.$item configure -bg $statusbar($currenttheme)\
-					-fg $widget($currenttheme)
-			if [info exists widget(settheme)] {
-				$widget(settheme) $currenttheme
+		switch [dict get $::widgetdict $item type] {
+		bar {}
+		transient {
+			if [dict exists $::widgetdict $item settheme] {
+				[dict get $::widgetdict $item settheme] $currenttheme
 			}
 		}
-		array unset widget
+		separator {
+			incr count
+			$bar.$item$count configure\
+				-background [dict get $::widgetdict $item $currenttheme]
+		} 
+		default {
+			$bar.$item configure -bg $themebar\
+				-fg [dict get $::widgetdict $item $currenttheme]
+			if [dict exists $::widgetdict $item settheme] {
+				[dict get $::widgetdict $item settheme] $currenttheme
+			}
+		}}
 	}
 }
 
 proc zstatus::set_datetime {} {
 	variable datetime
 	variable datetime_format
+	variable locale
+
 	set datetime [clock format [clock seconds] \
-		-locale $::config(lang) -format $datetime_format]
+		-locale $locale  -format $datetime_format]
 }
 
 proc zstatus::send_message {msg} {
-	set xscreen $::config(xscreen)
-	set wmsocket $::config(zwmsocket)
+	set xscreen [dict get $::config xscreen]
+	set wmsocket [dict get $::config zwmsocket]
 
 	if [catch {set channel [unix_sockets::connect $wmsocket]}] {
 		puts stderr "Could not open socket $wmsocket!\n"
@@ -189,12 +191,13 @@ proc zstatus::read_message {channel} {
 		return
 	}
 
-	if { ![info exists ::messagearray($key)] } { return }
-	array set selected $::messagearray($key)
-	if {$selected(arg) == 1} {
-		$selected(action) $value
+	if { ![dict exists $::messagedict $key] } { return }
+	set action [dict get $::messagedict $key action]
+	set arg [dict get $::messagedict $key arg]
+	if {$arg == 1} {
+		$action $value
 	} else {
-		$selected(action)
+		$action
 	}
 }
 
@@ -214,30 +217,34 @@ proc zstatus::add_widgets {side widgets} {
 	regsub -all {,} $widgets { } widgets
 	regsub -all {[ ]+} $widgets { } widgets
 
+	set last $bar
 	foreach item [split $widgets] {
-		if ![info exists ::widgetarray($item)] { continue }
-		array set widget $::widgetarray($item)
-		switch $widget(type) {
+		if ![dict exists $::widgetdict $item] { continue }
+		switch [dict get $::widgetdict $item type] {
 		lwidget {
-			pack [label $bar.$item -font $widget(font)\
-				-textvar $widget(source)] -side $side
-			if [info exists widget(setup)] {
-				$widget(setup) $bar $item
+			pack [label $bar.$item\
+				-font [dict get $::widgetdict $item font]\
+				-textvar [dict get $::widgetdict $item source]]\
+				-side $side
+			if [dict exists $::widgetdict $item setup] {
+				[dict get $::widgetdict $item setup] $bar $item
 			}
 			set last $item
 		}
 		twidget {
-			if ![info exists widget(setup)] {
+			if ![dict exists $::widgetdict $item setup] {
 				puts "No setup defined for $item!"
 				exit 1
 			}
-			$widget(setup) $bar $item
+			[dict get $::widgetdict $item setup] $bar $item
 			pack $bar.$item -side $side -expand 1
 			set last $item
 		}
 		string {
-			pack [label $bar.$item -font $widget(font)\
-				-textvar $widget(source)] -side $side
+			pack [label $bar.$item\
+				-font [dict get $::widgetdict $item font]\
+				-textvar [dict get $::widgetdict $item source]]\
+				-side $side
 			set last $item
 		}
 		separator {
@@ -247,16 +254,15 @@ proc zstatus::add_widgets {side widgets} {
 			set last $item$sepcount
 		}
 		transient {
-			if [info exists widget(setup)] {
-				$widget(setup) $bar $last $side
+			if [dict exists $::widgetdict $item setup] {
+				[dict get $::widgetdict $item setup] $bar $last $side
 			}
 		}}
 
-		if [info exists widget(proc)] {
-			lappend proclist $widget(proc)
+		if [dict exists $::widgetdict $item proc] {
+			lappend proclist [dict get $::widgetdict $item proc]
 		}
 		lappend widgetlist $item
-		array unset widget
 	}
 }
 
@@ -264,6 +270,7 @@ proc zstatus::setup {} {
 	variable bar
 	variable widgetlist
 	variable datetime_format
+	variable locale
 	variable sepcount
 
 	set bar [frame .zstatus]
@@ -272,15 +279,15 @@ proc zstatus::setup {} {
 
 	set sepcount 0
 	set widgetlist {}
-	add_widgets left $::config(leftside)
-	add_widgets right $::config(rightside)
+	add_widgets left [dict get $::config leftside]
+	add_widgets right [dict get $::config rightside]
 
-	array set widget $::widgetarray(datetime)
-	set datetime_format $widget(format)
+	set datetime_format [dict get $::widgetdict datetime format]
+	set locale [dict get $::config lang]
 
 	set theme ""
-	if [info exists ::config(theme)] {
-		set theme $::config(theme)
+	if [dict exists $::config theme] {
+		set theme [dict get $::config theme]
 	} elseif [info exists ::params(theme)] {
 		set theme $::params(theme)
 	}
@@ -288,7 +295,7 @@ proc zstatus::setup {} {
 		set theme "light"
 	}
 	set_theme $theme
-	zstatus::every $::config(delay) zstatus::update
+	zstatus::every [dict get $::config delay] zstatus::update
 }
 
 # Treat command line options
@@ -308,18 +315,25 @@ try {
 # Setup tk app
 tk appname "@PACKAGE_NAME@"
 wm title . "@PACKAGE_NAME@ @PACKAGE_VERSION@"
-array set config [zstatus::config::read $params(config)]
-set config(xscreen) [lindex [split [winfo screen .] "."] 1]
-if ![info exists config(geometry)] {
-	set config(geometry) "[winfo vrootwidth .]x26+0+0"
+#set config [dict create]
+set config [zstatus::config::read $params(config)]
+dict set config xscreen [lindex [split [winfo screen .] "."] 1]
+if ![dict exists $config geometry] {
+	dict set config geometry "[winfo vrootwidth .]x26+0+0"
 }
-wm geometry . $config(geometry)
+wm geometry . [dict get $config geometry]
 wm attributes . -topmost 1 -type dock
-font create normal -family $config(fontname) -size $config(fontsize)
-font create italic -family $config(fontname) -size $config(fontsize) -slant italic
-font create bold -family $config(fontname) -size $config(fontsize) -weight bold
-font create emoji -family $config(emojifontname) -size $config(emojifontsize)
+
+set fontname [dict get $config fontname]
+set fontsize [dict get $config fontsize]
+set emojifontname [dict get $config emojifontname]
+set emojifontsize [dict get $config emojifontsize]
+
+font create normal -family $fontname -size $fontsize
+font create italic -family $fontname -size $fontsize -slant italic
+font create bold -family $fontname -size $fontsize -weight bold
+font create emoji -family $emojifontname -size $emojifontsize
 
 zstatus::setup
-set listen [unix_sockets::listen $config(barsocket) zstatus::server_accept]
+set listen [unix_sockets::listen [dict get $config barsocket] zstatus::server_accept]
 vwait forever

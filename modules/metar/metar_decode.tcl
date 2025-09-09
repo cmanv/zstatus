@@ -121,27 +121,32 @@ namespace eval zstatus::metar::decode {
 }
 
 proc zstatus::metar::decode::current_day {} {
+	variable timezone
 	set currenttime [clock seconds]
+
 	set fixedtime [clock format $currenttime -format {%Y-%m-%d 12:00:00}\
-			-timezone $::config(timezone)]
+			-timezone $timezone]
 	set currentday [expr round([clock scan $fixedtime -format {%Y-%m-%d %H:%M:%S}\
-			-timezone $::config(timezone)]/86400.0)]
+			-timezone $timezone]/86400.0)]
 }
 
 proc zstatus::metar::decode::current_date {} {
+	variable timezone
 	set currenttime [clock seconds]
 	set datetime [clock format $currenttime -format {%Y-%m-%d}\
-			-timezone $::config(timezone)]
+			-timezone $timezone]
 }
 
 proc zstatus::metar::decode::calc_seconds {datetime} {
+	variable timezone
 	set currenttime [clock scan $datetime -format {%Y-%m-%d %H:%M:%S}\
-			-timezone $::config(timezone)]
+			-timezone $timezone]
 }
 
 proc zstatus::metar::decode::calc_timezone_offset {} {
+	variable timezone
 	set currenttime [clock seconds]
-	set tzoffset [clock format $currenttime -format {%z} -timezone $::config(timezone)]
+	set tzoffset [clock format $currenttime -format {%z} -timezone $timezone]
 	set len [string length $tzoffset]
 	set moffset [expr [scan [string range $tzoffset $len-2 $len-1] %f]/60]
 	set hoffset [expr [scan [string range $tzoffset 0 $len-3] %f]]
@@ -166,9 +171,11 @@ proc zstatus::metar::decode::fetch_station {code} {
 	return 1
 }
 
-proc zstatus::metar::decode::calc_station_data {} {
+proc zstatus::metar::decode::calc_station_data {tz} {
 	variable station
+	variable timezone
 	variable const
+	set timezone $tz
 
 	set julian_day [expr [current_day] + $const(julian1970) - $const(julian2000)]
 	set station(julian) $julian_day
@@ -297,6 +304,7 @@ proc zstatus::metar::decode::calc_humidex {temperature dew} {
 proc zstatus::metar::decode::decode_datetime {datetime} {
 	variable station
 	variable current
+	variable timezone
 	variable locale
 
 	set day [string range $datetime 0 1]
@@ -308,9 +316,9 @@ proc zstatus::metar::decode::decode_datetime {datetime} {
 	set date "$date-$day $hour:$minute:00"
 	set rtime [clock scan $date -format {%Y-%m-%d %H:%M:%S} -timezone :UTC]
 	set current(date) [clock format $rtime -format {%d %B %H:%M %Z}\
-			 -locale $locale -timezone $::config(timezone)]
+			 -locale $locale -timezone $timezone]
 	set current(daytime) [clock format $rtime -format {%a %H:%M}\
-			 -locale $locale -timezone $::config(timezone)]
+			 -locale $locale -timezone $timezone]
 }
 
 proc zstatus::metar::decode::decode_wind {wdir wspeed wgust} {
@@ -508,7 +516,7 @@ proc zstatus::metar::decode::get_weather_icon {} {
 		set code $current(precip_code)
 		array set precip_code $precip_codes($code)
 		set icon $precip_code(icon)
-		return $::remix($icon)
+		return [dict get $::remix $icon]
 	}
 
 	variable station
@@ -527,17 +535,18 @@ proc zstatus::metar::decode::get_weather_icon {} {
 		} else {
 			set icon "$cloud_code(icon)_$suffix"
 		}
-		return $::remix($icon)
+		return [dict get $::remix $icon]
 	}
-	return  $::remix(nometar)
+	return [dict get $::remix nometar]
 }
 
 proc zstatus::metar::decode::get_report {lang} {
 	variable current
 	variable report
 	variable station
-
 	variable locale
+	variable timezone
+
 	variable windchill_label
 	variable humidex_label
 	variable success_label
@@ -546,7 +555,7 @@ proc zstatus::metar::decode::get_report {lang} {
 	set locale $lang
 	set now [clock seconds]
 	set reporttime [clock format $now -format {%H:%M}\
-			 -timezone $::config(timezone)]
+			 -timezone $timezone]
 
 	if [decode_metar_report [fetch_metar_report]] {
 		set report(date) $current(date)
@@ -630,7 +639,7 @@ proc zstatus::metar::decode::get_report {lang} {
 
 		set report(request_message) "$success_label($locale) $reporttime"
 	} else {
-		set report(statusbar) $::remix(failed)
+		set report(statusbar) [dict get $::remix failed]
 		set report(request_message) "$failed_label($locale) $reporttime"
 	}
 

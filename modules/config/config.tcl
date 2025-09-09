@@ -2,6 +2,7 @@
 package require fileutil
 
 namespace eval zstatus::config {
+	set config [dict create]
 	if [info exists ::env(XDG_CONFIG_HOME)] {
 		set config_prefix $::env(XDG_CONFIG_HOME)
 	} else {
@@ -14,22 +15,21 @@ namespace eval zstatus::config {
 		set cache_prefix $::env(HOME)/.cache
 	}
 	if [info exists ::env(LANG)] {
-		set config(lang) $::env(LANG)
+		dict set config lang $::env(LANG)
 	} else {
-		set config(lang) C
+		dict set config lang C
 	}
 
 	variable defaultfile "$config_prefix/zstatus/config"
 
-	array set config [ list \
-		timezone	[exec date +%Z]\
-		delay		2000\
-		fontname	NotoSans\
-		fontsize	11\
-		emojifontname	NotoSansEmoji\
-		emojifontsize	11\
-		barsocket	"$cache_prefix/zstatus/socket"\
-		zwmsocket 	"$cache_prefix/zwm/socket"]
+	dict set config timezone 	[exec date +%Z]
+	dict set config delay		2000
+	dict set config	fontname	NotoSans
+	dict set config	fontsize	11
+	dict set config	emojifontname	NotoSansEmoji
+	dict set config	emojifontsize	11
+	dict set config	barsocket	"$cache_prefix/zstatus/socket"
+	dict set config	zwmsocket 	"$cache_prefix/zwm/socket"
 
 	namespace export read get
 }
@@ -43,8 +43,8 @@ proc zstatus::config::get {key configfile} {
 	}
 
 	set value ""
-	if [info exists config($key)] {
-		set value $config($key)
+	if [dict exists $config $key] {
+		set value [dict get $config $key]
 	}
 
 	if [file exists $configfile] {
@@ -85,9 +85,9 @@ proc zstatus::config::read {configfile} {
 		set configfile $defaultfile
 	}
 
-	set config(leftside) {deskmode separator desklist separator\
+	dict set config leftside {deskmode separator desklist separator\
 					deskname separator wintitle}
-	set config(rightside) {datetime}
+	dict set config rightside datetime
 	array set mailboxes {}
 
 	if [file exists $configfile] {
@@ -112,7 +112,7 @@ proc zstatus::config::read {configfile} {
 					continue
 				}
 				if {$context == "main"} {
-					set config($key) $value
+					dict set config $key $value
 				} elseif {$context == "maildir"} {
 					if [info exists mailboxes($index)] {
 						array set mailbox $mailboxes($index)
@@ -121,10 +121,7 @@ proc zstatus::config::read {configfile} {
 					set mailboxes($index) [array get mailbox]
 					array unset mailbox
 				} else {
-					array set widget $::widgetarray($context)
-					set widget($key) $value
-					set ::widgetarray($context) [array get widget]
-					array unset widget
+					dict set ::widgetdict $context $key $value
 				}
 			}
 		}
@@ -146,8 +143,8 @@ proc zstatus::config::read {configfile} {
 		}
 		array unset mailbox
 	}
-	set config(mailboxes) [array get mailboxes]
+	dict set config mailboxes [array get mailboxes]
 
-	return [array get config]
+	return $config
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

@@ -39,19 +39,19 @@ namespace eval zstatus::metar {
 }
 
 proc zstatus::metar::show_tooltip {} {
-	variable statusbar
+	variable themebar
 	variable metar
 	variable ttip1
 	variable theme
 
 	set window [toplevel .metartooltip -highlightthickness 0\
-			-background $statusbar($theme)]
+			-background $themebar]
 	wm title $window "Metar Summary"
 	wm attributes $window -type dialog
 	wm overrideredirect $window 1
 
 	pack [label $window.text -font $ttip1(font)\
-		-fg $ttip1($theme) -bg $statusbar($theme)\
+		-fg $ttip1($theme) -bg $themebar\
 		-textvar zstatus::metar::report(tooltip)]\
 		-side left -padx 5 -pady 3
 
@@ -79,91 +79,95 @@ proc zstatus::metar::toggle_window {} {
 }
 
 proc zstatus::metar::set_theme_header {header} {
-	variable statusbar
+	variable themebar
 	variable label1
 	variable statn1
 	variable theme
 
-	$header configure -background $statusbar($theme)
-	$header.keys configure -background $statusbar($theme)
-	$header.keys.station configure -background $statusbar($theme)
-	$header.keys.station.text configure -bg $statusbar($theme) -fg $label1($theme)
-	$header.keys.date configure -background $statusbar($theme)
-	$header.keys.date.text configure -bg $statusbar($theme) -fg $label1($theme)
-	$header.keys.status configure -background $statusbar($theme)
-	$header.keys.status.text configure -bg $statusbar($theme) -fg $label1($theme)
-	$header.values configure -background $statusbar($theme)
-	$header.values.station configure -background $statusbar($theme)
-	$header.values.station.text configure -bg $statusbar($theme) -fg $statn1($theme)
-	$header.values.date configure -background $statusbar($theme)
-	$header.values.date.text configure -bg $statusbar($theme) -fg $statn1($theme)
-	$header.values.status configure -background $statusbar($theme)
-	$header.values.status.text configure -bg $statusbar($theme) -fg $statn1($theme)
+	$header configure -background $themebar
+	$header.keys configure -background $themebar
+	$header.keys.station configure -background $themebar
+	$header.keys.station.text configure -bg $themebar -fg $label1($theme)
+	$header.keys.date configure -background $themebar
+	$header.keys.date.text configure -bg $themebar -fg $label1($theme)
+	$header.keys.status configure -background $themebar
+	$header.keys.status.text configure -bg $themebar -fg $label1($theme)
+	$header.values configure -background $themebar
+	$header.values.station configure -background $themebar
+	$header.values.station.text configure -bg $themebar -fg $statn1($theme)
+	$header.values.date configure -background $themebar
+	$header.values.date.text configure -bg $themebar -fg $statn1($theme)
+	$header.values.status configure -background $themebar
+	$header.values.status.text configure -bg $themebar -fg $statn1($theme)
 }
 
 proc zstatus::metar::set_theme_summary {summary} {
-	variable statusbar
-	variable separator
+	variable themebar
+	variable themesep
 	variable label1
 	variable statn1
 	variable summ1
 	variable icons
 	variable theme
 
-	$summary configure -background $statusbar($theme)
-	$summary.temp configure -background $statusbar($theme)
-	$summary.temp.status configure -background $statusbar($theme)
-	$summary.temp.status.icon configure -bg $statusbar($theme) -fg $summ1($theme)
-	$summary.temp.status.text configure -bg $statusbar($theme) -fg $summ1($theme)
-	$summary.temp.remark configure -background $statusbar($theme)
-	$summary.temp.remark.key configure -bg $statusbar($theme) -fg $summ1($theme)
-	$summary.temp.remark.value configure -bg $statusbar($theme) -fg $summ1($theme)
-	$summary.separator configure -background $separator($theme)
-	$summary.sun configure -background $statusbar($theme)
-	$summary.sun.text configure -bg $statusbar($theme) -fg $label1($theme)
-	$summary.sun.sunrise_text configure -bg $statusbar($theme) -fg $label1($theme)
-	$summary.sun.sunrise_hour configure -bg $statusbar($theme) -fg $statn1($theme)
-	$summary.sun.sunset_text configure -bg $statusbar($theme) -fg $label1($theme)
-	$summary.sun.sunset_hour configure -bg $statusbar($theme) -fg $statn1($theme)
+	$summary configure -background $themebar
+	$summary.temp configure -background $themebar
+	$summary.temp.status configure -background $themebar
+	$summary.temp.status.icon configure -bg $themebar -fg $summ1($theme)
+	$summary.temp.status.text configure -bg $themebar -fg $summ1($theme)
+	$summary.temp.remark configure -background $themebar
+	$summary.temp.remark.key configure -bg $themebar -fg $summ1($theme)
+	$summary.temp.remark.value configure -bg $themebar -fg $summ1($theme)
+	$summary.separator configure -background $themesep
+	$summary.sun configure -background $themebar
+	$summary.sun.text configure -bg $themebar -fg $label1($theme)
+	$summary.sun.sunrise_text configure -bg $themebar -fg $label1($theme)
+	$summary.sun.sunrise_hour configure -bg $themebar -fg $statn1($theme)
+	$summary.sun.sunset_text configure -bg $themebar -fg $label1($theme)
+	$summary.sun.sunset_hour configure -bg $themebar -fg $statn1($theme)
 }
 
 proc zstatus::metar::set_theme_grid {grid} {
-	variable statusbar
+	variable themebar
 	variable title1
 	variable label1
 	variable metar1
 	variable theme
 
-	$grid configure -background $statusbar($theme)
-	$grid.title configure -bg $statusbar($theme) -fg $title1($theme)
-	$grid.wind configure -bg $statusbar($theme) -fg $label1($theme)
-	$grid.wind_val configure -bg $statusbar($theme) -fg $metar1($theme)
-	$grid.gust configure -bg $statusbar($theme) -fg $label1($theme)
-	$grid.gust_val configure -bg $statusbar($theme) -fg $metar1($theme)
-	$grid.dew configure -bg $statusbar($theme) -fg $label1($theme)
-	$grid.dew_val configure -bg $statusbar($theme) -fg $metar1($theme)
-	$grid.rhumidity configure -bg $statusbar($theme) -fg $label1($theme)
-	$grid.rhumidity_val configure -bg $statusbar($theme) -fg $metar1($theme)
-	$grid.pressure configure -bg $statusbar($theme) -fg $label1($theme)
-	$grid.pressure_val configure -bg $statusbar($theme) -fg $metar1($theme)
-	$grid.visibility configure -bg $statusbar($theme) -fg $label1($theme)
-	$grid.visibility_val configure -bg $statusbar($theme) -fg $metar1($theme)
-	$grid.clouds configure -bg $statusbar($theme) -fg $label1($theme)
-	$grid.clouds_val configure -bg $statusbar($theme) -fg $metar1($theme)
-	$grid.precips configure -bg $statusbar($theme) -fg $label1($theme)
-	$grid.precips_val configure -bg $statusbar($theme) -fg $metar1($theme)
+	$grid configure -background $themebar
+	$grid.title configure -bg $themebar -fg $title1($theme)
+	$grid.wind configure -bg $themebar -fg $label1($theme)
+	$grid.wind_val configure -bg $themebar -fg $metar1($theme)
+	$grid.gust configure -bg $themebar -fg $label1($theme)
+	$grid.gust_val configure -bg $themebar -fg $metar1($theme)
+	$grid.dew configure -bg $themebar -fg $label1($theme)
+	$grid.dew_val configure -bg $themebar -fg $metar1($theme)
+	$grid.rhumidity configure -bg $themebar -fg $label1($theme)
+	$grid.rhumidity_val configure -bg $themebar -fg $metar1($theme)
+	$grid.pressure configure -bg $themebar -fg $label1($theme)
+	$grid.pressure_val configure -bg $themebar -fg $metar1($theme)
+	$grid.visibility configure -bg $themebar -fg $label1($theme)
+	$grid.visibility_val configure -bg $themebar -fg $metar1($theme)
+	$grid.clouds configure -bg $themebar -fg $label1($theme)
+	$grid.clouds_val configure -bg $themebar -fg $metar1($theme)
+	$grid.precips configure -bg $themebar -fg $label1($theme)
+	$grid.precips_val configure -bg $themebar -fg $metar1($theme)
 }
 
 proc zstatus::metar::set_theme {newtheme} {
 	variable station
 	if ![info exists station(icaoId)] { return }
 
-	variable statusbar
-	variable popup
 	variable theme
-
 	set theme $newtheme
-	$popup configure -background $statusbar($theme)
+
+	variable themebar
+	set themebar [dict get $::widgetdict statusbar $theme]
+	variable themesep
+	set themesep [dict get $::widgetdict separator $theme]
+
+	variable popup
+	$popup configure -background $themebar
 	set_theme_header $popup.header
 	set_theme_summary $popup.summary
 	set_theme_grid $popup.grid
@@ -236,6 +240,7 @@ proc zstatus::metar::update {} {
 	variable popup
 	variable station
 	variable report
+	variable timezone
 	variable locale
 
 	if ![info exists station(icaoId)] {
@@ -245,7 +250,7 @@ proc zstatus::metar::update {} {
 		}
 	}
 
-	array set station [decode::calc_station_data]
+	array set station [decode::calc_station_data $timezone]
 	array set report [decode::get_report $locale]
 
 	update_grid $popup.grid
@@ -408,24 +413,22 @@ proc zstatus::metar::setup_grid { grid } {
 
 proc zstatus::metar::setup {bar widget} {
 	variable metar_locales
+	variable timezone 
 	variable locale
 	variable theme
 	variable metar
 	variable popup
 
-	array set metar $::widgetarray(metar)
+	array set metar [dict get $::widgetdict metar]
 	if ![info exists metar(station)] {
 		variable report
 		set report(statusbar) "-"
 		return
 	}
 
-	variable statusbar
-	variable separator
-	array set statusbar $::widgetarray(statusbar)
-	array set separator $::widgetarray(separator)
-
-	set index [lsearch $metar_locales [lindex [split $::config(lang) "_"] 0]]
+	set timezone [dict get $::config timezone]
+	set lang [dict get $::config lang]
+	set index [lsearch $metar_locales [lindex [split $lang "_"] 0]]
 	if {$index < 0} {
 		set locale C
 	} else {
@@ -443,8 +446,8 @@ proc zstatus::metar::setup {bar widget} {
 	wm title $popup {Metar Report}
 	wm state $popup withdrawn
 
-	set ::messagearray(metar_toggle) {action metar::toggle_window arg 0}
-	set ::messagearray(metar_update) {action metar::update arg 0}
+	dict set ::messagedict metar_toggle {action metar::toggle_window arg 0}
+	dict set ::messagedict metar_update {action metar::update arg 0}
 
 	bind $popup <3> { zstatus::metar::toggle_window }
 #	bind $popup <Escape> { zstatus::metar::toggle_window }

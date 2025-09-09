@@ -6,24 +6,26 @@ namespace eval zstatus::devices {
 
 proc zstatus::devices::set_theme {newtheme} {
 	variable devices
-	variable statusbar
-	variable separator
 	variable devframe
 	variable devsep
 	variable devicelist
 	variable theme
-	set theme $newtheme
 
-	$devframe configure -background $statusbar($theme)
-	$devsep configure -background $separator($theme)
+	set theme $newtheme
+	variable themebar
+	set themebar [dict get $::widgetdict statusbar $theme]
+	set themesep [dict get $::widgetdict separator $theme]
+
+	$devframe configure -background $themebar
+	$devsep configure -background $themesep
 	foreach device $devicelist {
-		$devframe.$device configure -fg $devices($theme) -bg $statusbar($theme)
+		$devframe.$device configure -fg $devices($theme) -bg $themebar
 	}
 }
 
 proc zstatus::devices::update {} {
 	variable devices
-	variable statusbar
+	variable themebar
 	variable theme
 	variable searchlist
 	variable devicelist
@@ -48,7 +50,7 @@ proc zstatus::devices::update {} {
 			pack [label $devframe.$device -font $devices(font)\
 				 -text "$device"] -side left
 			$devframe.$device configure -fg $devices($theme)\
-				 -bg $statusbar($theme)
+				 -bg $themebar
 		}
 	}
 
@@ -66,16 +68,14 @@ proc zstatus::devices::update {} {
 proc zstatus::devices::setup { base position side } {
 	variable devices
 	variable searchlist
-	variable statusbar
+	variable themebar
 	variable separator
 	variable devframe
 	variable devsep
 	variable devpos
 	variable devside
 
-	array set devices $::widgetarray(devices)
-	array set statusbar $::widgetarray(statusbar)
-	array set separator $::widgetarray(separator)
+	array set devices [dict get $$::widgetdict devices]
 	set devframe $base.devices
 	set devsep $base.devivessep
 	set devpos $base.$position
