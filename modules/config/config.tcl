@@ -2,34 +2,34 @@
 package require fileutil
 
 namespace eval zstatus::config {
-	set config [dict create]
 	if [info exists ::env(XDG_CONFIG_HOME)] {
 		set config_prefix $::env(XDG_CONFIG_HOME)
 	} else {
 		set config_prefix $::env(HOME)/.config
 	}
+	variable defaultfile "$config_prefix/zstatus/config"
 
 	if [info exists ::env(XDG_CACHE_HOME)] {
 		set cache_prefix $::env(XDG_CACHE_HOME)
 	} else {
 		set cache_prefix $::env(HOME)/.cache
 	}
+
+	set config [dict create\
+		timezone 	[exec date +%Z]\
+		delay		2000\
+		fontname	NotoSans\
+		fontsize	11\
+		emojifontname	NotoSansEmoji\
+		emojifontsize	11\
+		barsocket	"$cache_prefix/zstatus/socket"\
+		zwmsocket 	"$cache_prefix/zwm/socket"]
+
 	if [info exists ::env(LANG)] {
 		dict set config lang $::env(LANG)
 	} else {
 		dict set config lang C
 	}
-
-	variable defaultfile "$config_prefix/zstatus/config"
-
-	dict set config timezone 	[exec date +%Z]
-	dict set config delay		2000
-	dict set config	fontname	NotoSans
-	dict set config	fontsize	11
-	dict set config	emojifontname	NotoSansEmoji
-	dict set config	emojifontsize	11
-	dict set config	barsocket	"$cache_prefix/zstatus/socket"
-	dict set config	zwmsocket 	"$cache_prefix/zwm/socket"
 
 	namespace export read get
 }

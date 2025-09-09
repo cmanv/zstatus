@@ -315,7 +315,6 @@ try {
 # Setup tk app
 tk appname "@PACKAGE_NAME@"
 wm title . "@PACKAGE_NAME@ @PACKAGE_VERSION@"
-#set config [dict create]
 set config [zstatus::config::read $params(config)]
 dict set config xscreen [lindex [split [winfo screen .] "."] 1]
 if ![dict exists $config geometry] {
