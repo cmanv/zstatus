@@ -123,10 +123,10 @@ proc zstatus::set_theme {theme} {
 
 	variable bar
 	variable widgetlist
-	set themebar [dict get $::widgetdict statusbar $currenttheme]
+	set bartheme [dict get $::widgetdict statusbar $currenttheme]
 
 	set count 0
-	$bar configure -background $themebar
+	$bar configure -background $bartheme
 	foreach item $widgetlist {
 		switch [dict get $::widgetdict $item type] {
 		bar {}
@@ -141,7 +141,7 @@ proc zstatus::set_theme {theme} {
 				-background [dict get $::widgetdict $item $currenttheme]
 		} 
 		default {
-			$bar.$item configure -bg $themebar\
+			$bar.$item configure -bg $bartheme\
 				-fg [dict get $::widgetdict $item $currenttheme]
 			if [dict exists $::widgetdict $item settheme] {
 				[dict get $::widgetdict $item settheme] $currenttheme
