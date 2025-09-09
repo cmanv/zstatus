@@ -64,7 +64,6 @@ set widgetdict [dict create\
 	netout {type lwidget source zstatus::system::netout\
 		proc system::set_netout setup system::setup interface em0\
 		font normal light black dark LightGray}\
-	sep {type separator light black dark gray}\
 	separator {type separator light black dark gray}\
 	statusbar {type bar light gray90 dark gray20}\
 	wintitle {type twidget setup desktop::setup maxlength 110\
@@ -219,6 +218,9 @@ proc zstatus::add_widgets {side widgets} {
 
 	set last $bar
 	foreach item [split $widgets] {
+		if {$item == "sep"} {
+			set item "separator"
+		}
 		if ![dict exists $::widgetdict $item] { continue }
 		switch [dict get $::widgetdict $item type] {
 		lwidget {

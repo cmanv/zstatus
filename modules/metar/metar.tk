@@ -148,7 +148,7 @@ proc zstatus::metar::set_theme_grid {grid} {
 	$grid configure -background $themebar
 	$grid.title configure -bg $themebar -fg [dict get $style title1 $theme]
 	$grid.wind configure -bg $themebar -fg [dict get $style label1 $theme]
-	$grid.wind_val configure -bg $themebar -fg [dict get $style value1 $theme] 
+	$grid.wind_val configure -bg $themebar -fg [dict get $style value2 $theme]
 	$grid.gust configure -bg $themebar -fg [dict get $style label1 $theme]
 	$grid.gust_val configure -bg $themebar -fg [dict get $style value2 $theme]
 	$grid.dew configure -bg $themebar -fg [dict get $style label1 $theme]
@@ -433,7 +433,7 @@ proc zstatus::metar::setup {bar widget} {
 	set metar_code [dict get $::widgetdict metar station]
 
 	variable metar_locales
-	variable timezone 
+	variable timezone
 	variable locale
 	set timezone [dict get $::config timezone]
 	set lang [dict get $::config lang]

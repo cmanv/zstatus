@@ -100,7 +100,7 @@ proc zstatus::mail::new { index } {
 	pack [frame .mailpopup.$index -background $bartheme]\
 		-expand 1 -fill x -side top
 	pack [label .mailpopup.$index.label -font bold -bg $bartheme\
-		-fg $mailtheme -text "-- [$mailboxname] =="] \
+		-fg $mailtheme -text "-- $mailboxname --"] \
 		-expand 1 -side left
 	pack [frame .mailpopup.headersep -background $septheme\
 		-height 1] -fill x -side top

@@ -76,7 +76,7 @@ proc zstatus::config::read {configfile} {
 	# List of valid contexts in config file
 	set contexts { main arcsize datetime desklist deskmode deskname\
 		devices loadavg mail maildir memused metar mixer music\
-		netin netout sep separator statusbar wintitle}
+		netin netout separator statusbar wintitle}
 
 	# Cant change these from config file
 	set immutables {type source proc setup settheme}

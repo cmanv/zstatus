@@ -70,7 +70,7 @@ These are the options can be specified in the __[main]__ section.
 
 > Font family used for text in the statusbar. (Default: _NotoSans_)
 
-* __fontsize__ 
+* __fontsize__
 
 > Font size for the statusbar. (Default: _11_)
 
@@ -98,11 +98,11 @@ These are the options can be specified in the __[main]__ section.
 
 > Unix socket of the window manager. (Default: _$HOME/.cache/zwm/socket_)
 
-* __leftside__ 
+* __leftside__
 
 > List of widgets in the statusbar starting from the left. (Default: _deskmode separator desklist separator deskname separator wintitle_)
 
-* __rightside__ 
+* __rightside__
 
 > List of widgets in the statusbar starting from the right. (Default: _datetime_)
 
@@ -112,7 +112,10 @@ The list of valid widgets are:
 
 > __arcsize__, __datetime__, __desklist__, __deskmode__, __deskname__, __devices__,
 > __loadavg__, __mail__, __memused__, __metar__, __mixer__, __music__, __netin__,
-> __netout__, __sep__, __separator__, __wintitle__
+> __netout__,  __separator__, __wintitle__
+
+Note: when used in the widgets lists __leftside__ and __rightside__,__separator__ can be
+abbreviated as __sep__.
 
 Each of these widgets can be customized in its own section:
 
