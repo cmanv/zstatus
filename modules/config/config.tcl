@@ -18,10 +18,8 @@ namespace eval zstatus::config {
 	set config [dict create\
 		timezone 	[exec date +%Z]\
 		delay		2000\
-		fontname	NotoSans\
-		fontsize	11\
-		emojifontname	NotoColorEmoji\
-		emojifontsize	11\
+		fontname	"Dejavu Sans"\
+		fontsize	10\
 		barsocket	"$cache_prefix/zstatus/socket"\
 		zwmsocket 	"$cache_prefix/zwm/socket"]
 

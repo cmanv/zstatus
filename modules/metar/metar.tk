@@ -2,19 +2,13 @@ package require Tk 9.0
 package require zstatus::metar::decode
 
 namespace eval zstatus::metar {
-	font create m_italic -family Sans -size 12 -slant italic
-	font create m_normal -family Sans -size 12
-	font create m_large -family Sans -size 13
-	font create m_icon -family Remix -size 16
-
 	set style [dict create\
-		title1 {font m_large light black dark gray80}\
-		label1 {font m_italic light black dark gray80}\
-		value1 {font m_normal light DarkBlue dark CadetBlue3}\
-		value2 {font m_normal light DarkGreen dark PaleGreen3}\
-		summary {font m_large light DarkGreen dark PaleGreen3}\
-		icon {font m_icon light DarkGreen dark PaleGreen3}\
-		tooltip {font m_normal light black dark gray80}]
+		title1 {font large2 light black dark gray80}\
+		label1 {font italic2 light black dark gray80}\
+		value1 {font large light DarkBlue dark CadetBlue3}\
+		value2 {font large light DarkGreen dark PaleGreen3}\
+		summary {font large2 light DarkGreen dark PaleGreen3}\
+		tooltip {font normal light black dark gray80}]
 
 	set metar_locales {C fr}
 	set labeldict [dict create\
@@ -118,7 +112,7 @@ proc zstatus::metar::set_theme_summary {summary} {
 	$summary.temp configure -background $bartheme
 	$summary.temp.status configure -background $bartheme
 	$summary.temp.status.icon configure -bg $bartheme\
-		-fg [dict get $style icon $theme]
+		-fg [dict get $style summary $theme]
 	$summary.temp.status.text configure -bg $bartheme\
 		-fg [dict get $style summary $theme]
 	$summary.temp.remark configure -background $bartheme
@@ -310,7 +304,7 @@ proc zstatus::metar::setup_summary { summary } {
 	pack [frame $summary] -padx 10 -side top -anchor w
 	pack [frame $summary.temp] -side left
 	pack [frame $summary.temp.status] -side top -anchor w
-	pack [label $summary.temp.status.icon -font [dict get $style icon font]\
+	pack [label $summary.temp.status.icon -font [dict get $style summary font]\
 		-textvar zstatus::metar::report(weather_icon)] -side left
 	pack [label $summary.temp.status.text -font [dict get $style summary font]\
 		-textvar zstatus::metar::report(summary)] -side left -padx 5

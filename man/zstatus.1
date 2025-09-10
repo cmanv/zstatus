@@ -79,36 +79,28 @@ Select a timezone.
 \f[B]delay\f[R]
 .RS
 .PP
-Refresh frequency of the statusbar.
+Refresh frequency.
 (Default \f[I]2000\f[R] milliseconds)
 .RE
 .IP \(bu 2
 \f[B]fontname\f[R]
 .RS
 .PP
-Font family used for text in the statusbar.
-(Default: \f[I]NotoSans\f[R])
+Font used for text.
+(Default: \f[I]Dejavu Sans\f[R])
 .RE
 .IP \(bu 2
 \f[B]fontsize\f[R]
 .RS
 .PP
-Font size for the statusbar.
-(Default: \f[I]11\f[R])
+Default font size.
+(Default: \f[I]12\f[R])
 .RE
 .IP \(bu 2
-\f[B]emojifontname\f[R]
+\f[B]emojifont\f[R]
 .RS
 .PP
-Font family used for emojis in the statusbar.
-(Default: \f[I]NotoColorEmoji\f[R])
-.RE
-.IP \(bu 2
-\f[B]emojifontsize\f[R]
-.RS
-.PP
-Font size for the emojis.
-(Default: \f[I]11\f[R])
+Font used for emojis.
 .RE
 .IP \(bu 2
 \f[B]geometry\f[R]
@@ -121,7 +113,7 @@ Geometry of the status bar in the format
 \f[B]theme\f[R]
 .RS
 .PP
-Default theme of the statusbar.
+Default theme.
 (\(aqdark\(aq or \(aqlight\(aq)
 .RE
 .IP \(bu 2
@@ -144,14 +136,16 @@ Unix socket of the window manager.
 .PP
 List of widgets in the statusbar starting from the left.
 (Default: \f[I]deskmode separator desklist separator deskname separator
-wintitle\f[R])
+wintitle\f[R]) Note: \f[I]separator\f[R] can be abbreviated as
+\f[I]sep\f[R].
 .RE
 .IP \(bu 2
 \f[B]rightside\f[R]
 .RS
 .PP
 List of widgets in the statusbar starting from the right.
-(Default: \f[I]datetime\f[R])
+(Default: \f[I]datetime\f[R]) Note: \f[I]separator\f[R] can be
+abbreviated as \f[I]sep\f[R].
 .RE
 .SS WIDGETS SECTIONS
 The list of valid widgets are:
@@ -163,10 +157,6 @@ The list of valid widgets are:
 \f[B]mixer\f[R], \f[B]music\f[R], \f[B]netin\f[R], \f[B]netout\f[R],
 \f[B]separator\f[R], \f[B]wintitle\f[R]
 .RE
-.PP
-Note: when used in the widgets lists \f[B]leftside\f[R] and
-\f[B]rightside\f[R],\f[B]separator\f[R] can be abbreviated as
-\f[B]sep\f[R].
 .PP
 Each of these widgets can be customized in its own section:
 .IP \(bu 2
@@ -308,8 +298,8 @@ Options: \- \f[I]interface\f[R]: Network interface to monitor \-
 \- \f[I]dark\f[R]: color in dark mode.
 .RE
 .IP \(bu 2
-\f[B][separator]\f[R] / \f[B][sep]\f[R]: Widget acting as vertical
-separators between two widgets.
+\f[B][separator]\f[R]: Widget acting as vertical separators between two
+widgets.
 .RS
 .PP
 Options: \- \f[I]light\f[R]: color in light mode.

@@ -66,7 +66,7 @@ set widgetdict [dict create\
 		font normal light black dark LightGray}\
 	separator {type separator light black dark gray}\
 	statusbar {type bar light gray90 dark gray20}\
-	wintitle {type twidget setup desktop::setup maxlength 110\
+	wintitle {type twidget setup desktop::setup maxlength 100\
 		font normal light black dark LightGray}]
 
 set messagedict [dict create set_theme {action set_theme arg 1}]
@@ -139,7 +139,7 @@ proc zstatus::set_theme {theme} {
 			incr count
 			$bar.$item$count configure\
 				-background [dict get $::widgetdict $item $currenttheme]
-		} 
+		}
 		default {
 			$bar.$item configure -bg $bartheme\
 				-fg [dict get $::widgetdict $item $currenttheme]
@@ -268,6 +268,32 @@ proc zstatus::add_widgets {side widgets} {
 	}
 }
 
+proc zstatus::make_font {} {
+	set fontsize [dict get $::config fontsize]
+	set fontname [dict get $::config fontname]
+
+	regsub -all {\"} $fontname {} fontname
+	regsub -all {\-} $fontname {} fontname
+	regsub -all { } $fontname {} fontname
+
+	font create small -family $fontname -size [expr $fontsize - 1]
+	font create normal -family $fontname -size $fontsize
+	font create italic -family $fontname -size $fontsize -slant italic
+	font create italic2 -family $fontname -size [expr $fontsize + 1] -slant italic
+	font create bold -family $fontname -size $fontsize -weight bold
+	font create bold2 -family $fontname -size [expr $fontsize + 1] -weight bold
+	font create large -family $fontname -size [expr $fontsize + 1]
+	font create large2 -family $fontname -size [expr $fontsize + 2]
+
+	if [dict exists $::config emojifont] {
+		set emojifont [dict get $::config emojifont]
+		regsub -all {\"} $emojifont {} emojifont
+		regsub -all {\-} $emojifont {} emojifont
+		regsub -all { } $emojifont {} emojifont
+		font create emoji -family $emojifont -size $fontsize
+	}
+}
+
 proc zstatus::setup {} {
 	variable bar
 	variable widgetlist
@@ -275,6 +301,7 @@ proc zstatus::setup {} {
 	variable locale
 	variable sepcount
 
+	make_font
 	set bar [frame .zstatus]
 	pack $bar -fill both -expand 1
 	set last $bar
@@ -324,16 +351,6 @@ if ![dict exists $config geometry] {
 }
 wm geometry . [dict get $config geometry]
 wm attributes . -topmost 1 -type dock
-
-set fontname [dict get $config fontname]
-set fontsize [dict get $config fontsize]
-set emojifontname [dict get $config emojifontname]
-set emojifontsize [dict get $config emojifontsize]
-
-font create normal -family $fontname -size $fontsize
-font create italic -family $fontname -size $fontsize -slant italic
-font create bold -family $fontname -size $fontsize -weight bold
-font create emoji -family $emojifontname -size $emojifontsize
 
 zstatus::setup
 set listen [unix_sockets::listen [dict get $config barsocket] zstatus::server_accept]

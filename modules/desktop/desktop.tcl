@@ -13,9 +13,13 @@ proc zstatus::desktop::set_wintitle {value} {
 	$wintitle delete 1.0 end
 	$wintitle configure -width $length
 	$wintitle insert 1.0 $value
-	foreach i [$wintitle search -all \
-		-regexp {[\u2000-\u28ff\U1f000-\U1faff]} 1.0 end] {
-		$wintitle tag add emoji $i
+
+	variable emojis
+	if {$emojis} {
+		foreach e [$wintitle search -all \
+			-regexp {[\u2000-\u28ff\U1f000-\U1faff]} 1.0 end] {
+			$wintitle tag add emoji $e
+		}
 	}
 	$wintitle configure -state disabled
 }
@@ -59,7 +63,13 @@ proc zstatus::desktop::setup {bar item} {
 			-font [dict get $::widgetdict wintitle font]\
 			-height 1 -borderwidth 0\
 			-highlightthickness 0 -wrap word]
-		$wintitle tag configure emoji -font emoji
+
+		variable emojis
+		set emojis 0
+		if {[lsearch [font names] emoji] != -1} {
+			set emojis 1
+			$wintitle tag configure emoji -font emoji
+		}
 		$wintitle configure -state disabled
 	}
 	deskmode {

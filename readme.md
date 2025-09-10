@@ -64,23 +64,19 @@ These are the options can be specified in the __[main]__ section.
 
 * __delay__
 
-> Refresh frequency of the statusbar. (Default _2000_ milliseconds)
+> Refresh frequency. (Default _2000_ milliseconds)
 
 * __fontname__
 
-> Font family used for text in the statusbar. (Default: _NotoSans_)
+> Font used for text. (Default: _Dejavu Sans_)
 
 * __fontsize__
 
-> Font size for the statusbar. (Default: _11_)
+> Default font size. (Default: _12_)
 
-* __emojifontname__
+* __emojifont__
 
-> Font family used for emojis in the statusbar. (Default: _NotoColorEmoji_)
-
-* __emojifontsize__
-
-> Font size for the emojis. (Default: _11_)
+> Font used for emojis.
 
 * __geometry__
 
@@ -88,7 +84,7 @@ These are the options can be specified in the __[main]__ section.
 
 * __theme__
 
-> Default theme of the statusbar. ('dark' or 'light')
+> Default theme. ('dark' or 'light')
 
 * __barsocket__
 
@@ -101,10 +97,12 @@ These are the options can be specified in the __[main]__ section.
 * __leftside__
 
 > List of widgets in the statusbar starting from the left. (Default: _deskmode separator desklist separator deskname separator wintitle_)
+> Note: _separator_ can be abbreviated as _sep_.
 
 * __rightside__
 
 > List of widgets in the statusbar starting from the right. (Default: _datetime_)
+> Note: _separator_ can be abbreviated as _sep_.
 
 ## WIDGETS SECTIONS
 
@@ -113,9 +111,6 @@ The list of valid widgets are:
 > __arcsize__, __datetime__, __desklist__, __deskmode__, __deskname__, __devices__,
 > __loadavg__, __mail__, __memused__, __metar__, __mixer__, __music__, __netin__,
 > __netout__,  __separator__, __wintitle__
-
-Note: when used in the widgets lists __leftside__ and __rightside__,__separator__ can be
-abbreviated as __sep__.
 
 Each of these widgets can be customized in its own section:
 
@@ -226,7 +221,7 @@ it shows the currently playing track.
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
 
-- __[separator]__ / __[sep]__: Widget acting as vertical separators between two widgets.
+- __[separator]__: Widget acting as vertical separators between two widgets.
 
 > Options:
 > - _light_: color in light mode.
