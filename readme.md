@@ -76,7 +76,7 @@ These are the options can be specified in the __[main]__ section.
 
 * __emojifontname__
 
-> Font family used for emojis in the statusbar. (Default: _NotoSansEmoji_)
+> Font family used for emojis in the statusbar. (Default: _NotoColorEmoji_)
 
 * __emojifontsize__
 
