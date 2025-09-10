@@ -230,7 +230,7 @@ it shows the currently playing track.
 - __[wintitle]__: Displays the title of the currently active window.
 
 > Options:
->-  _maxlength_: Maximum length of text to display. (Default 110 characters)
+>-  _maxlength_: Maximum length of text to display. (Default 100 characters)
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
