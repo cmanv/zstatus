@@ -209,7 +209,7 @@ proc zstatus::metar::decode::calc_daylight {} {
 	set station_lat [expr $latitude*$pi/180.0]
 
 	set cos_station_lat [expr cos($station_lat)]
-	if {$cos_station_lat == 0} {
+	if {!$cos_station_lat} {
 		# Cas spécial pour les pôles
 		set cos_station_lat 0.0001
 		set tan_station_lat 10000.0
@@ -366,7 +366,7 @@ proc zstatus::metar::decode::decode_visibility {vcode} {
 	if {$divider != -1} {
 		set numerator [string range $vcode 0 $divider-1]
 		set denominator [string range $vcode $divider+1 end]
-		if {[string length $denominator] == 0} {
+		if {![string length $denominator]} {
 			set denominator "1"
 		}
 		set latest(visibility) [format {%0.1f} [expr round(10 * $km_mile \
@@ -460,14 +460,13 @@ proc zstatus::metar::decode::fetch_metar_report {} {
 	variable metar_api
 
 	if [catch {set message [exec -ignorestderr -- curl -s \
-			$metar_api?ids=[dict get $station icaoId]]}] {return 0}
-	if {![string length $message]} {return 0}
+			$metar_api?ids=[dict get $station icaoId]]}] {return ""}
 	return $message
 }
 
 proc zstatus::metar::decode::decode_metar_report {message} {
 	variable station
-	if {$message == 0} {return 0}
+	if {![string length $message]} {return 0}
 	set tokens [split $message " "]
 	foreach token $tokens {
 		if {$token == "RMK"} break
