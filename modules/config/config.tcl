@@ -20,7 +20,7 @@ namespace eval zstatus::config {
 		delay		2000\
 		fontname	NotoSans\
 		fontsize	11\
-		emojifontname	NotoSansEmoji\
+		emojifontname	NotoColorEmoji\
 		emojifontsize	11\
 		barsocket	"$cache_prefix/zstatus/socket"\
 		zwmsocket 	"$cache_prefix/zwm/socket"]

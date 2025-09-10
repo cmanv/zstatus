@@ -59,8 +59,8 @@ proc zstatus::desktop::setup {bar item} {
 			-font [dict get $::widgetdict wintitle font]\
 			-height 1 -borderwidth 0\
 			-highlightthickness 0 -wrap word]
-		$bar.$item tag configure emoji -font emoji
-		$bar.$item configure -state disabled
+		$wintitle tag configure emoji -font emoji
+		$wintitle configure -state disabled
 	}
 	deskmode {
 		dict set ::messagedict desktop_mode {action desktop::set_deskmode arg 1}
