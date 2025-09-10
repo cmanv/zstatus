@@ -4,8 +4,6 @@ package require json
 namespace eval zstatus::metar::decode {
 	variable  metar_api 		https://aviationweather.gov/api/data/metar
 	variable  station_api 		https://aviationweather.gov/api/data/stationinfo
-	set report(prev_date)		""
-	set report(prev_pressure)	""
 
 	set pi			3.14159265358979
 	set obliquity 		23.4363
@@ -321,9 +319,9 @@ proc zstatus::metar::decode::decode_datetime {datetime} {
 	set date [clock format $currenttime -format {%Y-%m} -timezone :UTC]
 	set date "$date-$day $hour:$minute:00"
 	set rtime [clock scan $date -format {%Y-%m-%d %H:%M:%S} -timezone :UTC]
-	set latest(date) [clock format $rtime -format {%d %B %H:%M %Z}\
+	dict set latest date [clock format $rtime -format {%d %B %H:%M %Z}\
 			 -locale $locale -timezone $timezone]
-	set latest(daytime) [clock format $rtime -format {%a %H:%M}\
+	dict set latest daytime [clock format $rtime -format {%a %H:%M}\
 			 -locale $locale -timezone $timezone]
 }
 
@@ -333,29 +331,29 @@ proc zstatus::metar::decode::decode_wind {wdir wspeed wgust} {
 	variable locale
 
 	variable km_nautical_mile
-	set latest(speed) [expr round([scan $wspeed %d] * $km_nautical_mile)]
+	dict set latest speed [expr round([scan $wspeed %d] * $km_nautical_mile)]
 	if {[string length $wgust]} {
-		set latest(gust) [expr round([scan $wgust %d] * $km_nautical_mile)]
+		dict set latest gust [expr round([scan $wgust %d] * $km_nautical_mile)]
 	}
-	set latest(direction) [dict get $direction $wdir $locale]
+	dict set latest direction [dict get $direction $wdir $locale]
 }
 
 proc zstatus::metar::decode::decode_lightwind {wspeed} {
 	variable latest
-	set latest(speed) [expr round($wspeed * 1.852)]
+	dict set latest speed [expr round($wspeed * 1.852)]
 }
 
 proc zstatus::metar::decode::decode_temp {m1 tcode m2 dcode} {
 	variable latest
 	if {[string length $m1]} {
-		set latest(temp) [expr round(-[scan $tcode %d])]
+		dict set latest temp [expr round(-[scan $tcode %d])]
 	} else {
-		set latest(temp) [expr round([scan $tcode %d])]
+		dict set latest temp [expr round([scan $tcode %d])]
 	}
 	if {[string length $m2]} {
-		set latest(dew) [expr round(-[scan $dcode %d])]
+		dict set latest dew [expr round(-[scan $dcode %d])]
 	} else {
-		set latest(dew) [expr round([scan $dcode %d])]
+		dict set latest dew [expr round([scan $dcode %d])]
 	}
 }
 
@@ -369,10 +367,10 @@ proc zstatus::metar::decode::decode_visibility {vcode} {
 		if {![string length $denominator]} {
 			set denominator "1"
 		}
-		set latest(visibility) [format {%0.1f} [expr round(10 * $km_mile \
+		dict set latest visibility [format {%0.1f} [expr round(10 * $km_mile \
 					* $numerator / $denominator)/10.0]]
 	} else {
-		set latest(visibility) [format {%0.1f} [expr round(10 * $km_mile \
+		dict set latest visibility [format {%0.1f} [expr round(10 * $km_mile \
 					* $vcode)/10.0]]
 	}
 }
@@ -381,7 +379,7 @@ proc zstatus::metar::decode::decode_pressure {pcode} {
 	variable latest
 	variable cm_inch
 	variable kp_mmhg
-	set latest(pressure) [format {%0.1f} [expr round([scan $pcode %d] \
+	dict set latest pressure [format {%0.1f} [expr round([scan $pcode %d] \
 				* $cm_inch * $kp_mmhg)/10.0]]
 }
 
@@ -391,27 +389,27 @@ proc zstatus::metar::decode::decode_clouds {code alt type} {
 	variable latest
 	variable locale
 
-	set latest(cloud_desc) [dict get $cloud_codes $code $locale]
-	set latest(cloud_code) $code
+	dict set latest cloud_desc [dict get $cloud_codes $code $locale]
+	dict set latest cloud_code $code
 
 	variable cm_feet
 	if {[string length $alt]} {
 		set altitude [expr 100 * round([scan $alt %d] * $cm_feet / 100)]
-		set description "$latest(cloud_desc), $altitude m"
-		if {![info exists latest(clouds)]} {
-			set latest(clouds) $description
+		set description "[dict get $latest cloud_desc], $altitude m"
+		if {![dict exists $latest clouds]} {
+			dict set latest clouds $description
 		} else {
-			set latest(clouds) "$latest(clouds)\n$description"
+			dict append latest clouds "\n" $description
 		}
 	} else {
-		if {![info exists latest(clouds)]} {
-			set latest(clouds) $latest(cloud_desc)
+		if {![dict exists $latest clouds]} {
+			dict set latest clouds [dict get $latest cloud_desc]
 		} else {
-			set latest(clouds) "$latest(clouds)\n$latest(cloud_desc)"
+			dict append latest clouds "\n" [dict get $latest cloud_desc]]
 		}
 	}
 	if {[string length $type]} {
-		set latest(cloud_type) [dict get $cloud_types $type $locale]
+		dict set latest cloud_type [dict get $cloud_types $type $locale]
 	}
 }
 
@@ -445,12 +443,12 @@ proc zstatus::metar::decode::decode_precips {intensity qualifier precips} {
 		} else {
 			set description "[dict get $labeldict nodesc $locale] $fullcode"
 		}
-		if {![info exists latest(precips)]} {
-			set latest(precips) $description
-			set latest(precip_desc) $description
-			set latest(precip_code) $fullcode
+		if {![dict exists $latest precips]} {
+			dict set latest precips $description
+			dict set latest precip_desc $description
+			dict set latest precip_code $fullcode
 		} else {
-			set latest(precips) "$latest(precips)\n$description"
+			dict append latest precips "\n" $description
 		}
 	}
 }
@@ -511,8 +509,8 @@ proc zstatus::metar::decode::get_weather_icon {daylight} {
 	variable latest
 	variable precip_codes
 
-	if {[info exists latest(precip_code)]} {
-		set code $latest(precip_code)
+	if {[dict exists $latest precip_code]} {
+		set code [dict get $latest precip_code]
 		set icon [dict get $precip_codes $code icon]
 		return $::remix($icon)
 	}
@@ -523,9 +521,9 @@ proc zstatus::metar::decode::get_weather_icon {daylight} {
 		set suffix "night"
 	}
 
-	if {[info exists latest(cloud_code)]} {
+	if {[dict exists $latest cloud_code]} {
 		variable cloud_codes
-		set icon [dict get $cloud_codes $latest(cloud_code) icon]
+		set icon [dict get $cloud_codes [dict get $latest cloud_code] icon]
 		if {$icon != "overcast"} {
 			set icon "${icon}_$suffix"
 		}
@@ -547,26 +545,30 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 	set reporttime [clock format $now -format {%H:%M}\
 			 -timezone $timezone]
 
-	array unset latest
+	set latest {}
 	if [decode_metar_report [fetch_metar_report]] {
-		set report(date) $latest(date)
-		set report(temperature) "$latest(temp)°C"
-		set report(dew)  "$latest(dew)°C"
+		set latest_date [dict get $latest date]
+		set latest_temp [dict get $latest temp]
+		set latest_dew [dict get $latest dew]
 
-		if {[info exists latest(speed)]} {
-			if {[info exists latest(direction)]} {
-				set report(wind) "$latest(speed) km/h $latest(direction)"
-			} else {
-				set report(wind) "$latest(speed) km/h"
+		set report(date) $latest_date
+		set report(temperature) "$latest_temp]°C"
+		set report(dew) "$latest_dew°C"
+
+		if {[dict exists $latest speed]} {
+			set latest_speed [dict get $latest speed]
+			set report(wind) "$latest_speed km/h"
+			if {[dict exists $latest direction]} {
+				append report(wind) " " [dict get $latest direction]
 			}
-			set windchill [calc_windchill $latest(temp) $latest(speed)]
+			set windchill [calc_windchill $latest_temp $latest_speed]
 		} else {
 			set report(wind) ""
 			set windchill ""
 		}
 
-		if {[info exists latest(gust)]} {
-			set report(gust) "$latest(gust) km/h"
+		if {[dict exists $latest gust]} {
+			set report(gust) "[dict get $latest gust] km/h"
 		} else {
 			set report(gust) ""
 		}
@@ -580,54 +582,54 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 
 		set report(pressure) ""
 		set report(pressure_icon) ""
-		if {[info exists latest(pressure)]} {
-			if {$latest(date) != $report(prev_date) &&
-				[string length $report(prev_pressure)]} {
-				if {$latest(pressure) > $report(prev_pressure)} {
-					set report(pressure_icon) $::arrowup 
-				} elseif {$latest(pressure) < $report(prev_pressure)} {
-					set report(pressure_icon) $::arrowdown 
-				} elseif {$latest(pressure) == $report(prev_pressure)} {
-					set report(pressure_icon) ""
+		if {[dict exists $latest pressure]} {
+			set latest_pressure [dict get $latest pressure]
+			if {[info exists report(prev_pressure)] &&\
+				$latest_date != $report(prev_date)} {
+				set $prev_pressure $report(prev_pressure)
+				if {$latest_pressure > $prev_pressure} {
+					set report(pressure_icon) $::arrowup
+				} elseif {$latest_pressure < $prev_pressure} {
+					set report(pressure_icon) $::arrowdown
 				}
 			}
-			set report(prev_date) $latest(date)
-			set report(prev_pressure) $latest(pressure)
+			set report(prev_date) $latest_date
+			set report(prev_pressure) $latest_pressure
 			set report(pressure)\
-				"$latest(pressure) kPa $report(pressure_icon)"
+				"$latest_pressure kPa $report(pressure_icon)"
 		}
 
-		set humidex [calc_humidex $latest(temp) $latest(dew)]
+		set humidex [calc_humidex $latest_temp $latest_dew]
 		if {[string length $humidex]} {
 			set report(note) [dict get $labeldict humidex $locale]
 			set report(note_val) "$humidex°C"
 		}
 
-		set report(rel_humidity) "[calc_rel_humidity $latest(temp) $latest(dew)]%"
+		set report(rel_humidity) "[calc_rel_humidity $latest_temp $latest_dew]%"
 
 		set report(visibility) ""
-		if {[info exists latest(visibility)]} {
-			set report(visibility) "$latest(visibility) km"
+		if [dict exists $latest visibility] {
+			set report(visibility) "[dict get $latest visibility] km"
 		}
 		set report(clouds) ""
-		if {[info exists latest(clouds)]} {
-			set report(clouds) $latest(clouds)
+		if [dict exists $latest clouds] {
+			set report(clouds) [dict get $latest clouds]
 		}
 		set report(precips) ""
-		if {[info exists latest(precips)]} {
-			set report(precips) $latest(precips)
+		if [dict exists $latest precips] {
+			set report(precips) [dict get $latest precips]
 		}
 
 		set report(weather_icon) [get_weather_icon [calc_daylight]]
-		set report(statusbar) "$report(weather_icon) $latest(temp)°C"
+		set report(statusbar) "$report(weather_icon) $latest_temp°C"
 
-		set report(summary) "$latest(temp)°C"
-		if {[info exists latest(precip_desc)]} {
-			set report(summary) "$report(summary), $latest(precip_desc)"
-		} elseif {[info exists latest(cloud_desc)]} {
-			set report(summary) "$report(summary), $latest(cloud_desc)"
+		set report(summary) "$latest_temp°C"
+		if [dict exists $latest precip_desc] {
+			append report(summary) ", " [dict get $latest precip_desc]
+		} elseif [dict exists $latest cloud_desc] {
+			append report(summary) ", " [dict get $latest cloud_desc]
 		}
-		set report(tooltip) "$latest(daytime):  $report(summary)"
+		set report(tooltip) "[dict get $latest daytime]:  $report(summary)"
 		set report(request_message)\
 			"[dict get $labeldict success $locale] $reporttime"
 	} else {
