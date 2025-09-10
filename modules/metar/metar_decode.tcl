@@ -270,6 +270,33 @@ proc zstatus::metar::decode::calc_daylight {} {
 	return $report(daylight)
 }
 
+proc zstatus::metar::decode::get_weather_icon {daylight} {
+	variable latest
+	variable precip_codes
+
+	if {[dict exists $latest precip_code]} {
+		set code [dict get $latest precip_code]
+		set icon [dict get $precip_codes $code icon]
+		return $::remix($icon)
+	}
+
+	if {$daylight == 1} {
+		set suffix "day"
+	} else {
+		set suffix "night"
+	}
+
+	if {[dict exists $latest cloud_code]} {
+		variable cloud_codes
+		set icon [dict get $cloud_codes [dict get $latest cloud_code] icon]
+		if {$icon != "overcast"} {
+			set icon "${icon}_$suffix"
+		}
+		return $::remix($icon)
+	}
+	return $::remix(nometar)
+}
+
 proc zstatus::metar::decode::calc_windchill {temperature windspeed} {
 	if {$windspeed < 4.0} {
 		set windchill [expr $temperature + 0.2 * (0.1345 * $temperature -1.59)\
@@ -505,33 +532,6 @@ proc zstatus::metar::decode::decode_metar_report {message} {
 	return 1
 }
 
-proc zstatus::metar::decode::get_weather_icon {daylight} {
-	variable latest
-	variable precip_codes
-
-	if {[dict exists $latest precip_code]} {
-		set code [dict get $latest precip_code]
-		set icon [dict get $precip_codes $code icon]
-		return $::remix($icon)
-	}
-
-	if {$daylight == 1} {
-		set suffix "day"
-	} else {
-		set suffix "night"
-	}
-
-	if {[dict exists $latest cloud_code]} {
-		variable cloud_codes
-		set icon [dict get $cloud_codes [dict get $latest cloud_code] icon]
-		if {$icon != "overcast"} {
-			set icon "${icon}_$suffix"
-		}
-		return $::remix($icon)
-	}
-	return $::remix(nometar)
-}
-
 proc zstatus::metar::decode::get_report {plocale ptimezone} {
 	variable latest
 	variable report
@@ -586,7 +586,7 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 			set latest_pressure [dict get $latest pressure]
 			if {[info exists report(prev_pressure)] &&\
 				$latest_date != $report(prev_date)} {
-				set $prev_pressure $report(prev_pressure)
+				set prev_pressure $report(prev_pressure)
 				if {$latest_pressure > $prev_pressure} {
 					set report(pressure_icon) $::arrowup
 				} elseif {$latest_pressure < $prev_pressure} {
