@@ -205,7 +205,7 @@ proc zstatus::mail::setup { base position side } {
 	variable mailfont
 	variable mailicon
 	set mailfont [dict get $::widgetdict mail font]
-	set mailicon $::remix(mail)
+	set mailicon $::unicode(mail)
 
 	variable mailboxes
 	set mailboxes [dict get $::config mailboxes]

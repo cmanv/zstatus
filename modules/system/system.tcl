@@ -29,13 +29,13 @@ proc zstatus::system::set_arcsize {} {
 proc zstatus::system::set_netin {} {
 	variable netin
 	variable if_in
-	set netin "$::arrowdown[lindex [freebsd::getnetin $if_in] 0] "
+	set netin "$::unicode(arrowdown)[lindex [freebsd::getnetin $if_in] 0] "
 }
 
 proc zstatus::system::set_netout {} {
 	variable netout
 	variable if_out
-	set netout "$::arrowup[lindex [freebsd::getnetout $if_out] 0] "
+	set netout "$::unicode(arrowup)[lindex [freebsd::getnetout $if_out] 0] "
 }
 
 proc zstatus::system::set_mixer {} {
@@ -53,7 +53,7 @@ proc zstatus::system::setup {bar item} {
 	memused { }
 	mixer {
 		variable mixer_icon
-		set mixer_icon $::remix(mixer)
+		set mixer_icon $::unicode(mixer)
 		set_mixer
 		bind $bar.mixer <MouseWheel> {
 			if {%D < 0} {

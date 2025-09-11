@@ -277,7 +277,7 @@ proc zstatus::metar::decode::get_weather_icon {daylight} {
 	if {[dict exists $latest precip_code]} {
 		set code [dict get $latest precip_code]
 		set icon [dict get $precip_codes $code icon]
-		return $::remix($icon)
+		return $::unicode($icon)
 	}
 
 	if {$daylight == 1} {
@@ -292,9 +292,9 @@ proc zstatus::metar::decode::get_weather_icon {daylight} {
 		if {$icon != "overcast"} {
 			set icon "${icon}_$suffix"
 		}
-		return $::remix($icon)
+		return $::unicode($icon)
 	}
-	return $::remix(nometar)
+	return $::unicode(nometar)
 }
 
 proc zstatus::metar::decode::calc_windchill {temperature windspeed} {
@@ -588,9 +588,9 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 				$latest_date != $report(prev_date)} {
 				set prev_pressure $report(prev_pressure)
 				if {$latest_pressure > $prev_pressure} {
-					set report(pressure_icon) $::arrowup
+					set report(pressure_icon) $::unicode(arrowup)
 				} elseif {$latest_pressure < $prev_pressure} {
-					set report(pressure_icon) $::arrowdown
+					set report(pressure_icon) $::unicode(arrowdown)
 				}
 			}
 			set report(prev_date) $latest_date
@@ -633,7 +633,7 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 		set report(request_message)\
 			"[dict get $labeldict success $locale] $reporttime"
 	} else {
-		set report(statusbar) $::remix(failed)
+		set report(statusbar) $::unicode(failed)
 		set report(request_message)\
 			"[dict get $labeldict failed $locale] $reporttime"
 		set report(tooltip) $report(request_message)

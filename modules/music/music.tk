@@ -40,7 +40,7 @@ proc zstatus::music::update {} {
 
 	set state [mpd::state]
 	if {$state > 1} {
-		$musicframe configure -text $::remix($mpdstates($state))
+		$musicframe configure -text $::unicode($mpdstates($state))
 		if {!$music_active} {
 			pack $musicframe -after $musicpos -side $musicside
 			pack $musicsep -after $musicframe -fill y -padx 5 -side $musicside
