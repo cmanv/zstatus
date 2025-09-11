@@ -23,6 +23,7 @@ foreach icon $iconlist {
 	regsub {\-2} $icon {} icon
 	regsub {\-large} $icon {} icon
 	regsub {^cloudy$} $icon {overcast} icon
+	regsub {\-foggy$} $icon {-few-clouds} icon
 	regsub {^sun$} $icon {sun-clear} icon
 	puts "		$icon \\u$unicode\\"
 }

@@ -16,7 +16,7 @@ namespace eval zstatus::remixicon {
 		mist \uef5d\
 		moon-clear \uef6f\
 		moon-cloudy \uef71\
-		moon-foggy \uef74\
+		moon-few-clouds \uef74\
 		moon \uef75\
 		music \uef82\
 		pause \uf506\
@@ -27,7 +27,7 @@ namespace eval zstatus::remixicon {
 		snowflake \uf513\
 		snowy \uf15e\
 		sun-cloudy \uf1bb\
-		sun-foggy \uf1be\
+		sun-few-clouds \uf1be\
 		sun-clear \uf1bf\
 		thunderstorms \uf209\
 		tornado \uf21c\

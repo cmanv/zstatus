@@ -90,7 +90,7 @@ namespace eval zstatus::metar::decode {
 
 	set cloud_codes [dict create\
 		SKC	{C {Clear sky} fr {Ciel dégagé} icon clear}\
-		FEW	{C {Few clouds} fr {Quelques nuages} icon cloudy}\
+		FEW	{C {Few clouds} fr {Quelques nuages} icon few-clouds}\
 		SCT	{C {Scattered clouds} fr {Nuages dispersés} icon cloudy}\
 		BKN	{C {Broken clouds} fr {Éclaircies} icon cloudy}\
 		OVC	{C {Overcast} fr {Couvert} icon overcast}\
