@@ -27,63 +27,72 @@ namespace eval zstatus::metar::decode {
 		RE	{C {(recent)} fr {(récent)}}]
 
 	set precip_codes [dict create\
-		DZ	{C drizzle fr bruine icon rain1}\
-		FZDZ	{C {freezing drizzle} fr {bruine verglaçante} icon rain1}\
-		RA	{C rain fr pluie icon rain2}\
-		+RA	{C {heavy rain} fr {pluie forte} icon rain3}\
-		-RA	{C {light rain} fr {pluie légère} icon rain1}\
-		SHRA	{C {rain showers} fr {averses de pluie} icon rain3}\
-		-SHRA	{C {light rain showers} fr {légères averses de pluie} icon rain2}\
-		+SHRA	{C {heavy rain showers} fr {fortes averses de pluie} icon rain3}\
-		TSRA	{C {thunderstorms} fr {orages} icon thunder}\
-		-TSRA	{C {light thunderstorms} fr {orages faibles} icon thunder}\
-		+TSRA	{C {heavy thunderstorms} fr {orages forts} icon thunder}\
-		FZRA	{C {freezing rain} fr {pluie verglacante} icon rain2}\
-		-FZRA	{C {light freezing rain} fr {faible pluie verglaçante} icon rain1}\
-		+FZRA	{C {heavy freezing rain} fr {forte pluie verglaçante} icon rain3}\
-		SN	{C snow fr neige icon snow}\
-		+SN	{C {heavy snow} fr {neige forte} icon snow}\
-		-SN	{C {light snow} fr {neige légère} icon snow}\
-		SHSN	{C {snow showers} fr {averses de neige} icon snow}\
-		-SHSN	{C {light snow showers} fr {légères averses de neige} icon snow}\
-		+SHSN	{C {heavy snow showers} fr {fortes averses de neige} icon snow}\
-		DRSN	{C {low drifting snow} fr {chasse basse de neige} icon snow}\
-		BLSN	{C {blowing snow} fr {chasse haute de neige} icon snow}\
-		SG	{C {snow grains} fr {neige en grains} icon snow}\
-		IC	{C {ice crystals} fr {cristaux de glace} icon crystal}\
-		PL	{C {ice pellets} fr {granules de glace} icon crystal}\
+		DZ	{C drizzle fr bruine icon drizzle}\
+		FZDZ	{C {freezing drizzle} fr {bruine verglaçante} icon drizzle}\
+		RA	{C rain fr pluie icon showers}\
+		+RA	{C {heavy rain} fr {pluie forte} icon heavy-showers}\
+		-RA	{C {light rain} fr {pluie légère} icon rainy}\
+		SHRA	{C {rain showers} fr {averses de pluie} icon showers}\
+		-SHRA	{C {light rain showers} fr {légères averses de pluie}\
+			icon rainy}\
+		+SHRA	{C {heavy rain showers} fr {fortes averses de pluie}\
+			icon heavy-showers}\
+		TSRA	{C {thunderstorms} fr {orages} icon thunderstorms}\
+		-TSRA	{C {light thunderstorms} fr {orages faibles}\
+			icon thunderstorms}\
+		+TSRA	{C {heavy thunderstorms} fr {orages forts} icon thunderstorms}\
+		FZRA	{C {freezing rain} fr {pluie verglacante} icon showers}\
+		-FZRA	{C {light freezing rain} fr {faible pluie verglaçante}\
+			icon rainy}\
+		+FZRA	{C {heavy freezing rain} fr {forte pluie verglaçante}\
+			icon heavy-showers}\
+		SN	{C snow fr neige icon snowy}\
+		+SN	{C {heavy snow} fr {neige forte} icon snowy}\
+		-SN	{C {light snow} fr {neige légère} icon snowy}\
+		SHSN	{C {snow showers} fr {averses de neige} icon snowy}\
+		-SHSN	{C {light snow showers} fr {légères averses de neige}\
+			icon snowy}\
+		+SHSN	{C {heavy snow showers} fr {fortes averses de neige}\
+			icon snowy}\
+		DRSN	{C {low drifting snow} fr {chasse basse de neige} icon snowy}\
+		BLSN	{C {blowing snow} fr {chasse haute de neige} icon snowy}\
+		SG	{C {snow grains} fr {neige en grains} icon snowy}\
+		IC	{C {ice snowflakes} fr {cristaux de glace} icon snowflake}\
+		PL	{C {ice pellets} fr {granules de glace} icon snowflake}\
 		GR	{C hail fr grêle icon hail}\
 		+GR	{C {heavy hail} fr {grêle forte} icon hail}\
 		-GR	{C {light hail} fr {grêle légère} icon hail}\
 		GS	{C {small hail} fr {petite grêle} icon hail}\
-		UP	{C {unknown precipitations} fr {précipitations inconnues} icon nometar}\
-		BR	{C mist fr brume icon fog}\
+		UP	{C {unknown precipitations} fr {précipitations inconnues}\
+			icon question-mark}\
+		BR	{C mist fr brume icon mist}\
 		FG	{C fog fr brouillard icon fog}\
 		BCFG	{C {patches of fog} fr {bancs de brouillard} icon fog}\
 		FZFG	{C {freezing fog} fr {brouillard verglaçant} icon fog}\
 		MIFG	{C {shallow fog} fr {brouillard mince} icon fog}\
 		PRFG	{C {partial fog} fr {brouillard partiel} icon fog}\
-		FU	{C smoke fr fumée icon dust}\
-		VA	{C {volcanic ash} fr {cendre volcanique} icon dust}\
-		DU	{C dust fr poussière icon dust}\
-		DRDU	{C {low drifting dust} fr {chasse basse de poussière} icon dust}\
-		BLDU	{C {blowing dust} fr {chasse haute de poussière} icon dust}\
-		SA	{C sand fr sable icon dust}\
-		DRSA	{C {low drifting sand} fr {chasse basse de sable} icon dust}\
-		BLSA	{C {blowing sand} fr {chasse haute de sable} icon dust}\
-		HZ	{C haze fr {brume sèche} icon fog}\
+		FU	{C smoke fr fumée icon mist}\
+		VA	{C {volcanic ash} fr {cendre volcanique} icon mist}\
+		DU	{C dust fr poussière icon mist}\
+		DRDU	{C {low drifting dust} fr {chasse basse de poussière}\
+			icon mist}\
+		BLDU	{C {blowing dust} fr {chasse haute de poussière} icon mist}\
+		SA	{C sand fr sable icon mist}\
+		DRSA	{C {low drifting sand} fr {chasse basse de sable} icon mist}\
+		BLSA	{C {blowing sand} fr {chasse haute de sable} icon mist}\
+		HZ	{C haze fr {brume sèche} icon mist}\
 		PO	{C {dust whirls} fr {tourbillons de poussière} icon tornado}\
-		SQ	{C squalls fr grains icon squall}\
+		SQ	{C squalls fr grains icon cloud-windy}\
 		+FC	{C tornadoes fr tornades icon tornado}\
 		FC	{C {funnel clouds} fr entonnoirs icon tornado}\
-		SS	{C {sand storm} fr {tempête de sable} icon dust}\
-		DS	{C {dust storm} fr {tempête de poussière} icon dust}]
+		SS	{C {sand storm} fr {tempête de sable} icon mist}\
+		DS	{C {dust storm} fr {tempête de poussière} icon mist}]
 
 	set cloud_codes [dict create\
 		SKC	{C {Clear sky} fr {Ciel dégagé} icon clear}\
-		FEW	{C {Few clouds} fr {Quelques nuages} icon cloud1}\
-		SCT	{C {Scattered clouds} fr {Nuages dispersés} icon cloud2}\
-		BKN	{C {Broken clouds} fr {Éclaircies} icon cloud2}\
+		FEW	{C {Few clouds} fr {Quelques nuages} icon cloudy}\
+		SCT	{C {Scattered clouds} fr {Nuages dispersés} icon cloudy}\
+		BKN	{C {Broken clouds} fr {Éclaircies} icon cloudy}\
 		OVC	{C {Overcast} fr {Couvert} icon overcast}\
 		CLR	{C {No low clouds} fr {Aucun nuage bas} icon clear}\
 		NSC	{C {No low clouds} fr {Aucun nuage bas} icon clear}\
@@ -281,20 +290,20 @@ proc zstatus::metar::decode::get_weather_icon {daylight} {
 	}
 
 	if {$daylight == 1} {
-		set suffix "day"
+		set prefix "sun"
 	} else {
-		set suffix "night"
+		set prefix "moon"
 	}
 
 	if {[dict exists $latest cloud_code]} {
 		variable cloud_codes
 		set icon [dict get $cloud_codes [dict get $latest cloud_code] icon]
 		if {$icon != "overcast"} {
-			set icon "${icon}_$suffix"
+			set icon "${prefix}-${icon}"
 		}
 		return $::unicode($icon)
 	}
-	return $::unicode(nometar)
+	return $::unicode(question-mark)
 }
 
 proc zstatus::metar::decode::calc_windchill {temperature windspeed} {
@@ -633,7 +642,7 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 		set report(request_message)\
 			"[dict get $labeldict success $locale] $reporttime"
 	} else {
-		set report(statusbar) $::unicode(failed)
+		set report(statusbar) $::unicode(code-s-slash)
 		set report(request_message)\
 			"[dict get $labeldict failed $locale] $reporttime"
 		set report(tooltip) $report(request_message)

@@ -18,6 +18,7 @@ add_subdirectory(modules/devices)
 add_subdirectory(modules/mail)
 add_subdirectory(modules/metar)
 add_subdirectory(modules/music)
+add_subdirectory(modules/remixicon)
 add_subdirectory(modules/system)
 
 # Substitute some variable names
