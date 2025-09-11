@@ -432,7 +432,7 @@ proc zstatus::metar::decode::decode_clouds {code alt type} {
 		if {![dict exists $latest clouds]} {
 			dict set latest clouds [dict get $latest cloud_desc]
 		} else {
-			dict append latest clouds "\n" [dict get $latest cloud_desc]]
+			dict append latest clouds "\n" [dict get $latest cloud_desc]
 		}
 	}
 	if {[string length $type]} {
@@ -552,7 +552,7 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 		set latest_dew [dict get $latest dew]
 
 		set report(date) $latest_date
-		set report(temperature) "$latest_temp]°C"
+		set report(temperature) "$latest_temp°C"
 		set report(dew) "$latest_dew°C"
 
 		if {[dict exists $latest speed]} {
