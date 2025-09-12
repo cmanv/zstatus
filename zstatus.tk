@@ -274,6 +274,10 @@ proc zstatus::make_font {} {
 		regsub -all { } $emojifont {} emojifont
 		font create emoji -family $emojifont -size $fontsize
 	}
+
+	set ascent [font metrics large2 -ascent]
+	set descent [font metrics large2 -descent]
+	return [expr $ascent + $descent]
 }
 
 proc zstatus::setup {} {
@@ -283,10 +287,14 @@ proc zstatus::setup {} {
 	variable locale
 	variable sepcount
 
-	make_font
 	set bar [frame .zstatus]
 	pack $bar -fill both -expand 1
-	set last $bar
+	set winheight [make_font]
+	if ![dict exists $::config geometry] {
+		dict set ::config geometry "[winfo vrootwidth .]x$winheight+0+0"
+	}
+	wm geometry . [dict get $::config geometry]
+	dict set ::config xscreen [lindex [split [winfo screen .] "."] 1]
 
 	set sepcount 0
 	set widgetlist {}
@@ -323,20 +331,16 @@ try {
 	exit 1
 }
 
-# Unicode mapping from remixicon v4.6.0
-array set unicode [zstatus::remixicon::get]
-
 # Setup tk app
 tk appname "@PACKAGE_NAME@"
 wm title . "@PACKAGE_NAME@ @PACKAGE_VERSION@"
-set config [zstatus::config::read $params(config)]
-dict set config xscreen [lindex [split [winfo screen .] "."] 1]
-if ![dict exists $config geometry] {
-	dict set config geometry "[winfo vrootwidth .]x26+0+0"
-}
-wm geometry . [dict get $config geometry]
 wm attributes . -topmost 1 -type dock
 
+# Unicode mapping from remixicon v4.6.0
+array set unicode [zstatus::remixicon::get]
+# Read config
+set config [zstatus::config::read $params(config)]
+# Setup bar
 zstatus::setup
 set listen [unix_sockets::listen [dict get $config barsocket] zstatus::server_accept]
 vwait forever
