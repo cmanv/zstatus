@@ -59,7 +59,7 @@ proc every {ms cmd} {
 }
 
 namespace eval zstatus {
-	variable currenttheme	none
+	variable theme	none
 	variable proclist	{}
 }
 
@@ -98,14 +98,23 @@ proc zstatus::update {} {
 	foreach p $proclist { $p }
 }
 
-proc zstatus::set_theme {theme} {
-	variable currenttheme
-	if {$theme == $currenttheme} { return }
-	set currenttheme $theme
+proc zstatus::set_datetime {} {
+	variable datetime
+	variable datetime_format
+	variable locale
+
+	set datetime [clock format [clock seconds] \
+		-locale $locale  -format $datetime_format]
+}
+
+proc zstatus::set_theme {newtheme} {
+	variable theme
+	if {$theme == $newtheme} { return }
+	set theme $newtheme
 
 	variable bar
 	variable widgetlist
-	set bartheme [dict get $::widgetdict statusbar $currenttheme]
+	set bartheme [dict get $::widgetdict statusbar $theme]
 
 	set count 0
 	$bar configure -background $bartheme
@@ -114,31 +123,25 @@ proc zstatus::set_theme {theme} {
 		bar {}
 		transient {
 			if [dict exists $::widgetdict $item settheme] {
-				[dict get $::widgetdict $item settheme] $currenttheme
+				[dict get $::widgetdict $item settheme] $theme
 			}
 		}
 		separator {
 			incr count
 			$bar.$item$count configure\
-				-background [dict get $::widgetdict $item $currenttheme]
+				-background [dict get $::widgetdict $item $theme]
 		}
 		default {
 			$bar.$item configure -bg $bartheme\
-				-fg [dict get $::widgetdict $item $currenttheme]
+				-fg [dict get $::widgetdict $item $theme]
 			if [dict exists $::widgetdict $item settheme] {
-				[dict get $::widgetdict $item settheme] $currenttheme
+				[dict get $::widgetdict $item settheme] $theme
 			}
 		}}
 	}
-}
-
-proc zstatus::set_datetime {} {
-	variable datetime
-	variable datetime_format
-	variable locale
-
-	set datetime [clock format [clock seconds] \
-		-locale $locale  -format $datetime_format]
+	if [dict exists $::config zwmsocket] {
+		send_message "desktop-set-${theme}-theme"
+	}
 }
 
 proc zstatus::send_message {msg} {

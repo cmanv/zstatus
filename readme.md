@@ -117,7 +117,7 @@ The list of valid widgets are:
 > __loadavg__, __mail__, __memused__, __metar__, __mixer__, __music__, __netin__,
 > __netout__,  __separator__, __wintitle__
 
-Each of these widgets can be customized in its own section:
+Each of these widgets can be customized with options:
 
 - __[arcsize]__: Shows current usage of the ZFS ARC.
 
@@ -218,8 +218,8 @@ it shows the currently playing track.
 - __[netin]__: Shows the amount of inbound traffic on a given network interface.
 
 > Options:
+> - _interface_: Network interface to monitor. (required)
 > - _exec_: Command to execute on mouse click.
-> - _interface_: Network interface to monitor
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
@@ -227,8 +227,8 @@ it shows the currently playing track.
 - __[netout]__: Shows the amount of outbound traffic on a given network interface.
 
 > Options:
+> - _interface_: Network interface to monitor. (required)
 > - _exec_: Command to execute on mouse click.
-> - _interface_: Network interface to monitor
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.

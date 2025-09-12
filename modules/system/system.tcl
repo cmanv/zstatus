@@ -70,7 +70,8 @@ proc zstatus::system::setup {bar item} {
 	}}
 
 	if [dict exists $::widgetdict $item exec] {
-		bind $bar.$item <1> "exec [dict get $::widgetdict $item exec] &"
+		set command [dict get $::widgetdict $item exec]
+		bind $bar.$item <1> "exec $command >/dev/null 2>@1 &"
 	}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

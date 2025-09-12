@@ -9,7 +9,7 @@ namespace eval zstatus::mail {
 
 proc zstatus::mail::set_theme { theme } {
 	variable bartheme
-	variable mailtheme 
+	variable mailtheme
 	variable septheme
 	set bartheme [dict get $::widgetdict statusbar $theme]
 	set mailtheme [dict get $::widgetdict mail $theme]
@@ -207,7 +207,7 @@ proc zstatus::mail::setup { base position side } {
 	set mailfont [dict get $::widgetdict mail font]
 	set mailicon $::unicode(mail)
 
-	set mailclient 0
+	set mailclient ""
 	if [dict exists $::widgetdict mail exec] {
 		set mailclient [dict get $::widgetdict mail exec]
 	}
@@ -223,10 +223,8 @@ proc zstatus::mail::setup { base position side } {
 			destroy .mailpopup
 			set zstatus::mail::activepopup 0
 		}
-		if {$mailclient} {
-			bind $mailframe.$index <1> {
-				exec $mailclient > /dev/null 2>@1 &
-			}
+		if [string length $mailclient] {
+			bind $mailframe.$index <1> "exec $mailclient >/dev/null 2>@1 &"
 		}
 	}
 }
