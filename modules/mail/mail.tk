@@ -208,8 +208,8 @@ proc zstatus::mail::setup { base position side } {
 	set mailicon $::unicode(mail)
 
 	set mailclient 0
-	if [dict exists $::widgetdict mail client] {
-		set mailclient [dict get $::widgetdict mail client]
+	if [dict exists $::widgetdict mail exec] {
+		set mailclient [dict get $::widgetdict mail exec]
 	}
 	variable mailboxes
 	set mailboxes [dict get $::config mailboxes]

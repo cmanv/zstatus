@@ -122,6 +122,7 @@ Each of these widgets can be customized in its own section:
 - __[arcsize]__: Shows current usage of the ZFS ARC.
 
 > Options:
+> - _exec_: Command to execute on mouse click.
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
 
@@ -165,6 +166,7 @@ Each of these widgets can be customized in its own section:
 - __[loadavg]__: Shows current CPU load average.
 
 > Options:
+> - _exec_: Command to execute on mouse click.
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
@@ -172,7 +174,7 @@ Each of these widgets can be customized in its own section:
 - __[mail]__: Shows icons of new mail. There must be at least one maildir section defined.
 
 > Options:
-> - _client_: The program to execute when clicking on a mail icon.
+> - _exec_: Command to execute on mouse click.
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
@@ -180,6 +182,7 @@ Each of these widgets can be customized in its own section:
 - __[memused]__: Shows current used memory and swap usage if applicable.
 
 > Options:
+> - _exec_: Command to execute on mouse click.
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
@@ -197,6 +200,7 @@ Clicking on it opens a window showing current weather conditions.
 - __[mixer]__: Shows an icon and the volume level of _/dev/mixer_.
 
 > Options:
+> - _exec_: Command to execute on mouse click.
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
@@ -214,6 +218,7 @@ it shows the currently playing track.
 - __[netin]__: Shows the amount of inbound traffic on a given network interface.
 
 > Options:
+> - _exec_: Command to execute on mouse click.
 > - _interface_: Network interface to monitor
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
@@ -222,6 +227,7 @@ it shows the currently playing track.
 - __[netout]__: Shows the amount of outbound traffic on a given network interface.
 
 > Options:
+> - _exec_: Command to execute on mouse click.
 > - _interface_: Network interface to monitor
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.

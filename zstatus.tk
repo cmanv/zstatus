@@ -349,6 +349,6 @@ array set unicode [zstatus::remixicon::get]
 set config [zstatus::config::read $params(config)]
 
 zstatus::setup
-every [dict get $::config delay] zstatus::update
+every [dict get $config delay] zstatus::update
 set listen [unix_sockets::listen [dict get $config barsocket] zstatus::server_accept]
 vwait forever

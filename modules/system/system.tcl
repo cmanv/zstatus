@@ -46,11 +46,6 @@ proc zstatus::system::set_mixer {} {
 
 proc zstatus::system::setup {bar item} {
 	switch $item {
-	arcsize { }
-	loadavg {
-		bind $bar.loadavg <1> { exec xterm +sb -class top -e top & }
-	}
-	memused { }
 	mixer {
 		variable mixer_icon
 		set mixer_icon $::unicode(volume-up)
@@ -73,5 +68,9 @@ proc zstatus::system::setup {bar item} {
 		variable if_out
 		set if_out [dict get $::widgetdict netout interface]
 	}}
+
+	if [dict exists $::widgetdict $item exec] {
+		bind $bar.$item <1> "exec [dict get $::widgetdict $item exec] &"
+	}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@
