@@ -590,22 +590,22 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 		}
 
 		set report(pressure) ""
-		set report(pressure_icon) ""
+		set report(pressure_dir) ""
 		if {[dict exists $latest pressure]} {
 			set latest_pressure [dict get $latest pressure]
 			if {[info exists report(prev_pressure)] &&\
 				$latest_date != $report(prev_date)} {
 				set prev_pressure $report(prev_pressure)
 				if {$latest_pressure > $prev_pressure} {
-					set report(pressure_icon) $::unicode(arrowup)
+					set report(pressure_dir) $::unicode(arrow-up)
 				} elseif {$latest_pressure < $prev_pressure} {
-					set report(pressure_icon) $::unicode(arrowdown)
+					set report(pressure_dir) $::unicode(arrow-down)
 				}
 			}
 			set report(prev_date) $latest_date
 			set report(prev_pressure) $latest_pressure
 			set report(pressure)\
-				"$latest_pressure kPa $report(pressure_icon)"
+				"$latest_pressure kPa $report(pressure_dir)"
 		}
 
 		set humidex [calc_humidex $latest_temp $latest_dew]

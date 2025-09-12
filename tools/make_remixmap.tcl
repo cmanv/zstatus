@@ -2,9 +2,9 @@
 package require fileutil
 
 set iconlist {
-	arrow-down-line arrow-up-line cloud-windy-line cloudy-line\
-	code-s-slash-line download-line drizzle-line foggy-line hail-line\
-	haze-line heavy-showers-line mail-fill mist-line moon-clear-line\
+	arrow-down-line arrow-up-line arrow-up-down-line cloud-windy-line\
+	cloudy-line code-s-slash-line download-line drizzle-line foggy-line\
+	hail-line haze-line heavy-showers-line mail-fill mist-line moon-clear-line\
 	moon-cloudy-line moon-foggy-line moon-line music-2-fill\
 	pause-large-fill play-fill question-mark rainy-line showers-line\
 	snowflake-line snowy-line sun-cloudy-line sun-foggy-line sun-line\

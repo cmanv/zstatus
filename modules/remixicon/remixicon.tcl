@@ -3,6 +3,7 @@ namespace eval zstatus::remixicon {
 	set remixmap {\
 		arrow-down \uea4c\
 		arrow-up \uea76\
+		arrow-up-down \uea74\
 		cloud-windy \ueba1\
 		overcast \ueba5\
 		code-s-slash \uebad\
