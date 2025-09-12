@@ -462,6 +462,6 @@ proc zstatus::metar::setup {bar widget} {
 	bind $bar.$widget <Leave> { zstatus::metar::hide_tooltip }
 
 	set delay [expr [dict get $::widgetdict metar delay] * 60000]
-	zstatus::every $delay zstatus::metar::update
+	every $delay zstatus::metar::update
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

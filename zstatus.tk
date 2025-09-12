@@ -48,19 +48,19 @@ set widgetdict [dict create\
 		font normal light black dark LightGray}\
 	separator {type separator light black dark gray}\
 	statusbar {type bar light gray90 dark gray20}\
-	wintitle {type twidget setup desktop::setup maxlength 100\
+	wintitle {type twidget setup desktop::setup expand 0 maxlength 100\
 		font normal light black dark LightGray}]
 
 set messagedict [dict create set_theme {action set_theme arg 1}]
 
+proc every {ms cmd} {
+	after $ms [namespace code [info level 0]]
+	eval $cmd
+}
+
 namespace eval zstatus {
 	variable currenttheme	none
 	variable proclist	{}
-}
-
-proc zstatus::every {ms cmd} {
-	after $ms [namespace code [info level 0]]
-	eval $cmd
 }
 
 proc zstatus::map_window {window} {
@@ -221,12 +221,7 @@ proc zstatus::add_widgets {side widgets} {
 				exit 1
 			}
 			[dict get $::widgetdict $item setup] $bar $item
-			set expand 0
-			if [dict exists $::widgetdict $item expand] {
-				if [dict get $::widgetdict $item expand] {
-					set expand 1
-				}
-			}
+			set expand [dict get $::widgetdict $item expand]
 			pack $bar.$item -side $side -expand $expand
 			set last $item
 		}
@@ -327,7 +322,6 @@ proc zstatus::setup {} {
 		set theme "light"
 	}
 	set_theme $theme
-	zstatus::every [dict get $::config delay] zstatus::update
 }
 
 # Treat command line options
@@ -353,7 +347,8 @@ wm attributes . -topmost 1 -type dock
 array set unicode [zstatus::remixicon::get]
 # Read config
 set config [zstatus::config::read $params(config)]
-# Setup bar
+
 zstatus::setup
+every [dict get $::config delay] zstatus::update
 set listen [unix_sockets::listen [dict get $config barsocket] zstatus::server_accept]
 vwait forever
