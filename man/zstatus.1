@@ -236,8 +236,9 @@ bold).
 There must be at least one maildir section defined.
 .RS
 .PP
-Options: \- \f[I]font\f[R]: font to use for text (normal, italic or
-bold).
+Options: \- \f[I]client\f[R]: The program to execute when clicking on a
+mail icon.
+\- \f[I]font\f[R]: font to use for text (normal, italic or bold).
 \- \f[I]light\f[R]: color in light mode.
 \- \f[I]dark\f[R]: color in dark mode.
 .RE
@@ -258,7 +259,7 @@ Clicking on it opens a window showing current weather conditions.
 .RS
 .PP
 Options: \- \f[I]code\f[R]: The 4 characters code of the METAR station.
-\- \f[I]delay\f[R]: Time between updates in minutes.
+(required) \- \f[I]delay\f[R]: Time between updates in minutes.
 (Default 10) \- \f[I]font\f[R]: font to use for text (normal, italic or
 bold).
 \- \f[I]light\f[R]: color in light mode.
@@ -317,7 +318,9 @@ Options: \- \f[I]light\f[R]: color in light mode.
 \f[B][wintitle]\f[R]: Displays the title of the currently active window.
 .RS
 .PP
-Options: \- \f[I]maxlength\f[R]: Maximum length of text to display.
+Options: \- \f[I]expand\f[R]: The widget expands to occupy all available
+space.
+\- \f[I]maxlength\f[R]: Maximum length of text to display.
 (Default 100 characters) \- \f[I]font\f[R]: font to use for text
 (normal, italic or bold).
 \- \f[I]light\f[R]: color in light mode.

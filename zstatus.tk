@@ -221,7 +221,13 @@ proc zstatus::add_widgets {side widgets} {
 				exit 1
 			}
 			[dict get $::widgetdict $item setup] $bar $item
-			pack $bar.$item -side $side -expand 1
+			set expand 0
+			if [dict exists $::widgetdict $item expand] {
+				if [dict get $::widgetdict $item expand] {
+					set expand 1
+				}
+			}
+			pack $bar.$item -side $side -expand $expand
 			set last $item
 		}
 		string {

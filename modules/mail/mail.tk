@@ -207,6 +207,10 @@ proc zstatus::mail::setup { base position side } {
 	set mailfont [dict get $::widgetdict mail font]
 	set mailicon $::unicode(mail)
 
+	set mailclient 0
+	if [dict exists $::widgetdict mail client] {
+		set mailclient [dict get $::widgetdict mail client]
+	}
 	variable mailboxes
 	set mailboxes [dict get $::config mailboxes]
 	foreach index [dict keys $mailboxes] {
@@ -219,9 +223,10 @@ proc zstatus::mail::setup { base position side } {
 			destroy .mailpopup
 			set zstatus::mail::activepopup 0
 		}
-		bind $mailframe.$index <1> {
-			exec emacsclient -c -e -F "((width . 120) (height . 30))" \
-				"(mu4e)" > /dev/null 2>@1 &
+		if {$mailclient} {
+			bind $mailframe.$index <1> {
+				exec $mailclient > /dev/null 2>@1 &
+			}
 		}
 	}
 }

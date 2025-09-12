@@ -172,6 +172,7 @@ Each of these widgets can be customized in its own section:
 - __[mail]__: Shows icons of new mail. There must be at least one maildir section defined.
 
 > Options:
+> - _client_: The program to execute when clicking on a mail icon.
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
@@ -187,7 +188,7 @@ Each of these widgets can be customized in its own section:
 Clicking on it opens a window showing current weather conditions.
 
 > Options:
-> - _code_: The 4 characters code of the METAR station.
+> - _code_: The 4 characters code of the METAR station. (required)
 > - _delay_: Time between updates in minutes. (Default 10)
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
@@ -235,7 +236,8 @@ it shows the currently playing track.
 - __[wintitle]__: Displays the title of the currently active window.
 
 > Options:
->-  _maxlength_: Maximum length of text to display. (Default 100 characters)
+> - _expand_: The widget expands to occupy all available space.
+> - _maxlength_: Maximum length of text to display. (Default 100 characters)
 > - _font_: font to use for text (normal, italic or bold).
 > - _light_: color in light mode.
 > - _dark_: color in dark mode.
