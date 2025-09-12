@@ -84,7 +84,7 @@ proc zstatus::map_window {window} {
 
 	set hbar [winfo height .]
 	if [winfo rooty .] {
-		set limit [expr $rooth - $hbar - $height - 1]
+		set limit [expr $rheight - $hbar - $height - 1]
 		if {$ypos > $limit} { set ypos $limit }
 	} else {
 		if {$ypos <= $hbar} { set ypos [expr $hbar + 1] }
@@ -289,11 +289,18 @@ proc zstatus::setup {} {
 
 	set bar [frame .zstatus]
 	pack $bar -fill both -expand 1
-	set winheight [make_font]
+
+	set wheight [make_font]
+	if {[dict get $::config position] == "bottom"} {
+		set position "+0-0"
+	} else {
+		set position "+0+0"
+	}
 	if ![dict exists $::config geometry] {
-		dict set ::config geometry "[winfo vrootwidth .]x$winheight+0+0"
+		dict set ::config geometry "[winfo vrootwidth .]x${wheight}${position}"
 	}
 	wm geometry . [dict get $::config geometry]
+
 	dict set ::config xscreen [lindex [split [winfo screen .] "."] 1]
 
 	set sepcount 0

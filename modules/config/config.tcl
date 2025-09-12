@@ -20,6 +20,7 @@ namespace eval zstatus::config {
 		delay		2000\
 		fontname	"Dejavu Sans"\
 		fontsize	10\
+		position	top\
 		barsocket	"$cache_prefix/zstatus/socket"\
 		zwmsocket 	"$cache_prefix/zwm/socket"]
 

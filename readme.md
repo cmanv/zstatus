@@ -82,6 +82,11 @@ These are the options can be specified in the __[main]__ section.
 
 > Geometry of the status bar in the format _width_x_height_+_xpos_+_ypos_.
 
+* __position__
+
+> Whether the bar is position at the _top_ or the _bottom_ of the screen.
+> (Default: _top_)
+
 * __theme__
 
 > Default theme. ('dark' or 'light')
