@@ -161,7 +161,6 @@ proc zstatus::metar::set_theme_grid {grid} {
 
 proc zstatus::metar::set_theme {newtheme} {
 	variable station
-	if ![dict exists $station icaoId] { return }
 
 	variable theme
 	set theme $newtheme

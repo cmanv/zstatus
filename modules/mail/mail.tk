@@ -92,7 +92,7 @@ proc zstatus::mail::new { index } {
 	toplevel .mailpopup -background $bartheme -class Newmail
 	wm attributes .mailpopup -type dialog
 	wm overrideredirect .mailpopup 1
-	wm geometry .mailpopup -10+27
+	bind .mailpopup <Map> { zstatus::map_window .mailpopup }
 
 	variable mailboxes
 	set mailboxname [dict get $mailboxes $index name]
@@ -107,8 +107,8 @@ proc zstatus::mail::new { index } {
 
 	set count 0
 	foreach file [lsort -decreasing [glob -nocomplain -dir "$mailboxpath/new" *]] {
-		set mesg [fileutil::cat $file]
-		if {[string length $mesg] < 2} {
+		if [catch {set mesg [fileutil::cat $file]} error] {
+			puts "[info level 0]: $error"
 			continue
 		}
 		set tokens [mime::initialize -string $mesg]
@@ -149,6 +149,7 @@ proc zstatus::mail::new { index } {
 			-height 1] -side top -fill x
 		incr count
 	}
+
 }
 
 proc zstatus::mail::update {} {
