@@ -40,7 +40,7 @@ proc zstatus::devices::update {} {
 
 	foreach device $currentlist {
 		if {[lsearch $devicelist $device] == -1} {
-			if {![string length [pack slaves $devframe]]} {
+			if ![string length [pack slaves $devframe]] {
 				pack $devframe -after $devpos -side $devside
 				pack $devsep -after $devframe -fill y \
 					-padx 5 -side $devside
@@ -58,6 +58,7 @@ proc zstatus::devices::update {} {
 			if {![string length [pack slaves $devframe]]} {
 				pack forget $devframe $devsep
 			}
+			destroy $devframe.$device
 		}
 	}
 	set devicelist $currentlist

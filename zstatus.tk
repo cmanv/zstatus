@@ -318,7 +318,7 @@ proc zstatus::setup {} {
 	set theme ""
 	if [dict exists $::config theme] {
 		set theme [dict get $::config theme]
-	} elseif [info exists ::params(theme)] {
+	} elseif [string length $::params(theme)] {
 		set theme $::params(theme)
 	}
 	if {$theme != "light" && $theme != "dark"} {
