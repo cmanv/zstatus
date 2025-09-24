@@ -474,8 +474,8 @@ proc zstatus::metar::decode::decode_precips {intensity qualifier precips} {
 	foreach pcode $codes {
 		set fullcode "${intensity}${qualifier}${pcode}"
 		if [dict exists $precip_codes $fullcode $locale] {
-			set deccription [dict get $precip_codes $fullcode $locale]
-			set deccription "$description $suffix"
+			set description [dict get $precip_codes $fullcode $locale]
+			set description "$description $suffix"
 		} else {
 			set description "[dict get $labeldict nodesc $locale] $fullcode"
 		}
