@@ -16,7 +16,7 @@ namespace eval zstatus::metar::decode {
 	set kp_mmhg		0.133322
 
 	set labeldict [dict create\
-		windchill {C {Wind chill:} fr {Refroidissment éolien :}}\
+		windchill {C {Wind chill:} fr {Refroidissement éolien :}}\
 		humidex {C {Humidex:} fr {Humidex :}}\
 		success {C {Request completed at} fr {Requête complétée à}}\
 		failed {C {Request failed at} fr {Requête échouée à}}\
@@ -28,6 +28,8 @@ namespace eval zstatus::metar::decode {
 
 	set precip_codes [dict create\
 		DZ	{C drizzle fr bruine icon drizzle}\
+		-DZ	{C {light drizzle} fr {faible bruine} icon drizzle}\
+		+DZ	{C {heavy drizzle} fr {forte bruine} icon drizzle}\
 		FZDZ	{C {freezing drizzle} fr {bruine verglaçante} icon drizzle}\
 		RA	{C rain fr pluie icon showers}\
 		+RA	{C {heavy rain} fr {pluie forte} icon heavy-showers}\
