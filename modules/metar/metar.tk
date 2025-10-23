@@ -8,6 +8,7 @@ namespace eval zstatus::metar {
 		value1 {font large light DarkBlue dark CadetBlue3}\
 		value2 {font large light DarkGreen dark PaleGreen3}\
 		summary {font large2 light DarkGreen dark PaleGreen3}\
+		icon {font remix2 light DarkGreen dark PaleGreen3}\
 		tooltip {font normal light black dark gray80}]
 
 	set metar_locales {C fr}
@@ -303,7 +304,7 @@ proc zstatus::metar::setup_summary { summary } {
 	pack [frame $summary] -padx 10 -side top -anchor w
 	pack [frame $summary.temp] -side left
 	pack [frame $summary.temp.status] -side top -anchor w
-	pack [label $summary.temp.status.icon -font [dict get $style summary font]\
+	pack [label $summary.temp.status.icon -font [dict get $style icon font]\
 		-textvar zstatus::metar::report(weather_icon)] -side left
 	pack [label $summary.temp.status.text -font [dict get $style summary font]\
 		-textvar zstatus::metar::report(summary)] -side left -padx 5

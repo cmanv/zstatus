@@ -35,7 +35,7 @@ set widgetdict [dict create\
 		font normal light black dark LightGray}\
 	metar {type lwidget source zstatus::metar::report(statusbar)\
 		setup metar::setup settheme metar::set_theme delay 10\
-		font normal light black dark LightGray}\
+		font remix1 light black dark LightGray}\
 	mixer {type lwidget source zstatus::system::mixer setup system::setup\
 		font normal light black dark LightGray}\
 	music {type transient proc music::update setup music::setup\
@@ -270,6 +270,8 @@ proc zstatus::make_font {} {
 	font create bold2 -family $fontname -size [expr $fontsize + 1] -weight bold
 	font create large -family $fontname -size [expr $fontsize + 1]
 	font create large2 -family $fontname -size [expr $fontsize + 2]
+	font create remix1 -family remixicon -size [expr $fontsize]
+	font create remix2 -family remixicon -size [expr $fontsize + 1]
 
 	if [dict exists $::config emojifont] {
 		set emojifont [dict get $::config emojifont]
