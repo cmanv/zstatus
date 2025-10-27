@@ -46,6 +46,8 @@ set widgetdict [dict create\
 	netout {type lwidget source zstatus::system::netout\
 		proc system::set_netout setup system::setup interface em0\
 		font normal light black dark LightGray}\
+	osversion {type string source zstatus::osversion\
+		font normal light black dark LightGray}\
 	separator {type separator light black dark gray}\
 	statusbar {type bar light gray90 dark gray20}\
 	wintitle {type twidget setup desktop::setup expand 0 maxlength 100\
@@ -291,6 +293,7 @@ proc zstatus::setup {} {
 	variable widgetlist
 	variable datetime_format
 	variable locale
+	variable osversion
 	variable sepcount
 
 	set bar [frame .zstatus]
@@ -316,6 +319,7 @@ proc zstatus::setup {} {
 
 	set datetime_format [dict get $::widgetdict datetime format]
 	set locale [dict get $::config lang]
+	set osversion [exec uname -rs]
 
 	set theme ""
 	if [dict exists $::config theme] {
