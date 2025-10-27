@@ -1,8 +1,8 @@
 #!/usr/bin/env tclsh9.0
 namespace eval zstatus::remixicon {
 	set remixmap {\
-		arrow-down \uea4c\
-		arrow-up \uea76\
+		arrow-down \u2193\
+		arrow-up \u2191\
 		arrow-up-down \uea74\
 		cloud-windy \ueba1\
 		overcast \ueba5\
