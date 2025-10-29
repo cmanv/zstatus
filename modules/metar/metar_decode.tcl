@@ -172,7 +172,7 @@ proc zstatus::metar::decode::fetch_station {code} {
 	variable station
 	set station {}
 
-	if [catch {set message [exec -ignorestderr -- curl -s \
+	if [catch {set message [exec -ignorestderr -- curl --connect-timeout 10 -s \
 		$station_api?ids=$code]}] {return $station}
 	if ![string length $message] {return $station}
 
@@ -495,7 +495,7 @@ proc zstatus::metar::decode::fetch_metar_report {} {
 	variable station
 	variable metar_api
 
-	if [catch {set message [exec -ignorestderr -- curl -s \
+	if [catch {set message [exec -ignorestderr -- curl --connect-timeout 10 -s \
 			$metar_api?ids=[dict get $station icaoId]]}] {return ""}
 	return $message
 }
@@ -558,6 +558,13 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 
 	set latest {}
 	if [decode_metar_report [fetch_metar_report]] {
+		if {![dict exists $latest date] || ![dict exists $latest temp]} {
+			set report(statusbar) $::unicode(code-s-slash)
+			set report(request_message)\
+				"[dict get $labeldict failed $locale] $reporttime"
+			set report(tooltip) $report(request_message)
+			return [array get report]
+		}
 		set latest_date [dict get $latest date]
 		set latest_temp [dict get $latest temp]
 		set latest_dew [dict get $latest dew]

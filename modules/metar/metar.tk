@@ -245,9 +245,10 @@ proc zstatus::metar::update_grid {grid} {
 proc zstatus::metar::update {} {
 	variable metar_code
 	variable station
+	variable locale
+	variable labeldict
 	variable report
 
-	variable locale
 	if ![dict exists $station icaoId] {
 		set station [decode::fetch_station $metar_code]
 		if ![dict size $station] {
