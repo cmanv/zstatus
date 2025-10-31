@@ -170,13 +170,12 @@ proc zstatus::metar::decode::calc_timezone_offset {} {
 proc zstatus::metar::decode::fetch_station {code} {
 	variable station_api
 	variable station
-	set station {}
 
+	set station {}
 	if [catch {set message [exec -ignorestderr -- curl --connect-timeout 10 -s \
 		$station_api?ids=$code]}] {return $station}
 	if ![string length $message] {return $station}
-
-	set station {*}[json::json2dict $message]
+	if [catch {set station {*}[json::json2dict $message]}] { set station {} }
 	return $station
 }
 
