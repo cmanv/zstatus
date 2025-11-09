@@ -59,8 +59,14 @@ namespace eval zstatus::metar::decode {
 		DRSN	{C {low drifting snow} fr {chasse basse de neige} icon snowy}\
 		BLSN	{C {blowing snow} fr {chasse haute de neige} icon snowy}\
 		SG	{C {snow grains} fr {neige en grains} icon snowy}\
+		-SG	{C {light snow grains} fr {faible neige en grains} icon snowy}\
+		+SG	{C {heavy snow grains} fr {forte neige en grains} icon snowy}\
 		IC	{C {ice snowflakes} fr {cristaux de glace} icon snowflake}\
-		PL	{C {ice pellets} fr {granules de glace} icon snowflake}\
+		PL	{C {ice pellets} fr {granules de glace} icon hail}\
+		-PL	{C {light ice pellets} fr {faible granules de glace}\
+			icon hail}\
+		+PL	{C {heavy ice pellets} fr {forte granules de glace}\
+			icon hail}\
 		GR	{C hail fr grêle icon hail}\
 		+GR	{C {heavy hail} fr {grêle forte} icon hail}\
 		-GR	{C {light hail} fr {grêle légère} icon hail}\
