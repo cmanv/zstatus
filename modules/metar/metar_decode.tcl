@@ -31,11 +31,13 @@ namespace eval zstatus::metar::decode {
 		-DZ	{C {light drizzle} fr {faible bruine} icon drizzle}\
 		+DZ	{C {heavy drizzle} fr {forte bruine} icon drizzle}\
 		FZDZ	{C {freezing drizzle} fr {bruine verglaçante} icon drizzle}\
+		-FZDZ	{C {light freezing drizzle} fr {faible bruine verglaçante} icon drizzle}\
+		+FZDZ	{C {heavy freezing drizzle} fr {forte bruine verglaçante} icon drizzle}\
 		RA	{C rain fr pluie icon showers}\
-		+RA	{C {heavy rain} fr {pluie forte} icon heavy-showers}\
-		-RA	{C {light rain} fr {pluie légère} icon rainy}\
+		+RA	{C {heavy rain} fr {forte pluie} icon heavy-showers}\
+		-RA	{C {light rain} fr {faible pluie} icon rainy}\
 		SHRA	{C {rain showers} fr {averses de pluie} icon showers}\
-		-SHRA	{C {light rain showers} fr {légères averses de pluie}\
+		-SHRA	{C {light rain showers} fr {faibles averses de pluie}\
 			icon rainy}\
 		+SHRA	{C {heavy rain showers} fr {fortes averses de pluie}\
 			icon heavy-showers}\
@@ -49,10 +51,10 @@ namespace eval zstatus::metar::decode {
 		+FZRA	{C {heavy freezing rain} fr {forte pluie verglaçante}\
 			icon heavy-showers}\
 		SN	{C snow fr neige icon snowy}\
-		+SN	{C {heavy snow} fr {neige forte} icon snowy}\
-		-SN	{C {light snow} fr {neige légère} icon snowy}\
+		+SN	{C {heavy snow} fr {forte neige} icon snowy}\
+		-SN	{C {light snow} fr {faible neige} icon snowy}\
 		SHSN	{C {snow showers} fr {averses de neige} icon snowy}\
-		-SHSN	{C {light snow showers} fr {légères averses de neige}\
+		-SHSN	{C {light snow showers} fr {faibles averses de neige}\
 			icon snowy}\
 		+SHSN	{C {heavy snow showers} fr {fortes averses de neige}\
 			icon snowy}\
@@ -68,8 +70,8 @@ namespace eval zstatus::metar::decode {
 		+PL	{C {heavy ice pellets} fr {forte granules de glace}\
 			icon hail}\
 		GR	{C hail fr grêle icon hail}\
-		+GR	{C {heavy hail} fr {grêle forte} icon hail}\
-		-GR	{C {light hail} fr {grêle légère} icon hail}\
+		+GR	{C {heavy hail} fr {forte grêle} icon hail}\
+		-GR	{C {light hail} fr {faible grêle} icon hail}\
 		GS	{C {small hail} fr {petite grêle} icon hail}\
 		UP	{C {unknown precipitations} fr {précipitations inconnues}\
 			icon question-mark}\
