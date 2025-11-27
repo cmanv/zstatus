@@ -76,11 +76,11 @@ namespace eval zstatus::metar::decode {
 		UP	{C {unknown precipitations} fr {précipitations inconnues}\
 			icon question-mark}\
 		BR	{C mist fr brume icon mist}\
-		FG	{C fog fr brouillard icon fog}\
-		BCFG	{C {patches of fog} fr {bancs de brouillard} icon fog}\
-		FZFG	{C {freezing fog} fr {brouillard verglaçant} icon fog}\
-		MIFG	{C {shallow fog} fr {brouillard mince} icon fog}\
-		PRFG	{C {partial fog} fr {brouillard partiel} icon fog}\
+		FG	{C fog fr brouillard icon foggy}\
+		BCFG	{C {patches of fog} fr {bancs de brouillard} icon foggy}\
+		FZFG	{C {freezing fog} fr {brouillard verglaçant} icon foggy}\
+		MIFG	{C {shallow fog} fr {brouillard mince} icon foggy}\
+		PRFG	{C {partial fog} fr {brouillard partiel} icon foggy}\
 		FU	{C smoke fr fumée icon mist}\
 		VA	{C {volcanic ash} fr {cendre volcanique} icon mist}\
 		DU	{C dust fr poussière icon mist}\
