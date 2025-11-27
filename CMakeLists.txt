@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.20)
 # Project identification
 project ("zstatus")
 set(PACKAGE_NAME "zstatus")
-set(PACKAGE_VERSION "alpha1")
+set(PACKAGE_VERSION "alpha2")
 message (STATUS "*** Building ${PACKAGE_NAME} ${PACKAGE_VERSION} ***")
 
 # Tcl version

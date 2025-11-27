@@ -6,6 +6,13 @@ namespace eval zstatus::system {
 		 set_mixer
 }
 
+proc zstatus::system::set_theme {theme} {
+	variable systheme
+	variable bartheme 
+	set bartheme [dict get $::widgetdict statusbar $theme]
+	set systheme [dict get $::widgetdict netstat $theme]
+}
+
 proc zstatus::system::set_loadavg {} {
 	variable loadavg
 	set loadavg "C: [freebsd::getloadavg] "
@@ -38,6 +45,56 @@ proc zstatus::system::set_netout {} {
 	set netout "$::unicode(arrow-up)[lindex [freebsd::getnetout $if_out] 0] "
 }
 
+proc zstatus::system::hide_netstat {} {
+	variable netstat_visible
+	set netstat_visible 0
+	destroy .netstat
+}
+
+proc zstatus::system::show_netstat {} {
+	variable netstat_visible
+	variable netstat_text
+	variable bartheme
+	variable systheme
+	variable sysfont
+
+	set sysfont normal
+
+	set netstat_visible 1
+	set netstat [toplevel .netstat -highlightthickness 0\
+				 -background $bartheme]
+	wm title $netstat "Network status"
+	wm attributes $netstat -type dialog
+	wm overrideredirect $netstat 1
+
+	set netstat_text [text $netstat.text -font $sysfont\
+				-bd 0 -highlightthickness 0 -height 2]
+	pack $netstat_text -side left -padx 5 -pady 3
+
+	bind $netstat <Map> { zstatus::map_window .netstat }
+	update_netstat
+}
+
+proc zstatus::system::update_netstat {} {
+	variable systheme
+	variable bartheme
+	variable netstat_text
+	variable netstat_if
+
+	set netin "$::unicode(arrow-down) [lindex [freebsd::getnetin $netstat_if] 0]"
+	set netout "$::unicode(arrow-up) [lindex [freebsd::getnetout $netstat_if] 0]"
+	set current_text "Interface: $netstat_if \n$netout   $netin "
+
+	set width 0
+	foreach line [split $current_text \n] {
+		set width [tcl::mathfunc::max [string length $line] $width]
+	}
+
+	$netstat_text delete 1.0 end
+	$netstat_text insert 1.0 $current_text
+	$netstat_text configure -width $width -fg $systheme -bg $bartheme
+}
+
 proc zstatus::system::set_mixer {} {
 	variable mixer
 	variable mixer_icon
@@ -59,6 +116,15 @@ proc zstatus::system::setup {bar item} {
 			zstatus::system::set_mixer
 		}
 		dict set ::messagedict mixer_volume {action system::set_mixer arg 0}
+	}
+	netstat {
+		variable netstat_icon
+		set netstat_icon $::unicode(arrow-up-down)
+
+		variable netstat_if
+		set netstat_if [dict get $::widgetdict netstat interface]
+		bind $bar.netstat <Enter> { zstatus::system::show_netstat }
+		bind $bar.netstat <Leave> { zstatus::system::hide_netstat }
 	}
 	netin {
 		variable if_in

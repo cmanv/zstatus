@@ -46,6 +46,9 @@ set widgetdict [dict create\
 	netout {type lwidget source zstatus::system::netout\
 		proc system::set_netout setup system::setup interface em0\
 		font normal light black dark LightGray}\
+	netstat {type string source zstatus::system::netstat_icon setup system::setup\
+		settheme zstatus::system::set_theme\
+		font remix1 light black dark LightGray}\
 	osversion {type string source zstatus::osversion\
 		font normal light black dark LightGray}\
 	separator {type separator light black dark gray}\
@@ -235,6 +238,9 @@ proc zstatus::add_widgets {side widgets} {
 				-font [dict get $::widgetdict $item font]\
 				-textvar [dict get $::widgetdict $item source]]\
 				-side $side
+			if [dict exists $::widgetdict $item setup] {
+				[dict get $::widgetdict $item setup] $bar $item
+			}
 			set last $item
 		}
 		separator {
