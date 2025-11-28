@@ -68,7 +68,7 @@ proc zstatus::system::show_netstat {} {
 	wm overrideredirect $netstat 1
 
 	set netstat_text [text $netstat.text -font $sysfont\
-				-bd 0 -highlightthickness 0 -height 2]
+				-bd 0 -highlightthickness 0 -height 3]
 	pack $netstat_text -side left -padx 5 -pady 3
 
 	bind $netstat <Map> { zstatus::map_window .netstat }
@@ -81,9 +81,11 @@ proc zstatus::system::update_netstat {} {
 	variable netstat_text
 	variable netstat_if
 
-	set netin "$::unicode(arrow-down) [lindex [freebsd::getnetin $netstat_if] 0]"
-	set netout "$::unicode(arrow-up) [lindex [freebsd::getnetout $netstat_if] 0]"
-	set current_text "Interface: $netstat_if \n$netout   $netin "
+	set netstat [freebsd::getnetstat $netstat_if]
+	set ipaddr "IPv4: [lindex $netstat 0]"
+	set netin "$::unicode(arrow-down) [lindex $netstat 1]"
+	set netout "$::unicode(arrow-up) [lindex $netstat 2]"
+	set current_text "Interface: $netstat_if \n$ipaddr \n$netin   $netout"
 
 	set width 0
 	foreach line [split $current_text \n] {

@@ -8,6 +8,8 @@
 #include <vm/vm_param.h>
 #include <unistd.h>
 #include <net/if.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <ifaddrs.h>
 #include "config.h"
 #include "freebsd.h"
@@ -67,7 +69,7 @@ int FreeBSD_GetMemStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 	/* Returns used memory */
 	char vmemused[16];
 	snprintf(vmemused, 16, mem_fmt, memused, mem_unit);
-	if (Tcl_ListObjAppendElement(interp, resultObj,  Tcl_NewStringObj(vmemused, -1)) != TCL_OK) {
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(vmemused, -1)) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
@@ -102,7 +104,7 @@ int FreeBSD_GetMemStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 	bzero(vswapused, 16);
 	if (swapused > 0)
 		snprintf(vswapused, 16, swap_fmt, swapused, swap_unit);
-	if (Tcl_ListObjAppendElement(interp, resultObj,  Tcl_NewStringObj(vswapused, -1)) != TCL_OK) {
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(vswapused, -1)) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
@@ -168,7 +170,7 @@ int FreeBSD_GetArcStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 	char varcsize[16];
 	snprintf(varcsize, 16, arc_fmt, arcsize, arc_unit);
 
-	if (Tcl_ListObjAppendElement(interp, resultObj,  Tcl_NewStringObj(varcsize, -1)) != TCL_OK) {
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(varcsize, -1)) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
@@ -185,7 +187,7 @@ int FreeBSD_GetArcStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 	char vmfusize[16];
 	snprintf(vmfusize, 16, mfu_fmt, mfusize, mfu_unit);
 
-	if (Tcl_ListObjAppendElement(interp, resultObj,  Tcl_NewStringObj(vmfusize, -1)) != TCL_OK) {
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(vmfusize, -1)) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
@@ -202,7 +204,7 @@ int FreeBSD_GetArcStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 	char vmrusize[16];
 	snprintf(vmrusize, 16, mru_fmt, mrusize, mru_unit);
 
-	if (Tcl_ListObjAppendElement(interp, resultObj,  Tcl_NewStringObj(vmrusize, -1)) != TCL_OK) {
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(vmrusize, -1)) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
@@ -267,6 +269,78 @@ int FreeBSD_GetCpuFreqObjCmd( ClientData clientData, Tcl_Interp *interp,
 
 	double fmhz = (double)(freq)/1000;
 	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_ObjPrintf("%.1f Mhz", fmhz)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+	return TCL_OK;
+}
+
+int FreeBSD_GetNetStatObjCmd( ClientData clientData, Tcl_Interp *interp,
+				int objc, Tcl_Obj *const objv[])
+{
+	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
+	char iface[33];
+	struct ifaddrs *ifap, *ifa;
+	struct if_data *ifd;
+
+	if (objc < 2) {
+		Tcl_SetStringObj(resultObj, "getnetin: missing interface", -1);
+		return TCL_ERROR;
+	}
+
+	strlcpy(iface, Tcl_GetString(objv[1]), 32);
+
+	if (getifaddrs(&ifap) < 0) {
+		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
+		return TCL_ERROR;
+	}
+
+	char ipaddr[17];
+	strcpy(ipaddr, "N/A");
+	double inbound = 0;
+	double outbound = 0;
+	for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+		if (strcmp(ifa->ifa_name, iface)) continue;
+		if (ifa->ifa_addr->sa_family == AF_LINK) {
+			ifd = (struct if_data *)ifa->ifa_data;
+			inbound = (double)(ifd->ifi_ibytes>>10);
+			outbound = (double)(ifd->ifi_obytes>>10);
+			continue;
+		}
+		if (ifa->ifa_addr->sa_family != AF_INET) continue;
+		struct sockaddr_in *addr_in = (struct sockaddr_in *)ifa->ifa_addr;
+		strlcpy(ipaddr, inet_ntoa(addr_in->sin_addr), 16);
+	}
+	freeifaddrs(ifap);
+
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(ipaddr, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	char iunit[3];
+	strcpy(iunit, "Ki");
+	if (inbound>=1024) { inbound /= 1024; strcpy(iunit, "Mi"); }
+	if (inbound>=1024) { inbound /= 1024; strcpy(iunit, "Gi"); }
+
+	char ifmt[8];
+	strcpy(ifmt, "%.0f %s");
+	if (inbound < 100) strcpy(ifmt, "%.1f %s");
+	if (inbound < 10) strcpy(ifmt, "%.2f %s");
+
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_ObjPrintf(ifmt, inbound, iunit)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	char ounit[3];
+	strcpy(ounit, "Ki");
+	if (outbound>=1024) { outbound /= 1024; strcpy(ounit, "Mi"); }
+	if (outbound>=1024) { outbound /= 1024; strcpy(ounit, "Gi"); }
+
+	char ofmt[8];
+	strcpy(ofmt, "%.0f %s");
+	if (outbound < 100) strcpy(ofmt, "%.1f %s");
+	if (outbound < 10) strcpy(ofmt, "%.2f %s");
+
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_ObjPrintf(ifmt, outbound, ounit)) != TCL_OK) {
 		return TCL_ERROR;
 	}
 	return TCL_OK;
