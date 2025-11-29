@@ -32,6 +32,7 @@ set widgetdict [dict create\
 		font normal light black dark LightGray}\
 	memused {type lwidget source zstatus::system::memused\
 		proc system::set_memused setup system::setup\
+		settheme zstatus::system::set_theme\
 		font normal light black dark LightGray}\
 	metar {type lwidget source zstatus::metar::report(statusbar)\
 		setup metar::setup settheme metar::set_theme delay 10\
@@ -73,7 +74,7 @@ proc zstatus::map_window {window} {
 	set rheight [winfo vrootheight .]
 	set width [winfo width $window]
 	set height [winfo height $window]
-	set xpos [expr [winfo pointerx .] - 5]
+	set xpos [expr [winfo pointerx .] - 20]
 	set ypos [winfo pointery .]
 
 	set right [expr $xpos + $width]

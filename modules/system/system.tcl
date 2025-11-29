@@ -23,7 +23,7 @@ proc zstatus::system::set_loadavg {} {
 
 proc zstatus::system::set_memused {} {
 	variable memused
-	set memused "M: [lindex [freebsd::getmemused] 0] "
+	set memused "M: [lindex [freebsd::getpercmemused] 0] "
 	update_memstats
 }
 
@@ -67,7 +67,7 @@ proc zstatus::system::show_memstats {} {
 	wm overrideredirect $memstats 1
 
 	set memstats_text [text $memstats.text -font $sysfont\
-				-bd 0 -highlightthickness 0 -height 7]
+				-bd 0 -highlightthickness 0 -height 4]
 	pack $memstats_text -side left -padx 5 -pady 3
 
 	bind $memstats <Map> { zstatus::map_window .memstats }
@@ -82,13 +82,10 @@ proc zstatus::system::update_memstats {} {
 
 	if {!$memstats_visible} { return }
 
-	set memstats [freebsd::getmemstats]
+	set memstats [freebsd::getmemused]
 	set current_text "Memory:\n Total: [lindex $memstats 0]"
-	set current_text "$current_text\n Free: [lindex $memstats 5]"
-	set current_text "$current_text\n Active: [lindex $memstats 1]"
-	set current_text "$current_text\n Inactive: [lindex $memstats 2]"
-	set current_text "$current_text\n Wired: [lindex $memstats 3]"
-	set current_text "$current_text\n Laundry: [lindex $memstats 4]"
+	set current_text "$current_text\n Used: [lindex $memstats 1]"
+	set current_text "$current_text\n Free: [lindex $memstats 2]"
 
 	set width 0
 	foreach line [split $current_text \n] {

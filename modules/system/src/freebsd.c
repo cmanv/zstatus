@@ -33,7 +33,7 @@ int FreeBSD_GetLoadAvgObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-int FreeBSD_GetMemUsedObjCmd( ClientData clientData, Tcl_Interp *interp,
+int FreeBSD_GetPercMemUsedObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
@@ -62,6 +62,74 @@ int FreeBSD_GetMemUsedObjCmd( ClientData clientData, Tcl_Interp *interp,
 	char mem_perc[11];
 	snprintf(mem_perc, 10, "%.1f%%", memperc);
 	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(mem_perc, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	return TCL_OK;
+}
+
+int FreeBSD_GetMemUsedObjCmd( ClientData clientData, Tcl_Interp *interp,
+				int objc, Tcl_Obj *const objv[])
+{
+	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
+
+	/* Get total amount of memory */
+	long pages = 0;
+	size_t size = sizeof(long);
+	int err = sysctlbyname("vm.stats.vm.v_page_count", &pages, &size, (void *)NULL, (size_t)0);
+	if (err < 0) {
+		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
+		return TCL_ERROR;
+	}
+	double total = pages>>8;
+
+	/* Get amount of unused memory */
+	err = sysctlbyname("vm.stats.vm.v_free_count", &pages, &size, (void *)NULL, (size_t)0);
+	if (err < 0) {
+		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
+		return TCL_ERROR;
+	}
+	double unused = pages>>8;
+
+	/* Percent used = (total - unused) / total */
+	double usedmem = total - unused;
+
+	char unit[3];
+	strcpy(unit, "Mi");
+	if (total >= 1024) { total /= 1024; strcpy(unit, "Gi"); }
+
+	char fmt[8];
+	strcpy(fmt, "%.0f %s");
+	if (total < 100) strcpy(fmt, "%.1f %s");
+	if (total < 10) strcpy(fmt, "%.2f %s");
+
+	char string[16];
+	snprintf(string, 15, fmt, total, unit);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	strcpy(unit, "Mi");
+	if (usedmem >= 1024) { usedmem /= 1024; strcpy(unit, "Gi"); }
+
+	strcpy(fmt, "%.0f %s");
+	if (usedmem < 100) strcpy(fmt, "%.1f %s");
+	if (usedmem < 10) strcpy(fmt, "%.2f %s");
+
+	snprintf(string, 15, fmt, usedmem, unit);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	strcpy(unit, "Mi");
+	if (unused >= 1024) { unused /= 1024; strcpy(unit, "Gi"); }
+
+	strcpy(fmt, "%.0f %s");
+	if (unused < 100) strcpy(fmt, "%.1f %s");
+	if (unused < 10) strcpy(fmt, "%.2f %s");
+
+	snprintf(string, 15, fmt, unused, unit);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
