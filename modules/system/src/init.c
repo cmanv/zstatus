@@ -28,8 +28,20 @@ Freebsd_Init(Tcl_Interp *interp)
 				(Tcl_CmdDeleteProc*) NULL);
 
 	Tcl_CreateObjCommand(	interp,
+				"zstatus::system::freebsd::getmemused",
+				FreeBSD_GetMemUsedObjCmd,
+				(ClientData) NULL,
+				(Tcl_CmdDeleteProc*) NULL);
+
+	Tcl_CreateObjCommand(	interp,
 				"zstatus::system::freebsd::getmemstats",
 				FreeBSD_GetMemStatsObjCmd,
+				(ClientData) NULL,
+				(Tcl_CmdDeleteProc*) NULL);
+
+	Tcl_CreateObjCommand(	interp,
+				"zstatus::system::freebsd::getswapinfo",
+				FreeBSD_GetSwapInfoObjCmd,
 				(ClientData) NULL,
 				(Tcl_CmdDeleteProc*) NULL);
 

@@ -4,11 +4,14 @@ package require zstatus::system::freebsd
 namespace eval zstatus::system {
 	namespace export set_loadavg set_memused set_arcsize set_netin set_netout\
 		 set_mixer
+
+	variable memstats_visible 0
+	variable neottat_visible 0
 }
 
 proc zstatus::system::set_theme {theme} {
 	variable systheme
-	variable bartheme 
+	variable bartheme
 	set bartheme [dict get $::widgetdict statusbar $theme]
 	set systheme [dict get $::widgetdict netstat $theme]
 }
@@ -20,12 +23,8 @@ proc zstatus::system::set_loadavg {} {
 
 proc zstatus::system::set_memused {} {
 	variable memused
-	set memstats [freebsd::getmemstats]
-	set memused "M: [lindex $memstats 0] "
-	set swap [lindex $memstats 1]
-	if {[string length $swap]} {
-		set memused "$memused\($swap\) "
-	}
+	set memused "M: [lindex [freebsd::getmemused] 0] "
+	update_memstats
 }
 
 proc zstatus::system::set_arcsize {} {
@@ -43,6 +42,62 @@ proc zstatus::system::set_netout {} {
 	variable netout
 	variable if_out
 	set netout "$::unicode(arrow-up)[lindex [freebsd::getnetout $if_out] 0] "
+}
+
+proc zstatus::system::hide_memstats {} {
+	variable memstats_visible
+	set memstats_visible 0
+	destroy .memstats
+}
+
+proc zstatus::system::show_memstats {} {
+	variable memstats_visible
+	variable memstats_text
+	variable bartheme
+	variable systheme
+	variable sysfont
+
+	set sysfont normal
+
+	set memstats_visible 1
+	set memstats [toplevel .memstats -highlightthickness 0\
+				 -background $bartheme]
+	wm title $memstats "Memory stats"
+	wm attributes $memstats -type dialog
+	wm overrideredirect $memstats 1
+
+	set memstats_text [text $memstats.text -font $sysfont\
+				-bd 0 -highlightthickness 0 -height 7]
+	pack $memstats_text -side left -padx 5 -pady 3
+
+	bind $memstats <Map> { zstatus::map_window .memstats }
+	update_memstats
+}
+
+proc zstatus::system::update_memstats {} {
+	variable memstats_visible
+	variable memstats_text
+	variable bartheme
+	variable systheme
+
+	if {!$memstats_visible} { return }
+
+	set memstats [freebsd::getmemstats]
+	set current_text "Memory:\n Total: [lindex $memstats 0]"
+	set current_text "$current_text\n Free: [lindex $memstats 5]"
+	set current_text "$current_text\n Active: [lindex $memstats 1]"
+	set current_text "$current_text\n Inactive: [lindex $memstats 2]"
+	set current_text "$current_text\n Wired: [lindex $memstats 3]"
+	set current_text "$current_text\n Laundry: [lindex $memstats 4]"
+
+	set width 0
+	foreach line [split $current_text \n] {
+		set width [tcl::mathfunc::max [string length $line] $width]
+	}
+
+	$memstats_text delete 1.0 end
+	$memstats_text insert 1.0 $current_text
+	$memstats_text configure -width $width -fg $systheme -bg $bartheme
 }
 
 proc zstatus::system::hide_netstat {} {
@@ -76,11 +131,13 @@ proc zstatus::system::show_netstat {} {
 }
 
 proc zstatus::system::update_netstat {} {
-	variable systheme
-	variable bartheme
+	variable netstat_visible
 	variable netstat_text
 	variable netstat_if
+	variable systheme
+	variable bartheme
 
+	if {!$netstat_visible} { return }
 	set netstat [freebsd::getnetstat $netstat_if]
 	set ipaddr "IPv4: [lindex $netstat 0]"
 	set netin "$::unicode(arrow-down) [lindex $netstat 1]"
@@ -105,6 +162,10 @@ proc zstatus::system::set_mixer {} {
 
 proc zstatus::system::setup {bar item} {
 	switch $item {
+	memused {
+		bind $bar.memused <Enter> { zstatus::system::show_memstats }
+		bind $bar.memused <Leave> { zstatus::system::hide_memstats }
+	}
 	mixer {
 		variable mixer_icon
 		set mixer_icon $::unicode(volume-up)

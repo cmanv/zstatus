@@ -13,6 +13,7 @@
 #include <ifaddrs.h>
 #include "config.h"
 #include "freebsd.h"
+int add_mem_value(char *, Tcl_Interp *, Tcl_Obj *);
 
 int FreeBSD_GetLoadAvgObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
@@ -32,46 +33,118 @@ int FreeBSD_GetLoadAvgObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
+int FreeBSD_GetMemUsedObjCmd( ClientData clientData, Tcl_Interp *interp,
+				int objc, Tcl_Obj *const objv[])
+{
+	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
+
+	/* Get total amount of memory */
+	long total = 0;
+	size_t size = sizeof(long);
+	int err = sysctlbyname("vm.stats.vm.v_page_count", &total, &size, (void *)NULL, (size_t)0);
+	if (err < 0) {
+		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
+		return TCL_ERROR;
+	}
+
+	/* Get amount of unused memory */
+	long unused = 0;
+	err = sysctlbyname("vm.stats.vm.v_free_count", &unused, &size, (void *)NULL, (size_t)0);
+	if (err < 0) {
+		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
+		return TCL_ERROR;
+	}
+
+	/* Percent used = (total - unused) / total */
+	double memperc = (double)(total - unused)*100.0/(double)total;
+
+	/* Returns used memory */
+	char mem_perc[11];
+	snprintf(mem_perc, 10, "%.1f%%", memperc);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(mem_perc, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	return TCL_OK;
+}
+
 int FreeBSD_GetMemStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
 
+	/* Get amount of total available memory */
+	if (add_mem_value("vm.stats.vm.v_page_count", interp, resultObj)) {
+		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
+		return TCL_ERROR;
+	}
+
 	/* Get amount of active memory */
-	long active = 0;
-	size_t size = sizeof(long);
-	int err = sysctlbyname("vm.stats.vm.v_active_count", &active, &size, (void *)NULL, (size_t)0);
-	if (err < 0) {
+	if (add_mem_value("vm.stats.vm.v_active_count", interp, resultObj)) {
+		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
+		return TCL_ERROR;
+	}
+
+	/* Get amount of inactive memory */
+	if (add_mem_value("vm.stats.vm.v_inactive_count", interp, resultObj)) {
 		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
 		return TCL_ERROR;
 	}
 
 	/* Get amount of wired memory */
-	long wired = 0;
-	err = sysctlbyname("vm.stats.vm.v_wire_count", &wired, &size, (void *)NULL, (size_t)0);
-	if (err < 0) {
+	if (add_mem_value("vm.stats.vm.v_wire_count", interp, resultObj)) {
 		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
 		return TCL_ERROR;
 	}
 
-	/* Used nemory = active + wired */
-	double memused = (double)((active + wired)>>8);
-
-	char mem_unit[3];
-	strcpy(mem_unit, "Mi");
-	if (memused>=1024) { memused /= 1024; strcpy(mem_unit, "Gi"); }
-
-	char mem_fmt[8];
-	strcpy(mem_fmt, "%.0f %s");
-	if (memused < 100) strcpy(mem_fmt, "%.1f %s");
-	if (memused < 10) strcpy(mem_fmt, "%.2f %s");
-
-	/* Returns used memory */
-	char vmemused[16];
-	snprintf(vmemused, 16, mem_fmt, memused, mem_unit);
-	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(vmemused, -1)) != TCL_OK) {
+	/* Get amount of laundry memory */
+	if (add_mem_value("vm.stats.vm.v_laundry_count", interp, resultObj)) {
+		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
 		return TCL_ERROR;
 	}
+
+	/* Get amount of free memory */
+	if (add_mem_value("vm.stats.vm.v_free_count", interp, resultObj)) {
+		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
+		return TCL_ERROR;
+	}
+
+	return TCL_OK;
+}
+
+int add_mem_value(char *sysctlname, Tcl_Interp *interp, Tcl_Obj *resultObj)
+{
+	long pages = 0;
+	size_t size = sizeof(long);
+	int err = sysctlbyname(sysctlname, &pages, &size, (void *)NULL, (size_t)0);
+	if (err < 0) {
+		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
+		return TCL_ERROR;
+	}
+	double memory = pages>>8;
+
+	char unit[3];
+	strcpy(unit, "Mi");
+	if (memory >= 1024) { memory /= 1024; strcpy(unit, "Gi"); }
+
+	char fmt[8];
+	strcpy(fmt, "%.0f %s");
+	if (memory < 100) strcpy(fmt, "%.1f %s");
+	if (memory < 10) strcpy(fmt, "%.2f %s");
+
+	char string[16];
+	snprintf(string, 15, fmt, memory, unit);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	return 0;
+}
+
+int FreeBSD_GetSwapInfoObjCmd( ClientData clientData, Tcl_Interp *interp,
+				int objc, Tcl_Obj *const objv[])
+{
+	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
 
 	/* Get amount of swap in use */
 	struct xswdev xsw;
@@ -85,7 +158,7 @@ int FreeBSD_GetMemStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 	double swapused = 0;
 	for (int n=0; ; ++n) {
 		mib[mibsize] = n;
-		size = sizeof xsw;
+		size_t size = sizeof xsw;
 		if (sysctl(mib, mibsize + 1, &xsw, &size, NULL, 0) == -1) break;
 		swapused += (double)(xsw.xsw_used >> 8);
 	}
