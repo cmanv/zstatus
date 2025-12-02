@@ -57,7 +57,7 @@ proc zstatus::music::update {} {
 	}
 }
 
-proc zstatus::music::setup { widget position side } {
+proc zstatus::music::setup { bar position side } {
 	variable mpdsocket
 	if [dict exists $::widgetdict music socket] {
 		set mpdsocket [dict get $::widgetdict music socket]
@@ -67,13 +67,16 @@ proc zstatus::music::setup { widget position side } {
 	variable musicfont
 	set musicfont [dict get $::widgetdict music font]
 
+	variable barwidget
 	variable musicframe
 	variable musicsep
 	variable musicpos
 	variable musicside
-	set musicframe $widget.music
-	set musicsep $widget.musicsep
-	set musicpos $widget.$position
+
+	set barwidget $bar
+	set musicframe $bar.music
+	set musicsep $bar.musicsep
+	set musicpos $bar.$position
 	set musicside $side
 	label $musicframe -font $musicfont
 	frame $musicsep -width 1
@@ -113,13 +116,20 @@ proc zstatus::music::show_tooltip {} {
 	variable mpdtext
 	variable musicfont
 	variable bartheme
+	variable barwidget
+	variable musicframe
 
 	set tooltip_active 1
 	set tooltip [toplevel .musictooltip -highlightthickness 0\
 			-background $bartheme]
+
+	set xpos [winfo x $musicframe]
+	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
+
 	wm title $tooltip "Now Playing"
 	wm attributes $tooltip -type dialog
 	wm overrideredirect $tooltip 1
+	wm geometry $tooltip +$xpos+$ypos
 
 	set mpdtext [text $tooltip.text -font $musicfont\
 			-bd 0 -highlightthickness 0 -height 2]
