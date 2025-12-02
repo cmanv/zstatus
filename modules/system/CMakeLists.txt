@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.20)
 # Project identification
 project ("system")
 set(PACKAGE_NAME "zstatus::system")
-set(PACKAGE_VERSION "0.7")
+set(PACKAGE_VERSION "0.8")
 set(LIBRARY_PROVIDE "zstatus::system::freebsd")
 set(CMAKE_C_COMPILER "/usr/bin/cc")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

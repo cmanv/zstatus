@@ -40,12 +40,19 @@ proc zstatus::metar::show_tooltip {} {
 	variable bartheme
 	variable style
 	variable theme
+	variable barwidget
+	variable metarwidget
 
 	set window [toplevel .metartooltip -highlightthickness 0\
 			-background $bartheme]
+
+	set xpos [winfo x $metarwidget]
+	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
+
 	wm title $window "Metar Summary"
 	wm attributes $window -type dialog
 	wm overrideredirect $window 1
+	wm geometry $window +$xpos+$ypos
 
 	pack [label $window.text -font [dict get $style tooltip font]\
 		-fg [dict get $style tooltip $theme] -bg $bartheme\
@@ -62,6 +69,9 @@ proc zstatus::metar::hide_tooltip {} {
 proc zstatus::metar::toggle_window {} {
 	variable station
 	variable popup
+	variable barwidget
+	variable metarwidget
+
 	if ![dict exists $station icaoId] { return }
 
 	variable state_visible
@@ -69,6 +79,9 @@ proc zstatus::metar::toggle_window {} {
 		wm state $popup withdrawn
 		set state_visible 0
 	} else {
+		set xpos [winfo x $metarwidget]
+		set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
+		wm geometry $popup +$xpos+$ypos
 		wm state $popup normal
 		raise $popup
 		set state_visible 1
@@ -416,6 +429,8 @@ proc zstatus::metar::setup_grid { grid } {
 
 proc zstatus::metar::setup {bar widget} {
 	variable theme
+	variable barwidget
+	variable metarwidget
 
 	if ![dict exists $::widgetdict metar station] {
 		variable report
@@ -423,6 +438,8 @@ proc zstatus::metar::setup {bar widget} {
 		set report(tooltip) "-"
 		return
 	}
+	set barwidget $bar
+	set metarwidget $bar.$widget
 
 	variable metar_code
 	set metar_code [dict get $::widgetdict metar station]
@@ -457,10 +474,11 @@ proc zstatus::metar::setup {bar widget} {
 	bind $popup <3> { zstatus::metar::toggle_window }
 #	bind $popup <Escape> { zstatus::metar::toggle_window }
 	bind $popup <Map> { zstatus::map_window .metarreport }
-	bind $bar.$widget <1> { zstatus::metar::toggle_window }
-	bind $bar.$widget <2> { zstatus::metar::update }
-	bind $bar.$widget <Enter> { zstatus::metar::show_tooltip }
-	bind $bar.$widget <Leave> { zstatus::metar::hide_tooltip }
+
+	bind $metarwidget <1> { zstatus::metar::toggle_window }
+	bind $metarwidget <2> { zstatus::metar::update }
+	bind $metarwidget <Enter> { zstatus::metar::show_tooltip }
+	bind $metarwidget <Leave> { zstatus::metar::hide_tooltip }
 
 	set delay [expr [dict get $::widgetdict metar delay] * 60000]
 	after 1000 "every $delay zstatus::metar::update"

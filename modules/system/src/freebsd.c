@@ -136,79 +136,6 @@ int FreeBSD_GetMemUsedObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-int FreeBSD_GetMemStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
-				int objc, Tcl_Obj *const objv[])
-{
-	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
-
-	/* Get amount of total available memory */
-	if (add_mem_value("vm.stats.vm.v_page_count", interp, resultObj)) {
-		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
-		return TCL_ERROR;
-	}
-
-	/* Get amount of active memory */
-	if (add_mem_value("vm.stats.vm.v_active_count", interp, resultObj)) {
-		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
-		return TCL_ERROR;
-	}
-
-	/* Get amount of inactive memory */
-	if (add_mem_value("vm.stats.vm.v_inactive_count", interp, resultObj)) {
-		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
-		return TCL_ERROR;
-	}
-
-	/* Get amount of wired memory */
-	if (add_mem_value("vm.stats.vm.v_wire_count", interp, resultObj)) {
-		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
-		return TCL_ERROR;
-	}
-
-	/* Get amount of laundry memory */
-	if (add_mem_value("vm.stats.vm.v_laundry_count", interp, resultObj)) {
-		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
-		return TCL_ERROR;
-	}
-
-	/* Get amount of free memory */
-	if (add_mem_value("vm.stats.vm.v_free_count", interp, resultObj)) {
-		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
-		return TCL_ERROR;
-	}
-
-	return TCL_OK;
-}
-
-int add_mem_value(char *sysctlname, Tcl_Interp *interp, Tcl_Obj *resultObj)
-{
-	long pages = 0;
-	size_t size = sizeof(long);
-	int err = sysctlbyname(sysctlname, &pages, &size, (void *)NULL, (size_t)0);
-	if (err < 0) {
-		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
-		return TCL_ERROR;
-	}
-	double memory = pages>>8;
-
-	char unit[3];
-	strcpy(unit, "Mi");
-	if (memory >= 1024) { memory /= 1024; strcpy(unit, "Gi"); }
-
-	char fmt[8];
-	strcpy(fmt, "%.0f %s");
-	if (memory < 100) strcpy(fmt, "%.1f %s");
-	if (memory < 10) strcpy(fmt, "%.2f %s");
-
-	char string[16];
-	snprintf(string, 15, fmt, memory, unit);
-	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
-		return TCL_ERROR;
-	}
-
-	return 0;
-}
-
 int FreeBSD_GetSwapInfoObjCmd( ClientData clientData, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[])
 {
@@ -223,29 +150,42 @@ int FreeBSD_GetSwapInfoObjCmd( ClientData clientData, Tcl_Interp *interp,
 		return TCL_ERROR;
 	}
 
-	double swapused = 0;
+	double total = 0;
+	double used = 0;
 	for (int n=0; ; ++n) {
 		mib[mibsize] = n;
 		size_t size = sizeof xsw;
 		if (sysctl(mib, mibsize + 1, &xsw, &size, NULL, 0) == -1) break;
-		swapused += (double)(xsw.xsw_used >> 8);
+		total += (double)(xsw.xsw_nblks >> 8);
+		used += (double)(xsw.xsw_used >> 8);
 	}
 
-	char swap_unit[3];
-	strcpy(swap_unit, "Mi");
-	if (swapused>=1024) { swapused /= 1024; strcpy(swap_unit, "Gi"); }
+	char unit[3];
+	strcpy(unit, "Mi");
+	if (total>=1024) { total /= 1024; strcpy(unit, "Gi"); }
 
-	char swap_fmt[8];
-	strcpy(swap_fmt, "%.0f %s");
-	if (swapused < 100) strcpy(swap_fmt, "%.1f %s");
-	if (swapused < 10) strcpy(swap_fmt, "%.2f %s");
+	char fmt[8];
+	strcpy(fmt, "%.0f %s");
+	if (total < 100) strcpy(fmt, "%.1f %s");
+	if (total < 10) strcpy(fmt, "%.2f %s");
 
-	/* Returns swap */
-	char vswapused[16];
-	bzero(vswapused, 16);
-	if (swapused > 0)
-		snprintf(vswapused, 16, swap_fmt, swapused, swap_unit);
-	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(vswapused, -1)) != TCL_OK) {
+	char string[16];
+	bzero(string, 16);
+	snprintf(string, 16, fmt, total, unit);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	strcpy(unit, "Mi");
+	if (used>=1024) { used /= 1024; strcpy(unit, "Gi"); }
+
+	strcpy(fmt, "%.0f %s");
+	if (used < 100) strcpy(fmt, "%.1f %s");
+	if (used < 10) strcpy(fmt, "%.2f %s");
+
+	bzero(string, 16);
+	snprintf(string, 16, fmt, used, unit);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
@@ -257,95 +197,52 @@ int FreeBSD_GetArcStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 {
 	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
 
-	long long mfu = 0, mru = 0, anon = 0, header = 0, other = 0;
+	long long value = 0;
 	size_t size = sizeof(long);
-	int err = sysctlbyname("kstat.zfs.misc.arcstats.mfu_size", &mfu, &size,
+	int err = sysctlbyname("vfs.zfs.arc.max", &value, &size,
 				(void *)NULL, (size_t)0);
 	if (err < 0) {
 		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
 		return TCL_ERROR;
 	}
+	double arcmax = (double)(value>>20);
 
-	err = sysctlbyname("kstat.zfs.misc.arcstats.mru_size", &mru, &size,
+	char unit[3];
+	strcpy(unit, "Mi");
+	if (arcmax>=1024) { arcmax /= 1024; strcpy(unit, "Gi"); }
+
+	char fmt[8];
+	strcpy(fmt, "%.0f %s");
+	if (arcmax < 100) strcpy(fmt, "%.1f %s");
+	if (arcmax < 10) strcpy(fmt, "%.2f %s");
+
+	/* Returns a string containing ARC max size */
+	char string[16];
+	snprintf(string, 16, fmt, arcmax, unit);
+
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	err = sysctlbyname("kstat.zfs.misc.arcstats.size", &value, &size,
 				(void *)NULL, (size_t)0);
 	if (err < 0) {
 		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
 		return TCL_ERROR;
 	}
+	double arcsize = (double)(value>>20);
 
-	err = sysctlbyname("kstat.zfs.misc.arcstats.anon_size", &anon, &size,
-				(void *)NULL, (size_t)0);
-	if (err < 0) {
-		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
-		return TCL_ERROR;
-	}
+	strcpy(unit, "Mi");
+	if (arcsize>=1024) { arcsize /= 1024; strcpy(unit, "Gi"); }
 
-	err = sysctlbyname("kstat.zfs.misc.arcstats.hdr_size", &header, &size,
-				(void *)NULL, (size_t)0);
-	if (err < 0) {
-		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
-		return TCL_ERROR;
-	}
-
-	err = sysctlbyname("kstat.zfs.misc.arcstats.other_size", &other, &size,
-				(void *)NULL, (size_t)0);
-	if (err < 0) {
-		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
-		return TCL_ERROR;
-	}
-
-	double arcsize = (double)((mfu + mru + anon + header + other)>>20);
-	double mfusize = (double)(mfu>>20);
-	double mrusize = (double)(mru>>20);
-
-	char arc_unit[3];
-	strcpy(arc_unit, "Mi");
-	if (arcsize>=1024) { arcsize /= 1024; strcpy(arc_unit, "Gi"); }
-
-	char arc_fmt[8];
-	strcpy(arc_fmt, "%.0f %s");
-	if (arcsize < 100) strcpy(arc_fmt, "%.1f %s");
-	if (arcsize < 10) strcpy(arc_fmt, "%.2f %s");
+	strcpy(fmt, "%.0f %s");
+	if (arcsize < 100) strcpy(fmt, "%.1f %s");
+	if (arcsize < 10) strcpy(fmt, "%.2f %s");
 
 	/* Returns a string containing ARC size */
-	char varcsize[16];
-	snprintf(varcsize, 16, arc_fmt, arcsize, arc_unit);
+	snprintf(string, 16, fmt, arcsize, unit);
 
-	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(varcsize, -1)) != TCL_OK) {
-		return TCL_ERROR;
-	}
-
-	char mfu_unit[3];
-	strcpy(mfu_unit, "Mi");
-	if (mfusize>=1024) { mfusize /= 1024; strcpy(mfu_unit, "Gi"); }
-
-	char mfu_fmt[8];
-	strcpy(mfu_fmt, "%.0f %s");
-	if (mfusize < 100) strcpy(mfu_fmt, "%.1f %s");
-	if (mfusize < 10) strcpy(mfu_fmt, "%.2f %s");
-
-	/* Returns a string containing ARC size */
-	char vmfusize[16];
-	snprintf(vmfusize, 16, mfu_fmt, mfusize, mfu_unit);
-
-	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(vmfusize, -1)) != TCL_OK) {
-		return TCL_ERROR;
-	}
-
-	char mru_unit[3];
-	strcpy(mru_unit, "Mi");
-	if (mrusize>=1024) { mrusize /= 1024; strcpy(mru_unit, "Gi"); }
-
-	char mru_fmt[8];
-	strcpy(mru_fmt, "%.0f %s");
-	if (mrusize < 100) strcpy(mru_fmt, "%.1f %s");
-	if (mrusize < 10) strcpy(mru_fmt, "%.2f %s");
-
-	/* Returns a string containing ARC size */
-	char vmrusize[16];
-	snprintf(vmrusize, 16, mru_fmt, mrusize, mru_unit);
-
-	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(vmrusize, -1)) != TCL_OK) {
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
 		return TCL_ERROR;
 	}
 

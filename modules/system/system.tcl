@@ -29,7 +29,7 @@ proc zstatus::system::set_memused {} {
 
 proc zstatus::system::set_arcsize {} {
 	variable arcsize
-	set arcsize "ARC: [lindex [freebsd::getarcstats] 0] "
+	set arcsize "ARC: [lindex [freebsd::getarcstats] 1] "
 }
 
 proc zstatus::system::set_netin {} {
@@ -56,18 +56,24 @@ proc zstatus::system::show_memstats {} {
 	variable bartheme
 	variable systheme
 	variable sysfont
+	variable barwidget
+	variable memwidget
 
 	set sysfont normal
 
 	set memstats_visible 1
 	set memstats [toplevel .memstats -highlightthickness 0\
 				 -background $bartheme]
+
+	set xpos [winfo x $memwidget]
+	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
 	wm title $memstats "Memory stats"
 	wm attributes $memstats -type dialog
 	wm overrideredirect $memstats 1
+	wm geometry $memstats +$xpos+$ypos
 
 	set memstats_text [text $memstats.text -font $sysfont\
-				-bd 0 -highlightthickness 0 -height 4]
+				-bd 0 -highlightthickness 0 -height 6]
 	pack $memstats_text -side left -padx 5 -pady 3
 
 	bind $memstats <Map> { zstatus::map_window .memstats }
@@ -83,9 +89,15 @@ proc zstatus::system::update_memstats {} {
 	if {!$memstats_visible} { return }
 
 	set memstats [freebsd::getmemused]
-	set current_text "Memory:\n Total: [lindex $memstats 0]"
-	set current_text "$current_text\n Used: [lindex $memstats 1]"
-	set current_text "$current_text\n Free: [lindex $memstats 2]"
+	set current_text "Available memory: [lindex $memstats 0]\n"
+	append current_text " Used: [lindex $memstats 1]"
+	append current_text " Free: [lindex $memstats 2]\n"
+	set arcstats [freebsd::getarcstats]
+	append current_text "ARC:\n Max: [lindex $arcstats 0]"
+	append current_text " Used: [lindex $arcstats 1]\n"
+	set swapinfo [freebsd::getswapinfo]
+	append current_text "Swap:\n Max: [lindex $swapinfo 0]"
+	append current_text " Used: [lindex $swapinfo 1]"
 
 	set width 0
 	foreach line [split $current_text \n] {
@@ -109,15 +121,21 @@ proc zstatus::system::show_netstat {} {
 	variable bartheme
 	variable systheme
 	variable sysfont
+	variable barwidget
+	variable netwidget
 
 	set sysfont normal
 
 	set netstat_visible 1
 	set netstat [toplevel .netstat -highlightthickness 0\
 				 -background $bartheme]
+
+	set xpos [winfo x $netwidget]
+	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
 	wm title $netstat "Network status"
 	wm attributes $netstat -type dialog
 	wm overrideredirect $netstat 1
+	wm geometry $netstat +$xpos+$ypos
 
 	set netstat_text [text $netstat.text -font $sysfont\
 				-bd 0 -highlightthickness 0 -height 3]
@@ -125,6 +143,7 @@ proc zstatus::system::show_netstat {} {
 
 	bind $netstat <Map> { zstatus::map_window .netstat }
 	update_netstat
+
 }
 
 proc zstatus::system::update_netstat {} {
@@ -158,8 +177,14 @@ proc zstatus::system::set_mixer {} {
 }
 
 proc zstatus::system::setup {bar item} {
+	variable barwidget
+	variable memwidget
+	variable netwidget
+
 	switch $item {
 	memused {
+		set barwidget $bar
+		set memwidget $bar.$item
 		bind $bar.memused <Enter> { zstatus::system::show_memstats }
 		bind $bar.memused <Leave> { zstatus::system::hide_memstats }
 	}
@@ -178,6 +203,8 @@ proc zstatus::system::setup {bar item} {
 		dict set ::messagedict mixer_volume {action system::set_mixer arg 0}
 	}
 	netstat {
+		set barwidget $bar
+		set netwidget $bar.$item
 		variable netstat_icon
 		set netstat_icon $::unicode(arrow-up-down)
 
