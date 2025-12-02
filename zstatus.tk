@@ -47,7 +47,8 @@ set widgetdict [dict create\
 	netout {type lwidget source zstatus::system::netout\
 		proc system::set_netout setup system::setup interface em0\
 		font normal light black dark LightGray}\
-	netstat {type string source zstatus::system::netstat_icon setup system::setup\
+	netstat {type string source zstatus::system::netstat_icon interface em0\
+		proc zstatus::system::update_netstat setup system::setup\
 		settheme zstatus::system::set_theme\
 		font remix1 light black dark LightGray}\
 	osversion {type string source zstatus::osversion\
@@ -74,8 +75,8 @@ proc zstatus::map_window {window} {
 	set rheight [winfo vrootheight .]
 	set width [winfo width $window]
 	set height [winfo height $window]
-	set xpos [expr [winfo pointerx .] - 20]
-	set ypos [winfo pointery .]
+	set xpos [winfo x $window]
+	set ypos [winfo y $window]
 
 	set right [expr $xpos + $width]
 	if {$right >= $rwidth} {
@@ -96,7 +97,7 @@ proc zstatus::map_window {window} {
 		if {$ypos <= $hbar} { set ypos [expr $hbar + 1] }
 	}
 
-	wm geometry $window +$xpos+$ypos
+	wm geometry $window ${width}x${height}+$xpos+$ypos
 }
 
 proc zstatus::update {} {

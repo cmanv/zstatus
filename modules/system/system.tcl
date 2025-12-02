@@ -6,7 +6,7 @@ namespace eval zstatus::system {
 		 set_mixer
 
 	variable memstats_visible 0
-	variable neottat_visible 0
+	variable netstat_visible 0
 }
 
 proc zstatus::system::set_theme {theme} {
