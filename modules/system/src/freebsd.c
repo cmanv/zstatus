@@ -94,6 +94,7 @@ int FreeBSD_GetMemUsedObjCmd( ClientData clientData, Tcl_Interp *interp,
 	/* Percent used = (total - unused) / total */
 	double usedmem = total - unused;
 
+	// Total memory
 	char unit[3];
 	strcpy(unit, "Mi");
 	if (total >= 1024) { total /= 1024; strcpy(unit, "Gi"); }
@@ -109,6 +110,7 @@ int FreeBSD_GetMemUsedObjCmd( ClientData clientData, Tcl_Interp *interp,
 		return TCL_ERROR;
 	}
 
+	// Used memory
 	strcpy(unit, "Mi");
 	if (usedmem >= 1024) { usedmem /= 1024; strcpy(unit, "Gi"); }
 
@@ -121,6 +123,7 @@ int FreeBSD_GetMemUsedObjCmd( ClientData clientData, Tcl_Interp *interp,
 		return TCL_ERROR;
 	}
 
+	// Unused memory
 	strcpy(unit, "Mi");
 	if (unused >= 1024) { unused /= 1024; strcpy(unit, "Gi"); }
 
@@ -159,6 +162,7 @@ int FreeBSD_GetSwapInfoObjCmd( ClientData clientData, Tcl_Interp *interp,
 		total += (double)(xsw.xsw_nblks >> 8);
 		used += (double)(xsw.xsw_used >> 8);
 	}
+	double free = total - used;
 
 	char unit[3];
 	strcpy(unit, "Mi");
@@ -189,6 +193,19 @@ int FreeBSD_GetSwapInfoObjCmd( ClientData clientData, Tcl_Interp *interp,
 		return TCL_ERROR;
 	}
 
+	strcpy(unit, "Mi");
+	if (free>=1024) { free /= 1024; strcpy(unit, "Gi"); }
+
+	strcpy(fmt, "%.0f %s");
+	if (free < 100) strcpy(fmt, "%.1f %s");
+	if (free < 10) strcpy(fmt, "%.2f %s");
+
+	bzero(string, 16);
+	snprintf(string, 16, fmt, free, unit);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
 	return TCL_OK;
 }
 
@@ -207,6 +224,16 @@ int FreeBSD_GetArcStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 	}
 	double arcmax = (double)(value>>20);
 
+	err = sysctlbyname("kstat.zfs.misc.arcstats.size", &value, &size,
+				(void *)NULL, (size_t)0);
+	if (err < 0) {
+		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
+		return TCL_ERROR;
+	}
+	double arcsize = (double)(value>>20);
+	double arcfree = arcmax - arcsize;
+
+	// ARC MAX
 	char unit[3];
 	strcpy(unit, "Mi");
 	if (arcmax>=1024) { arcmax /= 1024; strcpy(unit, "Gi"); }
@@ -224,14 +251,7 @@ int FreeBSD_GetArcStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 		return TCL_ERROR;
 	}
 
-	err = sysctlbyname("kstat.zfs.misc.arcstats.size", &value, &size,
-				(void *)NULL, (size_t)0);
-	if (err < 0) {
-		Tcl_SetStringObj(resultObj, Tcl_PosixError(interp), -1);
-		return TCL_ERROR;
-	}
-	double arcsize = (double)(value>>20);
-
+	// ARC Used
 	strcpy(unit, "Mi");
 	if (arcsize>=1024) { arcsize /= 1024; strcpy(unit, "Gi"); }
 
@@ -239,8 +259,23 @@ int FreeBSD_GetArcStatsObjCmd( ClientData clientData, Tcl_Interp *interp,
 	if (arcsize < 100) strcpy(fmt, "%.1f %s");
 	if (arcsize < 10) strcpy(fmt, "%.2f %s");
 
-	/* Returns a string containing ARC size */
+	/* Returns a string containing ARC used size */
 	snprintf(string, 16, fmt, arcsize, unit);
+
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	// ARC unused
+	strcpy(unit, "Mi");
+	if (arcfree>=1024) { arcfree /= 1024; strcpy(unit, "Gi"); }
+
+	strcpy(fmt, "%.0f %s");
+	if (arcfree < 100) strcpy(fmt, "%.1f %s");
+	if (arcfree < 10) strcpy(fmt, "%.2f %s");
+
+	/* Returns a string containing ARC unused size */
+	snprintf(string, 16, fmt, arcfree, unit);
 
 	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(string, -1)) != TCL_OK) {
 		return TCL_ERROR;

@@ -5,6 +5,17 @@ namespace eval zstatus::system {
 	namespace export set_loadavg set_memused set_arcsize set_netin set_netout\
 		 set_mixer
 
+	set syslocales {C fr}
+	set sysdict [dict create\
+		load {C "L:" fr "C:"}\
+		memstats {C "MemStats" fr "MemStats"}\
+		mem {C "RAM:" fr "RAM :"}\
+		arc {C "ARC:" fr "ARC :"}\
+		swap {C "Swao:" fr "Swap :"}\
+		total {C "Total" fr "Total"}\
+		used {C "Used" fr "Utilisé"}\
+		free {C "Free" fr "Libre"}]
+
 	variable memstats_visible 0
 	variable netstat_visible 0
 }
@@ -48,7 +59,9 @@ proc zstatus::system::set_theme_netstat {} {
 
 proc zstatus::system::set_loadavg {} {
 	variable loadavg
-	set loadavg "C: [freebsd::getloadavg] "
+	variable sysdict
+	variable locale
+	set loadavg "[dict get $sysdict load $locale][freebsd::getloadavg] "
 }
 
 proc zstatus::system::set_memused {} {
@@ -82,14 +95,14 @@ proc zstatus::system::hide_memstats {} {
 
 proc zstatus::system::show_memstats {} {
 	variable memstats_visible
+	variable sysdict
+	variable locale
 	variable bartheme
 	variable systheme
 	variable sysfont
 	variable barwidget
 	variable memwidget
 	variable memgrid
-
-	set sysfont normal
 
 	set memstats_visible 1
 	set memstats [toplevel .memstats -highlightthickness 0\
@@ -106,31 +119,53 @@ proc zstatus::system::show_memstats {} {
 
 	set row 0
 	pack [frame $memgrid -background $bartheme] -padx 5 -pady 5 -side top -anchor w
-	label $memgrid.used -font normal -text "Used:" -bg $bartheme -fg $systheme
-	grid configure $memgrid.used -row $row -column 1 -sticky w
-	label $memgrid.total -font normal -text "Total:" -bg $bartheme -fg $systheme
-	grid configure $memgrid.total -row $row -column 2 -sticky w
+	label $memgrid.title -font $sysfont -text [dict get $sysdict memstats $locale]\
+		-bg $bartheme -fg $systheme
+	grid configure $memgrid.title -row $row -column 0 -sticky w
+	label $memgrid.used -font $sysfont  -text [dict get $sysdict used $locale]\
+		-bg $bartheme -fg $systheme
+	grid configure $memgrid.used -row $row -column 1 -sticky e
+	label $memgrid.free -font $sysfont -text [dict get $sysdict free $locale]\
+		 -bg $bartheme -fg $systheme
+	grid configure $memgrid.free -row $row -column 2 -sticky e
+	label $memgrid.total -font $sysfont -text [dict get $sysdict total $locale]\
+		-bg $bartheme -fg $systheme
+	grid configure $memgrid.total -row $row -column 3 -sticky e
 	incr row
-	label $memgrid.memory -font normal -text "Memory:" -bg $bartheme -fg $systheme
+	label $memgrid.memory -font $sysfont -text [dict get $sysdict mem $locale]\
+		-bg $bartheme -fg $systheme
 	grid configure $memgrid.memory -row $row -column 0 -sticky w
-	label $memgrid.mem_used -font normal -bg $bartheme -fg $systheme
-	grid configure $memgrid.mem_used -row $row -column 1 -sticky w
-	label $memgrid.mem_total -font normal -bg $bartheme -fg $systheme
-	grid configure $memgrid.mem_total -row $row -column 2 -sticky w
+	label $memgrid.mem_used -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $memgrid.mem_used -row $row -column 1 -sticky e
+	label $memgrid.mem_free -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $memgrid.mem_free -row $row -column 2 -sticky e
+	label $memgrid.mem_total -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $memgrid.mem_total -row $row -column 3 -sticky e
 	incr row
-	label $memgrid.arc -font normal -text "ARC:" -bg $bartheme -fg $systheme
+	label $memgrid.arc -font $sysfont -text [dict get $sysdict arc $locale]\
+		-bg $bartheme -fg $systheme
 	grid configure $memgrid.arc -row $row -column 0 -sticky w
-	label $memgrid.arc_used -font normal -bg $bartheme -fg $systheme
-	grid configure $memgrid.arc_used -row $row -column 1 -sticky w
-	label $memgrid.arc_total -font normal -bg $bartheme -fg $systheme
-	grid configure $memgrid.arc_total -row $row -column 2 -sticky w
+	label $memgrid.arc_used -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $memgrid.arc_used -row $row -column 1 -sticky e
+	label $memgrid.arc_free -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $memgrid.arc_free -row $row -column 2 -sticky e
+	label $memgrid.arc_total -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $memgrid.arc_total -row $row -column 3 -sticky e
 	incr row
-	label $memgrid.swap -font normal -text "Swap:" -bg $bartheme -fg $systheme
+	label $memgrid.swap -font $sysfont -text [dict get $sysdict swap $locale]\
+		 -bg $bartheme -fg $systheme
 	grid configure $memgrid.swap -row $row -column 0 -sticky w
-	label $memgrid.swap_used -font normal -bg $bartheme -fg $systheme
-	grid configure $memgrid.swap_used -row $row -column 1 -sticky w
-	label $memgrid.swap_total -font normal -bg $bartheme -fg $systheme
-	grid configure $memgrid.swap_total -row $row -column 2 -sticky w
+	label $memgrid.swap_used -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $memgrid.swap_used -row $row -column 1 -sticky e
+	label $memgrid.swap_free -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $memgrid.swap_free -row $row -column 2 -sticky e
+	label $memgrid.swap_total -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $memgrid.swap_total -row $row -column 3 -sticky e
+
+	grid columnconfigure $memgrid 0 -pad 5
+	grid columnconfigure $memgrid 1 -pad 5
+	grid columnconfigure $memgrid 2 -pad 5
+	grid columnconfigure $memgrid 3 -pad 5
 
 	bind $memstats <Map> { zstatus::map_window .memstats }
 	update_memstats
@@ -147,12 +182,15 @@ proc zstatus::system::update_memstats {} {
 	set memstats [freebsd::getmemused]
 	$memgrid.mem_total configure -text [lindex $memstats 0]
 	$memgrid.mem_used configure -text [lindex $memstats 1]
+	$memgrid.mem_free configure -text [lindex $memstats 2]
 	set arcstats [freebsd::getarcstats]
 	$memgrid.arc_total configure -text [lindex $arcstats 0]
 	$memgrid.arc_used configure -text [lindex $arcstats 1]
+	$memgrid.arc_free configure -text [lindex $arcstats 2]
 	set swapinfo [freebsd::getswapinfo]
 	$memgrid.swap_total configure -text [lindex $swapinfo 0]
 	$memgrid.swap_used configure -text [lindex $swapinfo 1]
+	$memgrid.swap_free configure -text [lindex $swapinfo 2]
 }
 
 proc zstatus::system::hide_netstat {} {
@@ -169,8 +207,6 @@ proc zstatus::system::show_netstat {} {
 	variable sysfont
 	variable barwidget
 	variable netwidget
-
-	set sysfont normal
 
 	set netstat_visible 1
 	set netstat [toplevel .netstat -highlightthickness 0\
@@ -220,6 +256,21 @@ proc zstatus::system::set_mixer {} {
 	variable mixer
 	variable mixer_icon
 	set mixer "$mixer_icon [freebsd::getmixervol]"
+}
+
+proc zstatus::system::init {} {
+	variable syslocales
+	variable locale
+	variable sysfont
+
+	set sysfont normal
+	set lang [dict get $::config lang]
+	set index [lsearch $syslocales [lindex [split $lang "_"] 0]]
+	if {$index < 0} {
+		set locale C
+	} else {
+		set locale [lindex $syslocales $index]
+	}
 }
 
 proc zstatus::system::setup {bar item} {
