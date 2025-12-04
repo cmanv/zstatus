@@ -10,10 +10,40 @@ namespace eval zstatus::system {
 }
 
 proc zstatus::system::set_theme {theme} {
+	variable memstats_visible
+	variable netstat_visible
 	variable systheme
 	variable bartheme
 	set bartheme [dict get $::widgetdict statusbar $theme]
 	set systheme [dict get $::widgetdict netstat $theme]
+	if {$memstats_visible} { set_theme_memstats }
+	if {$netstat_visible} { set_theme_netstat }
+}
+
+proc zstatus::system::set_theme_memstats {} {
+	variable systheme
+	variable bartheme
+	variable memgrid
+	.memstats configure -background $bartheme
+	$memgrid configure -background $bartheme
+	$memgrid.used configure -bg $bartheme -fg $systheme
+	$memgrid.total configure -bg $bartheme -fg $systheme
+	$memgrid.memory configure -bg $bartheme -fg $systheme
+	$memgrid.mem_used configure -bg $bartheme -fg $systheme
+	$memgrid.mem_total configure -bg $bartheme -fg $systheme
+	$memgrid.arc configure -bg $bartheme -fg $systheme
+	$memgrid.arc_used configure -bg $bartheme -fg $systheme
+	$memgrid.arc_total configure -bg $bartheme -fg $systheme
+	$memgrid.swap configure -bg $bartheme -fg $systheme
+	$memgrid.swap_used configure -bg $bartheme -fg $systheme
+	$memgrid.swap_total configure -bg $bartheme -fg $systheme
+}
+
+proc zstatus::system::set_theme_netstat {} {
+	variable systheme
+	variable bartheme
+	.netstat configure -background $bartheme
+	.netstat.text configure -fg $systheme -bg $bartheme
 }
 
 proc zstatus::system::set_loadavg {} {
@@ -52,12 +82,12 @@ proc zstatus::system::hide_memstats {} {
 
 proc zstatus::system::show_memstats {} {
 	variable memstats_visible
-	variable memstats_text
 	variable bartheme
 	variable systheme
 	variable sysfont
 	variable barwidget
 	variable memwidget
+	variable memgrid
 
 	set sysfont normal
 
@@ -72,9 +102,35 @@ proc zstatus::system::show_memstats {} {
 	wm overrideredirect $memstats 1
 	wm geometry $memstats +$xpos+$ypos
 
-	set memstats_text [text $memstats.text -font $sysfont\
-				-bd 0 -highlightthickness 0 -height 6]
-	pack $memstats_text -side left -padx 5 -pady 3
+	set memgrid $memstats.grid
+
+	set row 0
+	pack [frame $memgrid -background $bartheme] -padx 5 -pady 5 -side top -anchor w
+	label $memgrid.used -font normal -text "Used:" -bg $bartheme -fg $systheme
+	grid configure $memgrid.used -row $row -column 1 -sticky w
+	label $memgrid.total -font normal -text "Total:" -bg $bartheme -fg $systheme
+	grid configure $memgrid.total -row $row -column 2 -sticky w
+	incr row
+	label $memgrid.memory -font normal -text "Memory:" -bg $bartheme -fg $systheme
+	grid configure $memgrid.memory -row $row -column 0 -sticky w
+	label $memgrid.mem_used -font normal -bg $bartheme -fg $systheme
+	grid configure $memgrid.mem_used -row $row -column 1 -sticky w
+	label $memgrid.mem_total -font normal -bg $bartheme -fg $systheme
+	grid configure $memgrid.mem_total -row $row -column 2 -sticky w
+	incr row
+	label $memgrid.arc -font normal -text "ARC:" -bg $bartheme -fg $systheme
+	grid configure $memgrid.arc -row $row -column 0 -sticky w
+	label $memgrid.arc_used -font normal -bg $bartheme -fg $systheme
+	grid configure $memgrid.arc_used -row $row -column 1 -sticky w
+	label $memgrid.arc_total -font normal -bg $bartheme -fg $systheme
+	grid configure $memgrid.arc_total -row $row -column 2 -sticky w
+	incr row
+	label $memgrid.swap -font normal -text "Swap:" -bg $bartheme -fg $systheme
+	grid configure $memgrid.swap -row $row -column 0 -sticky w
+	label $memgrid.swap_used -font normal -bg $bartheme -fg $systheme
+	grid configure $memgrid.swap_used -row $row -column 1 -sticky w
+	label $memgrid.swap_total -font normal -bg $bartheme -fg $systheme
+	grid configure $memgrid.swap_total -row $row -column 2 -sticky w
 
 	bind $memstats <Map> { zstatus::map_window .memstats }
 	update_memstats
@@ -82,31 +138,21 @@ proc zstatus::system::show_memstats {} {
 
 proc zstatus::system::update_memstats {} {
 	variable memstats_visible
-	variable memstats_text
+	if {!$memstats_visible} { return }
+
+	variable memgrid
 	variable bartheme
 	variable systheme
 
-	if {!$memstats_visible} { return }
-
 	set memstats [freebsd::getmemused]
-	set current_text "Available memory: [lindex $memstats 0]\n"
-	append current_text " Used: [lindex $memstats 1]"
-	append current_text " Free: [lindex $memstats 2]\n"
+	$memgrid.mem_total configure -text [lindex $memstats 0]
+	$memgrid.mem_used configure -text [lindex $memstats 1]
 	set arcstats [freebsd::getarcstats]
-	append current_text "ARC:\n Max: [lindex $arcstats 0]"
-	append current_text " Used: [lindex $arcstats 1]\n"
+	$memgrid.arc_total configure -text [lindex $arcstats 0]
+	$memgrid.arc_used configure -text [lindex $arcstats 1]
 	set swapinfo [freebsd::getswapinfo]
-	append current_text "Swap:\n Max: [lindex $swapinfo 0]"
-	append current_text " Used: [lindex $swapinfo 1]"
-
-	set width 0
-	foreach line [split $current_text \n] {
-		set width [tcl::mathfunc::max [string length $line] $width]
-	}
-
-	$memstats_text delete 1.0 end
-	$memstats_text insert 1.0 $current_text
-	$memstats_text configure -width $width -fg $systheme -bg $bartheme
+	$memgrid.swap_total configure -text [lindex $swapinfo 0]
+	$memgrid.swap_used configure -text [lindex $swapinfo 1]
 }
 
 proc zstatus::system::hide_netstat {} {
@@ -138,12 +184,12 @@ proc zstatus::system::show_netstat {} {
 	wm geometry $netstat +$xpos+$ypos
 
 	set netstat_text [text $netstat.text -font $sysfont\
+				-fg $systheme -bg $bartheme\
 				-bd 0 -highlightthickness 0 -height 3]
 	pack $netstat_text -side left -padx 5 -pady 3
 
 	bind $netstat <Map> { zstatus::map_window .netstat }
 	update_netstat
-
 }
 
 proc zstatus::system::update_netstat {} {
@@ -167,7 +213,7 @@ proc zstatus::system::update_netstat {} {
 
 	$netstat_text delete 1.0 end
 	$netstat_text insert 1.0 $current_text
-	$netstat_text configure -width $width -fg $systheme -bg $bartheme
+	$netstat_text configure -width $width
 }
 
 proc zstatus::system::set_mixer {} {
