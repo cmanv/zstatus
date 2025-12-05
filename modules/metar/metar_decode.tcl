@@ -466,7 +466,7 @@ proc zstatus::metar::decode::decode_precips {intensity qualifier precips} {
 
 	set suffix ""
 	if {$intensity == "VC" || $intensity == "RE"} {
-		set suffix [dict get $precip_notes intensity $locale]
+		set suffix [dict get $precip_notes $intensity $locale]
 		set intensity ""
 	}
 
