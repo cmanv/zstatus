@@ -16,25 +16,46 @@ namespace eval zstatus::system {
 		used {C "Used" fr "Utilisé"}\
 		free {C "Free" fr "Libre"}]
 
+	array set linecolor { light blue dark Gold }
+
+	variable loadgraph_visible 0
 	variable memstats_visible 0
 	variable netstat_visible 0
+
+	variable load_queue {}
+	variable load_length 180
 }
 
 proc zstatus::system::set_theme {theme} {
-	variable memstats_visible
-	variable netstat_visible
-	variable systheme
 	variable bartheme
+	variable systheme
+	variable linecolor
+	variable linetheme
+
 	set bartheme [dict get $::widgetdict statusbar $theme]
-	set systheme [dict get $::widgetdict netstat $theme]
+	set linetheme $linecolor($theme)
+	set systheme [dict get $::widgetdict loadavg $theme]
+
+	variable loadgraph_visible
+	if {$loadgraph_visible} { set_theme_loadgraph }
+	variable memstats_visible
 	if {$memstats_visible} { set_theme_memstats }
+	variable netstat_visible
 	if {$netstat_visible} { set_theme_netstat }
+}
+
+proc zstatus::system::set_theme_loadgraph {} {
+	variable loadgraph
+	variable bartheme
+	$loadgraph configure -bg $bartheme
+	update_loadgraph
 }
 
 proc zstatus::system::set_theme_memstats {} {
 	variable systheme
 	variable bartheme
 	variable memgrid
+
 	.memstats configure -background $bartheme
 	$memgrid configure -background $bartheme
 	$memgrid.used configure -bg $bartheme -fg $systheme
@@ -61,30 +82,88 @@ proc zstatus::system::set_loadavg {} {
 	variable loadavg
 	variable sysdict
 	variable locale
-	set loadavg "[dict get $sysdict load $locale][freebsd::getloadavg] "
+	variable load_queue
+	variable load_length
+
+	set value [freebsd::getloadavg]
+	lappend load_queue $value
+	if {[llength $load_queue] > $load_length} {
+		set load_queue [lrange $load_queue 1 end]
+	}
+	set loadavg "[dict get $sysdict load $locale] $value "
+
+	variable loadgraph_visible
+	if {$loadgraph_visible} { update_loadgraph }
+}
+
+proc zstatus::system::hide_loadgraph {} {
+	variable loadgraph_visible
+	set loadgraph_visible 0
+	destroy .loadgraph
+}
+
+proc zstatus::system::show_loadgraph {} {
+	variable bartheme
+	variable systheme
+	variable sysfont
+	variable barwidget
+	variable loadwidget
+	variable loadgraph
+	variable loadgraph_visible
+
+	set loadgraph_visible 1
+	set loadframe [toplevel .loadgraph -highlightthickness 0\
+				 -background $bartheme]
+
+	set xpos [winfo x $loadwidget]
+	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
+	wm title $loadframe "Load average"
+	wm attributes $loadframe -type dialog
+	wm overrideredirect $loadframe 1
+	wm geometry $loadframe +$xpos+$ypos
+
+	set loadgraph $loadframe.graphics
+	pack [canvas $loadgraph -width 181 -height 61 -bg $bartheme]
+	$loadgraph create rectangle 1 1 180 60 -outline $systheme
+	update_loadgraph
+}
+
+proc zstatus::system::update_loadgraph {} {
+	variable bartheme
+	variable linetheme
+	variable systheme
+	variable loadgraph
+	variable load_queue
+
+	set ymax 1
+	foreach value $load_queue {
+		if {$value > $ymax} { incr ymax }
+	}
+	set xpos 1
+	foreach value $load_queue {
+		set ypos [tcl::mathfunc::round [expr 60 * ($ymax - $value) / $ymax]]
+		$loadgraph create line $xpos 60 $xpos $ypos -fill $linetheme
+		incr xpos
+	}
+	set hline 1
+	while {$hline < $ymax} {
+		set ypos [tcl::mathfunc::round [expr 60 * ($ymax - $hline) / $ymax ]]
+		$loadgraph create line 1 $ypos 180 $ypos -fill $systheme
+		incr hline
+	}
 }
 
 proc zstatus::system::set_memused {} {
 	variable memused
 	set memused "M: [lindex [freebsd::getpercmemused] 0] "
-	update_memstats
+
+	variable memstats_visible
+	if {$memstats_visible} { update_memstats }
 }
 
 proc zstatus::system::set_arcsize {} {
 	variable arcsize
 	set arcsize "ARC: [lindex [freebsd::getarcstats] 1] "
-}
-
-proc zstatus::system::set_netin {} {
-	variable netin
-	variable if_in
-	set netin "$::unicode(arrow-down)[lindex [freebsd::getnetin $if_in] 0] "
-}
-
-proc zstatus::system::set_netout {} {
-	variable netout
-	variable if_out
-	set netout "$::unicode(arrow-up)[lindex [freebsd::getnetout $if_out] 0] "
 }
 
 proc zstatus::system::hide_memstats {} {
@@ -172,9 +251,6 @@ proc zstatus::system::show_memstats {} {
 }
 
 proc zstatus::system::update_memstats {} {
-	variable memstats_visible
-	if {!$memstats_visible} { return }
-
 	variable memgrid
 	variable bartheme
 	variable systheme
@@ -191,6 +267,18 @@ proc zstatus::system::update_memstats {} {
 	$memgrid.swap_total configure -text [lindex $swapinfo 0]
 	$memgrid.swap_used configure -text [lindex $swapinfo 1]
 	$memgrid.swap_free configure -text [lindex $swapinfo 2]
+}
+
+proc zstatus::system::set_netin {} {
+	variable netin
+	variable if_in
+	set netin "$::unicode(arrow-down)[lindex [freebsd::getnetin $if_in] 0] "
+}
+
+proc zstatus::system::set_netout {} {
+	variable netout
+	variable if_out
+	set netout "$::unicode(arrow-up)[lindex [freebsd::getnetout $if_out] 0] "
 }
 
 proc zstatus::system::hide_netstat {} {
@@ -275,15 +363,22 @@ proc zstatus::system::init {} {
 
 proc zstatus::system::setup {bar item} {
 	variable barwidget
+	variable loadwidget
 	variable memwidget
 	variable netwidget
 
 	switch $item {
+	loadavg {
+		set barwidget $bar
+		set loadwidget $bar.$item
+		bind $loadwidget <Enter> { zstatus::system::show_loadgraph }
+		bind $loadwidget <Leave> { zstatus::system::hide_loadgraph }
+	}
 	memused {
 		set barwidget $bar
 		set memwidget $bar.$item
-		bind $bar.memused <Enter> { zstatus::system::show_memstats }
-		bind $bar.memused <Leave> { zstatus::system::hide_memstats }
+		bind $memwidget <Enter> { zstatus::system::show_memstats }
+		bind $memwidget <Leave> { zstatus::system::hide_memstats }
 	}
 	mixer {
 		variable mixer_icon
@@ -307,8 +402,8 @@ proc zstatus::system::setup {bar item} {
 
 		variable netstat_if
 		set netstat_if [dict get $::widgetdict netstat interface]
-		bind $bar.netstat <Enter> { zstatus::system::show_netstat }
-		bind $bar.netstat <Leave> { zstatus::system::hide_netstat }
+		bind $netwidget <Enter> { zstatus::system::show_netstat }
+		bind $netwidget <Leave> { zstatus::system::hide_netstat }
 	}
 	netin {
 		variable if_in
