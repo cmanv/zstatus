@@ -16,7 +16,7 @@ namespace eval zstatus::system {
 		used {C "Used" fr "Utilisé"}\
 		free {C "Free" fr "Libre"}]
 
-	array set linecolor { light blue dark Gold }
+	array set linecolor { light DeepSkyBlue dark SeaGreen }
 
 	variable loadgraph_visible 0
 	variable memstats_visible 0
@@ -123,8 +123,7 @@ proc zstatus::system::show_loadgraph {} {
 	wm geometry $loadframe +$xpos+$ypos
 
 	set loadgraph $loadframe.graphics
-	pack [canvas $loadgraph -width 181 -height 61 -bg $bartheme]
-	$loadgraph create rectangle 1 1 180 60 -outline $systheme
+	pack [canvas $loadgraph -width 180 -height 60 -highlightthickness 0 -bg $bartheme]
 	update_loadgraph
 }
 
