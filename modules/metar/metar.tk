@@ -32,7 +32,7 @@ namespace eval zstatus::metar {
 		sunset {C "Sunset:" fr "Coucher :"}]
 
 	set station {}
-	variable  state_visible 0
+	variable  popup_visible 0
 	namespace export setup update set_theme show_tooltip hide_tooltip
 }
 
@@ -66,25 +66,43 @@ proc zstatus::metar::hide_tooltip {} {
 	destroy .metartooltip
 }
 
-proc zstatus::metar::toggle_window {} {
+proc zstatus::metar::toggle_popup {} {
 	variable station
 	variable popup
+	variable bartheme
 	variable barwidget
 	variable metarwidget
 
 	if ![dict exists $station icaoId] { return }
 
-	variable state_visible
-	if {$state_visible} {
-		wm state $popup withdrawn
-		set state_visible 0
+	variable popup_visible
+	if {$popup_visible} {
+		destroy $popup
+		set popup_visible 0
 	} else {
+		set popup [toplevel .metarreport -class Metar -bd 1 -relief solid]
+		setup_header $popup.header
+		setup_summary $popup.summary
+		setup_grid $popup.grid
+
+		$popup configure -background $bartheme
+		set_theme_header $popup.header
+		set_theme_summary $popup.summary
+		set_theme_grid $popup.grid
+
+		update_grid $popup.grid
+
+		wm attributes $popup -type dialog
+		wm overrideredirect $popup 1
+		wm title $popup {Metar Report}
+
 		set xpos [winfo x $metarwidget]
 		set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
 		wm geometry $popup +$xpos+$ypos
-		wm state $popup normal
-		raise $popup
-		set state_visible 1
+		set popup_visible 1
+
+		bind $popup <3> { zstatus::metar::toggle_popup }
+		bind $popup <Map> { zstatus::map_window .metarreport }
 	}
 }
 
@@ -184,11 +202,14 @@ proc zstatus::metar::set_theme {newtheme} {
 	variable septheme
 	set septheme [dict get $::widgetdict separator $theme]
 
-	variable popup
-	$popup configure -background $bartheme
-	set_theme_header $popup.header
-	set_theme_summary $popup.summary
-	set_theme_grid $popup.grid
+	variable popup_visible
+	if {$popup_visible} {
+		variable popup
+		$popup configure -background $bartheme
+		set_theme_header $popup.header
+		set_theme_summary $popup.summary
+		set_theme_grid $popup.grid
+	}
 }
 
 proc zstatus::metar::update_grid {grid} {
@@ -274,8 +295,11 @@ proc zstatus::metar::update {} {
 	variable timezone
 	array set report [decode::get_report $locale $timezone]
 
-	variable popup
-	update_grid $popup.grid
+	variable popup_visible
+	if {$popup_visible} {
+		variable popup
+		update_grid $popup.grid
+	}
 }
 
 proc zstatus::metar::setup_header { header } {
@@ -456,26 +480,10 @@ proc zstatus::metar::setup {bar widget} {
 		set locale [lindex $metar_locales $index]
 	}
 
-	variable popup
-	set popup [toplevel .metarreport -class Metar -bd 1 -relief solid]
-	setup_header $popup.header
-	setup_summary $popup.summary
-	setup_grid $popup.grid
-
-	wm attributes $popup -type dialog
-	wm overrideredirect $popup 1
-	wm resizable $popup 0 0
-	wm title $popup {Metar Report}
-	wm state $popup withdrawn
-
-	dict set ::messagedict metar_toggle {action metar::toggle_window arg 0}
+	dict set ::messagedict metar_toggle {action metar::toggle_popup arg 0}
 	dict set ::messagedict metar_update {action metar::update arg 0}
 
-	bind $popup <3> { zstatus::metar::toggle_window }
-#	bind $popup <Escape> { zstatus::metar::toggle_window }
-	bind $popup <Map> { zstatus::map_window .metarreport }
-
-	bind $metarwidget <1> { zstatus::metar::toggle_window }
+	bind $metarwidget <1> { zstatus::metar::toggle_popup }
 	bind $metarwidget <2> { zstatus::metar::update }
 	bind $metarwidget <Enter> { zstatus::metar::show_tooltip }
 	bind $metarwidget <Leave> { zstatus::metar::hide_tooltip }
