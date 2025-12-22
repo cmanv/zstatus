@@ -2,8 +2,7 @@
 package require zstatus::system::freebsd
 
 namespace eval zstatus::system {
-	namespace export set_loadavg set_memused set_arcsize set_netin set_netout\
-		 set_mixer
+	namespace export set_loadavg set_memused set_mixer
 
 	set syslocales {C fr}
 	set sysdict [dict create\
@@ -163,11 +162,6 @@ proc zstatus::system::set_memused {} {
 	if {$memstats_visible} { update_memstats }
 }
 
-proc zstatus::system::set_arcsize {} {
-	variable arcsize
-	set arcsize "ARC: [lindex [freebsd::getarcstats] 1] "
-}
-
 proc zstatus::system::hide_memstats {} {
 	variable memstats_visible
 	set memstats_visible 0
@@ -269,18 +263,6 @@ proc zstatus::system::update_memstats {} {
 	$memgrid.swap_total configure -text [lindex $swapinfo 0]
 	$memgrid.swap_used configure -text [lindex $swapinfo 1]
 	$memgrid.swap_free configure -text [lindex $swapinfo 2]
-}
-
-proc zstatus::system::set_netin {} {
-	variable netin
-	variable if_in
-	set netin "$::unicode(arrow-down)[lindex [freebsd::getnetin $if_in] 0] "
-}
-
-proc zstatus::system::set_netout {} {
-	variable netout
-	variable if_out
-	set netout "$::unicode(arrow-up)[lindex [freebsd::getnetout $if_out] 0] "
 }
 
 proc zstatus::system::hide_netstat {} {
@@ -412,14 +394,6 @@ proc zstatus::system::setup {bar item} {
 
 		bind $netwidget <Enter> { zstatus::system::show_netstat }
 		bind $netwidget <Leave> { zstatus::system::hide_netstat }
-	}
-	netin {
-		variable if_in
-		set if_in [dict get $::widgetdict netin interface]
-	}
-	netout {
-		variable if_out
-		set if_out [dict get $::widgetdict netout interface]
 	}}
 
 	if [dict exists $::widgetdict $item exec] {

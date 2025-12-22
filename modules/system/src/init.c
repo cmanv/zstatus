@@ -76,18 +76,6 @@ Freebsd_Init(Tcl_Interp *interp)
 				(Tcl_CmdDeleteProc*) NULL);
 
 	Tcl_CreateObjCommand(	interp,
-				"zstatus::system::freebsd::getnetin",
-				FreeBSD_GetNetInObjCmd,
-				(ClientData) NULL,
-				(Tcl_CmdDeleteProc*) NULL);
-
-	Tcl_CreateObjCommand(	interp,
-				"zstatus::system::freebsd::getnetout",
-				FreeBSD_GetNetOutObjCmd,
-				(ClientData) NULL,
-				(Tcl_CmdDeleteProc*) NULL);
-
-	Tcl_CreateObjCommand(	interp,
 				"zstatus::system::freebsd::getmixervol",
 				FreeBSD_GetMixerVolObjCmd,
 				(ClientData) NULL,

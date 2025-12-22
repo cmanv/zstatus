@@ -11,9 +11,6 @@ package require zstatus::remixicon
 package require zstatus::system
 
 set widgetdict [dict create\
-	arcsize {type string source zstatus::system::arcsize\
-		proc system::set_arcsize setup system::setup\
-		font normal light black dark LightGray}\
 	datetime {type string source zstatus::datetime proc set_datetime\
 		format {%d %b %H:%M} font normal light black dark LightGray}\
 	desklist {type string source zstatus::desktop::desklist\
@@ -23,7 +20,7 @@ set widgetdict [dict create\
 	deskname {type string source zstatus::desktop::deskname\
 		setup desktop::setup font normal light black dark LightGray}\
 	devices {type transient proc devices::update setup devices::setup\
-		settheme devices::set_theme font normal light black dark LightGray}\
+		settheme devices::set_theme font bold light black dark LightGray}\
 	loadavg {type string source zstatus::system::loadavg\
 		proc system::set_loadavg setup system::setup\
 		font normal light black dark LightGray}\
@@ -41,12 +38,6 @@ set widgetdict [dict create\
 		font normal light black dark LightGray}\
 	music {type transient proc music::update setup music::setup\
 		settheme music::set_theme font normal light black dark LightGray}\
-	netin {type string source zstatus::system::netin\
-		proc system::set_netin setup system::setup interface em0\
-		font normal light black dark LightGray}\
-	netout {type string source zstatus::system::netout\
-		proc system::set_netout setup system::setup interface em0\
-		font normal light black dark LightGray}\
 	netstat {type string source zstatus::system::interface interface em0\
 		proc zstatus::system::update_netstat setup system::setup\
 		settheme zstatus::system::set_theme\
