@@ -14,7 +14,10 @@ namespace eval zstatus::system {
 		swap {C "Swao:" fr "Swap :"}\
 		total {C "Total" fr "Total"}\
 		used {C "Used" fr "Utilisé"}\
-		free {C "Free" fr "Libre"}]
+		free {C "Free" fr "Libre"}\
+		ipv4 {C "IPv4:" fr "IPv4 :"}\
+		ipv6 {C "IPv6:" fr "IPv6 :"}\
+		transferred {C "Transferred:" fr "Transferts :"}]
 
 	array set linecolor { light DeepSkyBlue dark SeaGreen }
 
@@ -90,7 +93,7 @@ proc zstatus::system::set_loadavg {} {
 	if {[llength $load_queue] > $load_length} {
 		set load_queue [lrange $load_queue 1 end]
 	}
-	set loadavg "[dict get $sysdict load $locale] $value "
+	set loadavg "[dict get $sysdict load $locale] $value"
 
 	variable loadgraph_visible
 	if {$loadgraph_visible} { update_loadgraph }
@@ -154,7 +157,7 @@ proc zstatus::system::update_loadgraph {} {
 
 proc zstatus::system::set_memused {} {
 	variable memused
-	set memused "M: [lindex [freebsd::getpercmemused] 0] "
+	set memused "M: [lindex [freebsd::getpercmemused] 0]"
 
 	variable memstats_visible
 	if {$memstats_visible} { update_memstats }
@@ -319,15 +322,19 @@ proc zstatus::system::update_netstat {} {
 	variable netstat_visible
 	variable netstat_text
 	variable netstat_if
+	variable sysdict
+	variable locale
 	variable systheme
 	variable bartheme
 
 	if {!$netstat_visible} { return }
 	set netstat [freebsd::getnetstat $netstat_if]
-	set ipaddr "IPv4: [lindex $netstat 0]"
-	set netin "$::unicode(arrow-down) [lindex $netstat 1]"
-	set netout "$::unicode(arrow-up) [lindex $netstat 2]"
-	set current_text "Interface: $netstat_if \n$ipaddr \n$netin   $netout"
+	set ipv4 "[dict get $sysdict ipv4 $locale]	[lindex $netstat 0]"
+	set ipv6 "[dict get $sysdict ipv6 $locale]	[lindex $netstat 1]"
+	set transferred "[dict get $sysdict transferred $locale]"
+	set netin "$::unicode(arrow-down) [lindex $netstat 2]"
+	set netout "$::unicode(arrow-up) [lindex $netstat 3]"
+	set current_text "$ipv4 \n$ipv6 \n$transferred	$netin   $netout"
 
 	set width 0
 	foreach line [split $current_text \n] {
@@ -396,11 +403,13 @@ proc zstatus::system::setup {bar item} {
 	netstat {
 		set barwidget $bar
 		set netwidget $bar.$item
-		variable netstat_icon
-		set netstat_icon $::unicode(arrow-up-down)
 
 		variable netstat_if
 		set netstat_if [dict get $::widgetdict netstat interface]
+		variable interface
+		#set interface "$::unicode(arrow-up-down) $netstat_if"
+		set interface "I: $netstat_if"
+
 		bind $netwidget <Enter> { zstatus::system::show_netstat }
 		bind $netwidget <Leave> { zstatus::system::hide_netstat }
 	}

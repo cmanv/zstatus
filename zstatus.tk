@@ -11,43 +11,43 @@ package require zstatus::remixicon
 package require zstatus::system
 
 set widgetdict [dict create\
-	arcsize {type lwidget source zstatus::system::arcsize\
+	arcsize {type string source zstatus::system::arcsize\
 		proc system::set_arcsize setup system::setup\
 		font normal light black dark LightGray}\
 	datetime {type string source zstatus::datetime proc set_datetime\
 		format {%d %b %H:%M} font normal light black dark LightGray}\
-	desklist {type lwidget source zstatus::desktop::desklist\
+	desklist {type string source zstatus::desktop::desklist\
 		setup desktop::setup font normal light black dark LightGray}\
-	deskmode {type lwidget source zstatus::desktop::deskmode\
+	deskmode {type string source zstatus::desktop::deskmode\
 		setup desktop::setup font normal light black dark LightGray}\
-	deskname {type lwidget source zstatus::desktop::deskname\
+	deskname {type string source zstatus::desktop::deskname\
 		setup desktop::setup font normal light black dark LightGray}\
 	devices {type transient proc devices::update setup devices::setup\
 		settheme devices::set_theme font normal light black dark LightGray}\
-	loadavg {type lwidget source zstatus::system::loadavg\
+	loadavg {type string source zstatus::system::loadavg\
 		proc system::set_loadavg setup system::setup\
 		font normal light black dark LightGray}\
 	mail {type transient proc zstatus::mail::update\
 		setup mail::setup settheme mail::set_theme\
 		font normal light black dark LightGray}\
-	memused {type lwidget source zstatus::system::memused\
+	memused {type string source zstatus::system::memused\
 		proc system::set_memused setup system::setup\
 		settheme zstatus::system::set_theme\
 		font normal light black dark LightGray}\
-	metar {type lwidget source zstatus::metar::report(statusbar)\
+	metar {type string source zstatus::metar::report(statusbar)\
 		setup metar::setup settheme metar::set_theme delay 10\
 		font remix1 light black dark LightGray}\
-	mixer {type lwidget source zstatus::system::mixer setup system::setup\
+	mixer {type string source zstatus::system::mixer setup system::setup\
 		font normal light black dark LightGray}\
 	music {type transient proc music::update setup music::setup\
 		settheme music::set_theme font normal light black dark LightGray}\
-	netin {type lwidget source zstatus::system::netin\
+	netin {type string source zstatus::system::netin\
 		proc system::set_netin setup system::setup interface em0\
 		font normal light black dark LightGray}\
-	netout {type lwidget source zstatus::system::netout\
+	netout {type string source zstatus::system::netout\
 		proc system::set_netout setup system::setup interface em0\
 		font normal light black dark LightGray}\
-	netstat {type string source zstatus::system::netstat_icon interface em0\
+	netstat {type string source zstatus::system::interface interface em0\
 		proc zstatus::system::update_netstat setup system::setup\
 		settheme zstatus::system::set_theme\
 		font remix1 light black dark LightGray}\
@@ -55,7 +55,7 @@ set widgetdict [dict create\
 		font normal light black dark LightGray}\
 	separator {type separator light black dark gray}\
 	statusbar {type bar light gray90 dark gray20}\
-	wintitle {type twidget setup desktop::setup expand 0 maxlength 100\
+	wintitle {type text setup desktop::setup expand 0 maxlength 100\
 		font normal light black dark LightGray}]
 
 set messagedict [dict create set_theme {action set_theme arg 1}]
@@ -215,17 +215,7 @@ proc zstatus::add_widgets {side widgets} {
 		}
 		if ![dict exists $::widgetdict $item] { continue }
 		switch [dict get $::widgetdict $item type] {
-		lwidget {
-			pack [label $bar.$item\
-				-font [dict get $::widgetdict $item font]\
-				-textvar [dict get $::widgetdict $item source]]\
-				-side $side
-			if [dict exists $::widgetdict $item setup] {
-				[dict get $::widgetdict $item setup] $bar $item
-			}
-			set last $item
-		}
-		twidget {
+		text {
 			if ![dict exists $::widgetdict $item setup] {
 				puts "No setup defined for $item!"
 				exit 1

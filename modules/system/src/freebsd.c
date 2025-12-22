@@ -367,25 +367,36 @@ int FreeBSD_GetNetStatObjCmd( ClientData clientData, Tcl_Interp *interp,
 		return TCL_ERROR;
 	}
 
-	char ipaddr[17];
-	strcpy(ipaddr, "N/A");
+	char ipv4[INET_ADDRSTRLEN+1], ipv6[INET6_ADDRSTRLEN+1];
 	double inbound = 0;
 	double outbound = 0;
+	strcpy(ipv4, "n/a");
+	strcpy(ipv6, "n/a");
+
 	for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
 		if (strcmp(ifa->ifa_name, iface)) continue;
-		if (ifa->ifa_addr->sa_family == AF_LINK) {
+		struct sockaddr_in *addr_in = (struct sockaddr_in *)ifa->ifa_addr;
+		if (addr_in->sin_family == AF_LINK) {
 			ifd = (struct if_data *)ifa->ifa_data;
 			inbound = (double)(ifd->ifi_ibytes>>10);
 			outbound = (double)(ifd->ifi_obytes>>10);
 			continue;
 		}
-		if (ifa->ifa_addr->sa_family != AF_INET) continue;
-		struct sockaddr_in *addr_in = (struct sockaddr_in *)ifa->ifa_addr;
-		strlcpy(ipaddr, inet_ntoa(addr_in->sin_addr), 16);
+		if (addr_in->sin_family == AF_INET) {
+			inet_ntop(AF_INET, &(addr_in->sin_addr), ipv4, INET_ADDRSTRLEN);
+			continue;
+		}
+		if (addr_in->sin_family == AF_INET6) {
+			inet_ntop(AF_INET6, &(addr_in->sin_addr), ipv6, INET6_ADDRSTRLEN);
+		}
 	}
 	freeifaddrs(ifap);
 
-	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(ipaddr, -1)) != TCL_OK) {
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(ipv4, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(ipv6, -1)) != TCL_OK) {
 		return TCL_ERROR;
 	}
 
