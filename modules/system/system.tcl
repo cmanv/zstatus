@@ -20,6 +20,7 @@ namespace eval zstatus::system {
 
 	array set linecolor { light DeepSkyBlue dark SeaGreen }
 
+	variable init_done 0
 	variable loadgraph_visible 0
 	variable memstats_visible 0
 	variable netstat_visible 0
@@ -334,7 +335,7 @@ proc zstatus::system::set_mixer {} {
 	set mixer "$mixer_icon [freebsd::getmixervol]"
 }
 
-proc zstatus::system::init {} {
+proc zstatus::system::common_init {} {
 	variable syslocales
 	variable locale
 	variable sysfont
@@ -354,6 +355,12 @@ proc zstatus::system::setup {bar item} {
 	variable loadwidget
 	variable memwidget
 	variable netwidget
+
+	variable init_done
+	if {!$init_done} {
+		common_init
+		set init_done 1
+	}
 
 	switch $item {
 	loadavg {
