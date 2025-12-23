@@ -16,7 +16,7 @@ namespace eval zstatus::system {
 		free {C "Free" fr "Libre"}\
 		ipv4 {C "IPv4:" fr "IPv4 :"}\
 		ipv6 {C "IPv6:" fr "IPv6 :"}\
-		transferred {C "Transferred:" fr "Transferts :"}]
+		trf {C "Transfers:" fr "Transferts :"}]
 
 	array set linecolor { light DeepSkyBlue dark SeaGreen }
 
@@ -65,20 +65,31 @@ proc zstatus::system::set_theme_memstats {} {
 	$memgrid.total configure -bg $bartheme -fg $systheme
 	$memgrid.memory configure -bg $bartheme -fg $systheme
 	$memgrid.mem_used configure -bg $bartheme -fg $systheme
+	$memgrid.mem_free configure -bg $bartheme -fg $systheme
 	$memgrid.mem_total configure -bg $bartheme -fg $systheme
 	$memgrid.arc configure -bg $bartheme -fg $systheme
 	$memgrid.arc_used configure -bg $bartheme -fg $systheme
+	$memgrid.arc_free configure -bg $bartheme -fg $systheme
 	$memgrid.arc_total configure -bg $bartheme -fg $systheme
 	$memgrid.swap configure -bg $bartheme -fg $systheme
 	$memgrid.swap_used configure -bg $bartheme -fg $systheme
+	$memgrid.swap_free configure -bg $bartheme -fg $systheme
 	$memgrid.swap_total configure -bg $bartheme -fg $systheme
 }
 
 proc zstatus::system::set_theme_netstat {} {
 	variable systheme
 	variable bartheme
+	variable netgrid
+
 	.netstat configure -background $bartheme
-	.netstat.text configure -fg $systheme -bg $bartheme
+	$netgrid configure -background $bartheme
+	$netgrid.ipv4 configure -bg $bartheme -fg $systheme
+	$netgrid.ipv4_addr configure -bg $bartheme -fg $systheme
+	$netgrid.ipv6 configure -bg $bartheme -fg $systheme
+	$netgrid.ipv6_addr configure -bg $bartheme -fg $systheme
+	$netgrid.transfer configure -bg $bartheme -fg $systheme
+	$netgrid.transfer_val configure -bg $bartheme -fg $systheme
 }
 
 proc zstatus::system::set_loadavg {} {
@@ -274,10 +285,12 @@ proc zstatus::system::hide_netstat {} {
 
 proc zstatus::system::show_netstat {} {
 	variable netstat_visible
-	variable netstat_text
+	variable netgrid
 	variable bartheme
 	variable systheme
 	variable sysfont
+	variable sysdict
+	variable locale
 	variable barwidget
 	variable netwidget
 
@@ -292,10 +305,32 @@ proc zstatus::system::show_netstat {} {
 	wm overrideredirect $netstat 1
 	wm geometry $netstat +$xpos+$ypos
 
-	set netstat_text [text $netstat.text -font $sysfont\
-				-fg $systheme -bg $bartheme\
-				-bd 0 -highlightthickness 0 -height 3]
-	pack $netstat_text -side left -padx 5 -pady 3
+	set netgrid $netstat.grid
+
+	set row 0
+	pack [frame $netgrid -background $bartheme] -padx 5 -pady 5 -side top -anchor w
+	label $netgrid.ipv4 -font $sysfont -text [dict get $sysdict ipv4 $locale]\
+		-bg $bartheme -fg $systheme
+	grid configure $netgrid.ipv4 -row $row -column 0 -sticky w
+	label $netgrid.ipv4_addr -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $netgrid.ipv4_addr -row $row -column 1 -sticky e
+
+	incr row
+	label $netgrid.ipv6 -font $sysfont -text [dict get $sysdict ipv6 $locale]\
+		-bg $bartheme -fg $systheme
+	grid configure $netgrid.ipv6 -row $row -column 0 -sticky w
+	label $netgrid.ipv6_addr -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $netgrid.ipv6_addr -row $row -column 1 -sticky e
+
+	incr row
+	label $netgrid.transfer -font $sysfont -text [dict get $sysdict trf $locale]\
+		-bg $bartheme -fg $systheme
+	grid configure $netgrid.transfer -row $row -column 0 -sticky w
+	label $netgrid.transfer_val -font $sysfont -bg $bartheme -fg $systheme
+	grid configure $netgrid.transfer_val -row $row -column 1 -sticky e
+
+	grid columnconfigure $netgrid 0 -pad 5
+	grid columnconfigure $netgrid 1 -pad 5
 
 	bind $netstat <Map> { zstatus::map_window .netstat }
 	update_netstat
@@ -303,30 +338,17 @@ proc zstatus::system::show_netstat {} {
 
 proc zstatus::system::update_netstat {} {
 	variable netstat_visible
-	variable netstat_text
-	variable netstat_if
-	variable sysdict
-	variable locale
-	variable systheme
-	variable bartheme
-
 	if {!$netstat_visible} { return }
+
+	variable netstat_if
+	variable netgrid
+
 	set netstat [freebsd::getnetstat $netstat_if]
-	set ipv4 "[dict get $sysdict ipv4 $locale]	[lindex $netstat 0]"
-	set ipv6 "[dict get $sysdict ipv6 $locale]	[lindex $netstat 1]"
-	set transferred "[dict get $sysdict transferred $locale]"
 	set netin "$::unicode(arrow-down) [lindex $netstat 2]"
 	set netout "$::unicode(arrow-up) [lindex $netstat 3]"
-	set current_text "$ipv4 \n$ipv6 \n$transferred	$netin   $netout"
-
-	set width 0
-	foreach line [split $current_text \n] {
-		set width [tcl::mathfunc::max [string length $line] $width]
-	}
-
-	$netstat_text delete 1.0 end
-	$netstat_text insert 1.0 $current_text
-	$netstat_text configure -width $width
+	$netgrid.ipv4_addr configure -text [lindex $netstat 0]
+	$netgrid.ipv6_addr configure -text [lindex $netstat 1]
+	$netgrid.transfer_val configure -text "$netin   $netout"
 }
 
 proc zstatus::system::set_mixer {} {
@@ -397,7 +419,7 @@ proc zstatus::system::setup {bar item} {
 		set netstat_if [dict get $::widgetdict netstat interface]
 		variable interface
 		#set interface "$::unicode(arrow-up-down) $netstat_if"
-		set interface "I: $netstat_if"
+		set interface "E: $netstat_if"
 
 		bind $netwidget <Enter> { zstatus::system::show_netstat }
 		bind $netwidget <Leave> { zstatus::system::hide_netstat }

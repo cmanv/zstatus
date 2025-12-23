@@ -18,12 +18,10 @@ set widgetdict [dict create\
 	loadavg {type string module system source zstatus::system::loadavg\
 		proc system::set_loadavg\
 		font normal light black dark LightGray}\
-	mail {type transient module mail proc zstatus::mail::update\
-		settheme mail::set_theme\
-		font normal light black dark LightGray}\
+	mail {type transient module mail proc mail::update\
+		settheme mail::set_theme font normal light black dark LightGray}\
 	memused {type string module system source zstatus::system::memused\
-		proc system::set_memused\
-		settheme zstatus::system::set_theme\
+		proc system::set_memused settheme system::set_theme\
 		font normal light black dark LightGray}\
 	metar {type string module metar source zstatus::metar::report(statusbar)\
 		settheme metar::set_theme delay 10\
@@ -33,9 +31,8 @@ set widgetdict [dict create\
 	music {type transient module music proc music::update\
 		settheme music::set_theme font normal light black dark LightGray}\
 	netstat {type string module system source zstatus::system::interface\
-		proc zstatus::system::update_netstat interface em0\
-		settheme zstatus::system::set_theme\
-		font normal light black dark LightGray}\
+		proc system::update_netstat interface em0\
+		settheme system::set_theme font normal light black dark LightGray}\
 	osversion {type string source zstatus::osversion\
 		font normal light black dark LightGray}\
 	separator {type separator light black dark gray}\
