@@ -19,10 +19,9 @@ namespace eval zstatus::config {
 		timezone 	[exec date +%Z]\
 		delay		2000\
 		fontname	"Dejavu Sans"\
-		fontsize	10\
+		fontsize	11\
 		position	top\
-		barsocket	"$cache_prefix/zstatus/socket"\
-		zwmsocket 	"$cache_prefix/zwm/socket"]
+		cache_prefix	"$cache_prefix"]
 
 	if [info exists ::env(LANG)] {
 		dict set config lang $::env(LANG)

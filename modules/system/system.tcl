@@ -4,7 +4,15 @@ package require zstatus::system::freebsd
 namespace eval zstatus::system {
 	namespace export set_loadavg set_memused set_mixer
 
+	variable locale C
+	variable sysfont normal
 	set syslocales {C fr}
+	set lang [dict get $::config lang]
+	set index [lsearch $syslocales [lindex [split $lang "_"] 0]]
+	if {$index >= 0} {
+		set locale [lindex $syslocales $index]
+	}
+
 	set sysdict [dict create\
 		load {C "L:" fr "C:"}\
 		memstats {C "MemStats" fr "MemStats"}\
@@ -20,7 +28,6 @@ namespace eval zstatus::system {
 
 	array set linecolor { light DeepSkyBlue dark SeaGreen }
 
-	variable init_done 0
 	variable loadgraph_visible 0
 	variable memstats_visible 0
 	variable netstat_visible 0
@@ -357,32 +364,11 @@ proc zstatus::system::set_mixer {} {
 	set mixer "$mixer_icon [freebsd::getmixervol]"
 }
 
-proc zstatus::system::common_init {} {
-	variable syslocales
-	variable locale
-	variable sysfont
-
-	set sysfont normal
-	set lang [dict get $::config lang]
-	set index [lsearch $syslocales [lindex [split $lang "_"] 0]]
-	if {$index < 0} {
-		set locale C
-	} else {
-		set locale [lindex $syslocales $index]
-	}
-}
-
 proc zstatus::system::setup {bar item} {
 	variable barwidget
 	variable loadwidget
 	variable memwidget
 	variable netwidget
-
-	variable init_done
-	if {!$init_done} {
-		common_init
-		set init_done 1
-	}
 
 	switch $item {
 	loadavg {

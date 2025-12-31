@@ -3,6 +3,21 @@ namespace eval zstatus::desktop {
 	array set modes {Monocle M VTiled V HTiled H Stacked S}
 	namespace export set_wintitle unset_wintitle set_desklit set_deskname\
 			set_deskmode
+
+	variable screen [lindex [split [winfo screen .] "."] 1]
+	variable zwmsocket "[dict get $::config cache_prefix]/zwm/socket"
+}
+
+proc zstatus::desktop::send_message {msg} {
+	variable screen
+	variable zwmsocket
+
+	if [catch {set channel [unix_sockets::connect $zwmsocket]}] {
+		puts stderr "Could not open socket $zwmsocket!\n"
+		return
+	}
+	puts $channel "$screen;$msg"
+	close $channel
 }
 
 proc zstatus::desktop::set_wintitle {value} {
@@ -76,9 +91,9 @@ proc zstatus::desktop::setup {bar item} {
 		dict set ::messagedict desktop_mode {action desktop::set_deskmode arg 1}
 		bind $bar.deskmode <MouseWheel> {
 			if {%D < 0} {
-				zstatus::send_message "desktop-mode-next"
+				zstatus::desktop::send_message "desktop-mode-next"
 			} else {
-				zstatus::send_message "desktop-mode-prev"
+				zstatus::desktop::send_message "desktop-mode-prev"
 			}
 		}
 	}
@@ -86,9 +101,9 @@ proc zstatus::desktop::setup {bar item} {
 		dict set ::messagedict desktop_list {action desktop::set_desklist arg 1}
 		bind $bar.desklist <MouseWheel> {
 			if {%D < 0} {
-				zstatus::send_message "desktop-switch-next"
+				zstatus::desktop::send_message "desktop-switch-next"
 			} else {
-				zstatus::send_message "desktop-switch-prev"
+				zstatus::desktop::send_message "desktop-switch-prev"
 			}
 		}
 	}

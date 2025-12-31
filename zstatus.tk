@@ -138,21 +138,6 @@ proc zstatus::set_theme {newtheme} {
 			}
 		}}
 	}
-	if [dict exists $::config zwmsocket] {
-		send_message "desktop-set-${theme}-theme"
-	}
-}
-
-proc zstatus::send_message {msg} {
-	set xscreen [dict get $::config xscreen]
-	set wmsocket [dict get $::config zwmsocket]
-
-	if [catch {set channel [unix_sockets::connect $wmsocket]}] {
-		puts stderr "Could not open socket $wmsocket!\n"
-		return
-	}
-	puts $channel "$xscreen;$msg"
-	close $channel
 }
 
 proc zstatus::read_message {channel} {
@@ -310,8 +295,6 @@ proc zstatus::setup {} {
 	}
 	wm geometry . [dict get $::config geometry]
 
-	dict set ::config xscreen [lindex [split [winfo screen .] "."] 1]
-
 	set sepcount 0
 	set widgetlist {}
 	add_widgets left [dict get $::config leftside]
@@ -359,5 +342,7 @@ set config [zstatus::config::read $params(config)]
 
 zstatus::setup
 every [dict get $config delay] zstatus::update
-unix_sockets::listen [dict get $config barsocket] zstatus::server_accept
+
+set barsocket "[dict get $config cache_prefix]/zstatus/socket"
+unix_sockets::listen $barsocket zstatus::server_accept
 vwait forever
