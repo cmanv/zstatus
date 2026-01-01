@@ -154,7 +154,7 @@ proc zstatus::music::update_tooltip { } {
 	variable musictheme
 
 	set mpdinfo [mpd::currenttitle]
-	set mpdtitle "[lindex $mpdinfo 0] - [lindex $mpdinfo 0]\n"
+	set mpdtitle "[lindex $mpdinfo 0] - [lindex $mpdinfo 1]\n"
 	append mpdtitle "[lindex $mpdinfo 2]  "
 	append mpdtitle "([lindex $mpdinfo 3] de [lindex $mpdinfo 4])\n"
 	append mpdtitle "[lindex $mpdinfo 5]  (Durée [lindex $mpdinfo 6])"
