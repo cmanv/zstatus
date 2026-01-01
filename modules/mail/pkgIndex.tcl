@@ -1,1 +1,1 @@
-package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ [list source [file join $dir mail.tk]]
+package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ [list source [file join $dir mail.tcl]]

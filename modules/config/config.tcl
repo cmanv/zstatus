@@ -1,4 +1,3 @@
-#!/usr/bin/env tclsh9.0
 package require fileutil
 
 namespace eval zstatus::config {

@@ -1,4 +1,4 @@
-#!/usr/bin/env wish9.0
+package require Tk
 package require fileutil
 package require mime
 

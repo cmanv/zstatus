@@ -1,1 +1,1 @@
-package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ [list source [file join $dir devices.tk]]
+package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ [list source [file join $dir devices.tcl]]

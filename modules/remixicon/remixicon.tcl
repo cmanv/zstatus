@@ -1,4 +1,3 @@
-#!/usr/bin/env tclsh9.0
 namespace eval zstatus::remixicon {
 	set remixmap {\
 		arrow-down \u2193\

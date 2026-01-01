@@ -1,4 +1,3 @@
-#!/usr/bin/env tclsh9.0
 package require zstatus::system::freebsd
 
 namespace eval zstatus::system {

@@ -1,4 +1,4 @@
-package require Tk 9.0
+package require Tk
 package require zstatus::metar::decode
 
 namespace eval zstatus::metar {

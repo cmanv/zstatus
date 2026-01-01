@@ -1,4 +1,5 @@
-#!/usr/bin/env wish9.0
+package require Tk
+
 namespace eval zstatus::devices {
 	variable searchlist {{da[0-9]} {ulpt[0-9]}}
 	namespace export setup update set_theme
