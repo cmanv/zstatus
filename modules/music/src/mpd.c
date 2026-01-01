@@ -58,20 +58,6 @@ int MPD_StateObjCmd( ClientData clientData, Tcl_Interp *interp,
 	return TCL_OK;
 }
 
-int MPD_CurrentTitleObjCmd( ClientData clientData, Tcl_Interp *interp,
-				int objc, Tcl_Obj *const objv[])
-{
-	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
-
-	char currenttitle[titlelength];
-	mpd_current_title(currenttitle, titlelength);
-
-	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(currenttitle, -1)) != TCL_OK) {
-		return TCL_ERROR;
-	}
-	return TCL_OK;
-}
-
 int mpd_get_state()
 {
 	if ((!conn) || (mpd_connection_get_error(conn) != MPD_ERROR_SUCCESS)) {
@@ -87,9 +73,13 @@ int mpd_get_state()
 	return mpd_status_get_state(status);
 }
 
-int mpd_current_title(char *currenttitle, int len)
+int MPD_CurrentTitleObjCmd( ClientData clientData, Tcl_Interp *interp,
+				int objc, Tcl_Obj *const objv[])
 {
-	bzero(currenttitle, len);
+	Tcl_Obj	*resultObj = Tcl_GetObjResult(interp);
+
+	char currenttitle[titlelength];
+	bzero(currenttitle, titlelength);
 
 	if ((!conn) || (mpd_connection_get_error(conn) != MPD_ERROR_SUCCESS)) {
 		if (conn) mpd_connection_free(conn);
@@ -113,31 +103,56 @@ int mpd_current_title(char *currenttitle, int len)
 		return 0;
 	}
 
+	char artist[64];
+	char album[64];
+	char title[110];
+
+	bzero(artist, 64);
+	bzero(album, 64);
+	bzero(title, 110);
+
 	struct mpd_song *song = mpd_run_get_queue_song_id(conn, id);
 	if (song) {
-		char artist[64];
-		char album[64];
-		char track[5];
-		char title[110];
-
-		bzero(artist, 64);
-		bzero(album, 64);
-		bzero(track, 5);
-		bzero(title, 110);
-
 		const char *partist =  mpd_song_get_tag(song, MPD_TAG_ARTIST, 0);
 		const char *palbum =  mpd_song_get_tag(song, MPD_TAG_ALBUM, 0);
-		const char *ptrack  = mpd_song_get_tag(song, MPD_TAG_TRACK, 0);
 		const char *ptitle  = mpd_song_get_tag(song, MPD_TAG_TITLE, 0);
 
 		if (partist) strlcpy(artist, partist, 64);
 		if (palbum) strlcpy(album, palbum, 64);
-		if (ptrack) strlcpy(track, ptrack, 5);
 		if (ptitle) strlcpy(title, ptitle, 110);
-
-		snprintf(currenttitle, len, "%s - %s\n%s - %s", artist, album, track, title);
 		mpd_song_free(song);
 	}
 	mpd_status_free(status);
-	return 0;
+
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(artist, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(album, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewStringObj(title, -1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	int pos = mpd_status_get_song_pos(status);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_ObjPrintf("%d", pos+1)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	unsigned length = mpd_status_get_queue_length(status);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_ObjPrintf("%u", length)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	unsigned elapsed = mpd_status_get_elapsed_time(status);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_ObjPrintf("%um %02us", elapsed/60, elapsed%60)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	unsigned total = mpd_status_get_total_time(status);
+	if (Tcl_ListObjAppendElement(interp, resultObj, Tcl_ObjPrintf("%um:%02us", total/60, total%60)) != TCL_OK) {
+		return TCL_ERROR;
+	}
+
+	return TCL_OK;
 }

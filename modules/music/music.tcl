@@ -1,4 +1,5 @@
-#!/usr/bin/env wish9.0
+#!/usr/bin/env tclsh9.0
+package require Tk
 package require zstatus::music::mpd
 
 namespace eval zstatus::music {
@@ -132,7 +133,7 @@ proc zstatus::music::show_tooltip {} {
 	wm geometry $tooltip +$xpos+$ypos
 
 	set mpdtext [text $tooltip.text -font $musicfont\
-			-bd 0 -highlightthickness 0 -height 2]
+			-bd 0 -highlightthickness 0 -height 3]
 	pack $mpdtext -side left -padx 5 -pady 3
 
 	bind $tooltip <Map> { zstatus::map_window .musictooltip }
@@ -153,7 +154,12 @@ proc zstatus::music::update_tooltip { } {
 	variable bartheme
 	variable musictheme
 
-	set mpdtitle [join [mpd::currenttitle]]
+	set mpdinfo [mpd::currenttitle]
+	set mpdtitle "[lindex $mpdinfo 0] - [lindex $mpdinfo 0]\n"
+	append mpdtitle "[lindex $mpdinfo 2]  "
+	append mpdtitle "([lindex $mpdinfo 3] de [lindex $mpdinfo 4])\n"
+	append mpdtitle "[lindex $mpdinfo 5]  (Durée [lindex $mpdinfo 6])"
+
 	set width 0
 	foreach line [split $mpdtitle \n] {
 		set width [tcl::mathfunc::max [string length $line] $width]
