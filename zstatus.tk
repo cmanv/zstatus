@@ -7,7 +7,7 @@ package require zstatus::remixicon
 set widgetdict [dict create\
 	datetime {type string source zstatus::datetime proc set_datetime\
 		format {%d %b %H:%M} font normal light black dark LightGray}\
-	desklist {type string module desktop source zstatus::desktop::desklist\
+	desklist {type widget module desktop settheme desktop::set_desktheme\
 		font normal light black dark LightGray}\
 	deskmode {type string module desktop source zstatus::desktop::deskmode\
 		font normal light black dark LightGray}\
@@ -130,6 +130,11 @@ proc zstatus::set_theme {newtheme} {
 			$bar.$item$count configure\
 				-background [dict get $::widgetdict $item $theme]
 		}
+		widget {
+			if [dict exists $::widgetdict $item settheme] {
+				[dict get $::widgetdict $item settheme] $theme
+			}
+		}
 		default {
 			$bar.$item configure -bg $bartheme\
 				-fg [dict get $::widgetdict $item $theme]
@@ -216,6 +221,15 @@ proc zstatus::add_widgets {side widgets} {
 			if [dict exists $::widgetdict $item module] {
 				zstatus::${module}::setup $bar $item
 			}
+			set last $item
+		}
+		widget {
+			if [dict exists $::widgetdict $item module] {
+				set module [dict get $::widgetdict $item module]
+				load_module $module
+			}
+			zstatus::${module}::setup $bar $item
+			pack $bar.$item -side $side
 			set last $item
 		}
 		separator {

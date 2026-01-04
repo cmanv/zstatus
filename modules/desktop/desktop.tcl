@@ -20,6 +20,22 @@ proc zstatus::desktop::send_message {msg} {
 	close $channel
 }
 
+proc zstatus::desktop::set_desktheme {theme} {
+	variable bartheme
+	variable desklisttheme
+	variable desklistbar
+	variable desklistframe
+
+	set bartheme [dict get $::widgetdict statusbar $theme]
+	set desklisttheme [dict get $::widgetdict desklist $theme]
+
+	$desklistbar configure -background $bartheme
+	$desklistframe configure -background $bartheme
+	foreach slave [pack slaves $desklistframe] {
+		$slave configure -bg $bartheme -fg $desklisttheme
+	}
+}
+
 proc zstatus::desktop::set_wintitle {value} {
 	set maxlength [dict get $::widgetdict wintitle maxlength]
 	set length [tcl::mathfunc::min [string length $value] $maxlength]
@@ -47,8 +63,44 @@ proc zstatus::desktop::unset_wintitle {value} {
 }
 
 proc zstatus::desktop::set_desklist {value} {
-	variable desklist
-	set desklist $value
+	variable bartheme
+	variable desklisttheme
+	variable desklistbar
+	variable desklistframe
+
+	destroy $desklistframe
+	pack [frame $desklistframe]
+	$desklistbar configure -background $bartheme
+	$desklistframe configure -background $bartheme
+
+	foreach name [split $value "|"] {
+		if {![string length $name]} {
+			continue
+		}
+		set active 0
+		set first [string index $name 0]
+		set font normal
+		if {$first == "+"} {
+			set num [string range $name 1 end]
+			set font bold
+			set active 1
+		} elseif {$first == "!"} {
+			set num [string range $name 1 end]
+			set font italic
+		} else {
+			set num $name
+		}
+
+		set slave $desklistframe.$num
+		pack [label $slave -font $font -text "$name" -padx 2] -side left
+
+		$slave configure -bg $bartheme -fg $desklisttheme
+		if {$active} {
+			continue
+		}
+
+		bind $slave <1> "zstatus::desktop::send_message desktop-switch-$num"
+	}
 }
 
 proc zstatus::desktop::set_deskmode {value} {
@@ -99,13 +151,12 @@ proc zstatus::desktop::setup {bar item} {
 	}
 	desklist {
 		dict set ::messagedict desktop_list {action desktop::set_desklist arg 1}
-		bind $bar.desklist <MouseWheel> {
-			if {%D < 0} {
-				zstatus::desktop::send_message "desktop-switch-next"
-			} else {
-				zstatus::desktop::send_message "desktop-switch-prev"
-			}
-		}
+		variable desklistbar
+		variable desklistframe
+		set desklistbar [frame $bar.$item]
+		set desklistframe [frame $desklistbar.frame]
+		pack $desklistbar
+		pack $desklistframe
 	}
 	deskname {
 		dict set ::messagedict desktop_name {action desktop::set_deskname arg 1}

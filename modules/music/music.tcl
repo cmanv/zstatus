@@ -153,18 +153,18 @@ proc zstatus::music::update_tooltip { } {
 	variable bartheme
 	variable musictheme
 
-	set mpdinfo [mpd::currenttitle]
-	set mpdtitle "[lindex $mpdinfo 0] - [lindex $mpdinfo 1]\n"
-	append mpdtitle "[lindex $mpdinfo 2]  "
-	append mpdtitle "([lindex $mpdinfo 3] de [lindex $mpdinfo 4])\n"
-	append mpdtitle "[lindex $mpdinfo 5]  (Durée [lindex $mpdinfo 6])"
+	set info [mpd::currenttitle]
+	set title "[lindex $info 0] - [lindex $info 1]\n"
+	append title "[lindex $info 2]  "
+	append title "([lindex $info 3] de [lindex $info 4])\n"
+	append title "[lindex $info 5]  (Durée [lindex $info 6])"
 
 	set width 0
-	foreach line [split $mpdtitle \n] {
+	foreach line [split $title \n] {
 		set width [tcl::mathfunc::max [string length $line] $width]
 	}
 	$mpdtext delete 1.0 end
-	$mpdtext insert 1.0 $mpdtitle
+	$mpdtext insert 1.0 $title
 	$mpdtext configure -width $width -fg $musictheme -bg $bartheme
 }
 
