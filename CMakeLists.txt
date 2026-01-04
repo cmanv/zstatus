@@ -13,13 +13,13 @@ include(GNUInstallDirs)
 
 # Add modules
 add_subdirectory(modules/config)
-add_subdirectory(modules/desktop)
 add_subdirectory(modules/devices)
 add_subdirectory(modules/mail)
 add_subdirectory(modules/metar)
 add_subdirectory(modules/music)
 add_subdirectory(modules/remixicon)
 add_subdirectory(modules/system)
+add_subdirectory(modules/workspace)
 
 # Substitute some variable names
 set(LIBDIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})

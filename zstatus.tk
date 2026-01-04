@@ -7,11 +7,11 @@ package require zstatus::remixicon
 set widgetdict [dict create\
 	datetime {type string source zstatus::datetime proc set_datetime\
 		format {%d %b %H:%M} font normal light black dark LightGray}\
-	desklist {type widget module desktop settheme desktop::set_desktheme\
+	wslist {type widget module workspace settheme workspace::set_theme\
 		font normal light black dark LightGray}\
-	deskmode {type string module desktop source zstatus::desktop::deskmode\
+	wsmode {type string module workspace source zstatus::workspace::wsmode\
 		font normal light black dark LightGray}\
-	deskname {type string module desktop source zstatus::desktop::deskname\
+	wsname {type string module workspace source zstatus::workspace::wsname\
 		font normal light black dark LightGray}\
 	devices {type transient module devices proc devices::update\
 		settheme devices::set_theme font bold light black dark LightGray}\
@@ -37,7 +37,7 @@ set widgetdict [dict create\
 		font normal light black dark LightGray}\
 	separator {type separator light black dark gray}\
 	statusbar {type bar light gray90 dark gray20}\
-	wintitle {type text module desktop expand 0 maxlength 100\
+	wintitle {type text module workspace expand 0 maxlength 120\
 		font normal light black dark LightGray}]
 
 set messagedict [dict create set_theme {action set_theme arg 1}]
