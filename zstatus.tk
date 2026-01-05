@@ -7,6 +7,7 @@ package require zstatus::remixicon
 set color [dict create\
 	foreground {light black dark LightGray}\
 	background {light gray90 dark gray20}\
+	highlight {light gray70 dark gray40}\
 	separator {light black dark gray}]
 
 set widgetdict [dict create\
@@ -32,7 +33,7 @@ set widgetdict [dict create\
 		proc system::update_netstat interface em0\
 		settheme system::set_theme}\
 	osversion {type string source zstatus::osversion}\
-	separator {type separator bg {light black dark gray}}\
+	separator {type separator}\
 	wintitle {type text module workspace expand 0 maxlength 120}]
 
 set messagedict [dict create set_theme {action set_theme arg 1}]
@@ -122,7 +123,7 @@ proc zstatus::set_theme {newtheme} {
 		separator {
 			incr count
 			$bar.$item$count configure\
-				-background [dict get $::widgetdict $item bg $theme]
+				-background [dict get $::color separator $theme]
 		}
 		widget {
 			if [dict exists $::widgetdict $item settheme] {

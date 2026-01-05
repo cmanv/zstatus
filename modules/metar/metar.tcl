@@ -200,7 +200,7 @@ proc zstatus::metar::set_theme {newtheme} {
 	set theme $newtheme
 	set bgcolor [dict get $::widgetdict metar bg $theme]
 	set fgcolor [dict get $::widgetdict metar fg $theme]
-	set sepcolor [dict get $::widgetdict separator bg $theme]
+	set sepcolor [dict get $::color separator $theme]
 
 	variable popup_visible
 	if {$popup_visible} {

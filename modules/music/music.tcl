@@ -18,7 +18,7 @@ proc zstatus::music::set_theme { theme } {
 	variable fgcolor
 	set bgcolor [dict get $::widgetdict music bg $theme]
 	set fgcolor [dict get $::widgetdict music fg $theme]
-	set sepcolor [dict get $::widgetdict separator bg $theme]
+	set sepcolor [dict get $::color separator $theme]
 
 	variable musicframe
 	variable musicsep
