@@ -26,7 +26,7 @@ proc zstatus::workspace::set_theme {theme} {
 	variable wslistbar
 	variable wslistframe
 
-	set bartheme [dict get $::widgetdict statusbar $theme]
+	set bartheme [dict get $::color background $theme]
 	set wslisttheme [dict get $::widgetdict wslist $theme]
 
 	$wslistbar configure -background $bartheme

@@ -11,9 +11,9 @@ proc zstatus::mail::set_theme { theme } {
 	variable bartheme
 	variable mailtheme
 	variable septheme
-	set bartheme [dict get $::widgetdict statusbar $theme]
+	set bartheme [dict get $::color background $theme]
 	set mailtheme [dict get $::widgetdict mail $theme]
-	set septheme [dict get $::widgetdict separator $theme]
+	set septheme [dict get $::color separator $theme]
 
 	variable mailframe
 	variable mailsep

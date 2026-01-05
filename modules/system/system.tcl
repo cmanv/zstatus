@@ -41,7 +41,7 @@ proc zstatus::system::set_theme {theme} {
 	variable linecolor
 	variable linetheme
 
-	set bartheme [dict get $::widgetdict statusbar $theme]
+	set bartheme [dict get $::color background $theme]
 	set linetheme $linecolor($theme)
 	set systheme [dict get $::widgetdict loadavg $theme]
 

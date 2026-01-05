@@ -8,7 +8,7 @@ namespace eval zstatus::devices {
 proc zstatus::devices::set_theme {theme} {
 	variable bartheme
 	variable devicetheme
-	set bartheme [dict get $::widgetdict statusbar $theme]
+	set bartheme [dict get $::color background $theme]
 	set devicetheme [dict get $::widgetdict devices $theme]
 
 	variable devframe

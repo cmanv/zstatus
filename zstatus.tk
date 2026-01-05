@@ -4,41 +4,36 @@ package require unix_sockets
 package require zstatus::config
 package require zstatus::remixicon
 
+set color [dict create\
+	foreground {light black dark LightGray}\
+	background {light gray90 dark gray20}\
+	separator {light black dark gray}]
+
 set widgetdict [dict create\
 	datetime {type string source zstatus::datetime proc set_datetime\
-		format {%d %b %H:%M} font normal light black dark LightGray}\
-	wslist {type widget module workspace settheme workspace::set_theme\
-		font normal light black dark LightGray}\
-	wsmode {type string module workspace source zstatus::workspace::wsmode\
-		font normal light black dark LightGray}\
-	wsname {type string module workspace source zstatus::workspace::wsname\
-		font normal light black dark LightGray}\
+		format {%d %b %H:%M} }\
+	wslist {type widget module workspace settheme workspace::set_theme}\
+	wsmode {type string module workspace source zstatus::workspace::wsmode}\
+	wsname {type string module workspace source zstatus::workspace::wsname}\
 	devices {type transient module devices proc devices::update\
-		settheme devices::set_theme font bold light black dark LightGray}\
+		settheme devices::set_theme font bold}\
 	loadavg {type string module system source zstatus::system::loadavg\
-		proc system::set_loadavg\
-		font normal light black dark LightGray}\
+		proc system::set_loadavg}\
 	mail {type transient module mail proc mail::update\
-		settheme mail::set_theme font normal light black dark LightGray}\
+		settheme mail::set_theme}\
 	memused {type string module system source zstatus::system::memused\
-		proc system::set_memused settheme system::set_theme\
-		font normal light black dark LightGray}\
+		proc system::set_memused settheme system::set_theme}\
 	metar {type string module metar source zstatus::metar::report(statusbar)\
-		settheme metar::set_theme delay 10\
-		font remix1 light black dark LightGray}\
-	mixer {type string module system source zstatus::system::mixer\
-		font normal light black dark LightGray}\
+		settheme metar::set_theme delay 10 font remix1}\
+	mixer {type string module system source zstatus::system::mixer}\
 	music {type transient module music proc music::update\
-		settheme music::set_theme font normal light black dark LightGray}\
+		settheme music::set_theme}\
 	netstat {type string module system source zstatus::system::interface\
 		proc system::update_netstat interface em0\
-		settheme system::set_theme font normal light black dark LightGray}\
-	osversion {type string source zstatus::osversion\
-		font normal light black dark LightGray}\
+		settheme system::set_theme}\
+	osversion {type string source zstatus::osversion}\
 	separator {type separator light black dark gray}\
-	statusbar {type bar light gray90 dark gray20}\
-	wintitle {type text module workspace expand 0 maxlength 120\
-		font normal light black dark LightGray}]
+	wintitle {type text module workspace expand 0 maxlength 120}]
 
 set messagedict [dict create set_theme {action set_theme arg 1}]
 
@@ -113,7 +108,7 @@ proc zstatus::set_theme {newtheme} {
 
 	variable bar
 	variable widgetlist
-	set bartheme [dict get $::widgetdict statusbar $theme]
+	set bartheme [dict get $::color background $theme]
 
 	set count 0
 	$bar configure -background $bartheme
@@ -196,6 +191,16 @@ proc zstatus::add_widgets {side widgets} {
 			set item "separator"
 		}
 		if ![dict exists $::widgetdict $item] { continue }
+		if {![dict exists $::widgetdict $item font]} {
+			dict set ::widgetdict $item font normal
+		}
+		if {![dict exists $::widgetdict $item light]} {
+			dict set ::widgetdict $item light "[dict get $::color foreground light]"
+		}
+		if {![dict exists $::widgetdict $item dark]} {
+			dict set ::widgetdict $item dark "[dict get $::color foreground dark]"
+		}
+
 		switch [dict get $::widgetdict $item type] {
 		text {
 			if ![dict exists $::widgetdict $item module] {

@@ -16,8 +16,8 @@ proc zstatus::music::set_theme { theme } {
 
 	variable bartheme
 	variable musictheme
-	set bartheme [dict get $::widgetdict statusbar $theme]
-	set septheme [dict get $::widgetdict separator $theme]
+	set bartheme [dict get $::color background $theme]
+	set septheme [dict get $::color separator $theme]
 	set musictheme [dict get $::widgetdict music $theme]
 
 	variable musicframe
