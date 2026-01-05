@@ -104,7 +104,7 @@ proc zstatus::config::read {configfile} {
 				continue
 			}
 			if ![string length $context] { continue }
-			if [regexp {^([a-z_]+):([a-z_]+)=(.+)} $line -> key1 key2 value] {
+			if [regexp {^([a-z_]+)\.([a-z_]+)=(.+)} $line -> key1 key2 value] {
 				if {$context == "main"} {
 					dict set config $key1 $key2 $value
 				} elseif {$context == "maildir"} {
