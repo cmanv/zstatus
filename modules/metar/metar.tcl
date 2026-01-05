@@ -37,14 +37,14 @@ namespace eval zstatus::metar {
 }
 
 proc zstatus::metar::show_tooltip {} {
-	variable bartheme
-	variable style
-	variable theme
+	variable bgcolor
+	variable fgcolor
+	variable metarfont
 	variable barwidget
 	variable metarwidget
 
 	set window [toplevel .metartooltip -highlightthickness 0\
-			-background $bartheme]
+			-background $bgcolor]
 
 	set xpos [winfo x $metarwidget]
 	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
@@ -54,8 +54,8 @@ proc zstatus::metar::show_tooltip {} {
 	wm overrideredirect $window 1
 	wm geometry $window +$xpos+$ypos
 
-	pack [label $window.text -font [dict get $style tooltip font]\
-		-fg [dict get $style tooltip $theme] -bg $bartheme\
+	pack [label $window.text -font $metarfont\
+		-fg $fgcolor -bg $bgcolor\
 		-textvar zstatus::metar::report(tooltip)]\
 		-side left -padx 5 -pady 3
 
@@ -69,7 +69,7 @@ proc zstatus::metar::hide_tooltip {} {
 proc zstatus::metar::toggle_popup {} {
 	variable station
 	variable popup
-	variable bartheme
+	variable bgcolor
 	variable barwidget
 	variable metarwidget
 
@@ -85,7 +85,7 @@ proc zstatus::metar::toggle_popup {} {
 		setup_summary $popup.summary
 		setup_grid $popup.grid
 
-		$popup configure -background $bartheme
+		$popup configure -background $bgcolor
 		set_theme_header $popup.header
 		set_theme_summary $popup.summary
 		set_theme_grid $popup.grid
@@ -107,105 +107,105 @@ proc zstatus::metar::toggle_popup {} {
 }
 
 proc zstatus::metar::set_theme_header {header} {
-	variable bartheme
+	variable bgcolor
 	variable style
 	variable theme
 
-	$header configure -background $bartheme
-	$header.keys configure -background $bartheme
-	$header.keys.station configure -background $bartheme
-	$header.keys.station.text configure -bg $bartheme\
+	$header configure -background $bgcolor
+	$header.keys configure -background $bgcolor
+	$header.keys.station configure -background $bgcolor
+	$header.keys.station.text configure -bg $bgcolor\
 		-fg [dict get $style label1 $theme]
-	$header.keys.date configure -background $bartheme
-	$header.keys.date.text configure -bg $bartheme\
+	$header.keys.date configure -background $bgcolor
+	$header.keys.date.text configure -bg $bgcolor\
 		-fg [dict get $style label1 $theme]
-	$header.keys.status configure -background $bartheme
-	$header.keys.status.text configure -bg $bartheme\
+	$header.keys.status configure -background $bgcolor
+	$header.keys.status.text configure -bg $bgcolor\
 		-fg [dict get $style label1 $theme]
-	$header.values configure -background $bartheme
-	$header.values.station configure -background $bartheme
-	$header.values.station.text configure -bg $bartheme\
+	$header.values configure -background $bgcolor
+	$header.values.station configure -background $bgcolor
+	$header.values.station.text configure -bg $bgcolor\
 		-fg [dict get $style value1 $theme]
-	$header.values.date configure -background $bartheme
-	$header.values.date.text configure -bg $bartheme\
+	$header.values.date configure -background $bgcolor
+	$header.values.date.text configure -bg $bgcolor\
 		-fg [dict get $style value1 $theme]
-	$header.values.status configure -background $bartheme
-	$header.values.status.text configure -bg $bartheme\
+	$header.values.status configure -background $bgcolor
+	$header.values.status.text configure -bg $bgcolor\
 		-fg [dict get $style value1 $theme]
 }
 
 proc zstatus::metar::set_theme_summary {summary} {
-	variable bartheme
-	variable septheme
+	variable bgcolor
+	variable sepcolor
 	variable style
 	variable theme
 
-	$summary configure -background $bartheme
-	$summary.temp configure -background $bartheme
-	$summary.temp.status configure -background $bartheme
-	$summary.temp.status.icon configure -bg $bartheme\
+	$summary configure -background $bgcolor
+	$summary.temp configure -background $bgcolor
+	$summary.temp.status configure -background $bgcolor
+	$summary.temp.status.icon configure -bg $bgcolor\
 		-fg [dict get $style summary $theme]
-	$summary.temp.status.text configure -bg $bartheme\
+	$summary.temp.status.text configure -bg $bgcolor\
 		-fg [dict get $style summary $theme]
-	$summary.temp.remark configure -background $bartheme
-	$summary.temp.remark.key configure -bg $bartheme\
+	$summary.temp.remark configure -background $bgcolor
+	$summary.temp.remark.key configure -bg $bgcolor\
 		-fg [dict get $style summary $theme]
-	$summary.temp.remark.value configure -bg $bartheme\
+	$summary.temp.remark.value configure -bg $bgcolor\
 		-fg [dict get $style summary $theme]
-	$summary.separator configure -background $septheme
-	$summary.sun configure -background $bartheme
-	$summary.sun.text configure -bg $bartheme\
+	$summary.separator configure -background $sepcolor
+	$summary.sun configure -background $bgcolor
+	$summary.sun.text configure -bg $bgcolor\
 		-fg [dict get $style label1 $theme]
-	$summary.sun.sunrise_text configure -bg $bartheme\
+	$summary.sun.sunrise_text configure -bg $bgcolor\
 		-fg [dict get $style label1 $theme]
-	$summary.sun.sunrise_hour configure -bg $bartheme\
+	$summary.sun.sunrise_hour configure -bg $bgcolor\
 		-fg [dict get $style value1 $theme]
-	$summary.sun.sunset_text configure -bg $bartheme\
+	$summary.sun.sunset_text configure -bg $bgcolor\
 		 -fg [dict get $style label1 $theme]
-	$summary.sun.sunset_hour configure -bg $bartheme\
+	$summary.sun.sunset_hour configure -bg $bgcolor\
 		-fg [dict get $style value1 $theme]
 }
 
 proc zstatus::metar::set_theme_grid {grid} {
-	variable bartheme
+	variable bgcolor
 	variable style
 	variable theme
 
-	$grid configure -background $bartheme
-	$grid.title configure -bg $bartheme -fg [dict get $style title1 $theme]
-	$grid.wind configure -bg $bartheme -fg [dict get $style label1 $theme]
-	$grid.wind_val configure -bg $bartheme -fg [dict get $style value2 $theme]
-	$grid.gust configure -bg $bartheme -fg [dict get $style label1 $theme]
-	$grid.gust_val configure -bg $bartheme -fg [dict get $style value2 $theme]
-	$grid.dew configure -bg $bartheme -fg [dict get $style label1 $theme]
-	$grid.dew_val configure -bg $bartheme -fg [dict get $style value2 $theme]
-	$grid.rhumidity configure -bg $bartheme -fg [dict get $style label1 $theme]
-	$grid.rhumidity_val configure -bg $bartheme -fg [dict get $style value2 $theme]
-	$grid.pressure configure -bg $bartheme -fg [dict get $style label1 $theme]
-	$grid.pressure_val configure -bg $bartheme -fg [dict get $style value2 $theme]
-	$grid.visibility configure -bg $bartheme -fg [dict get $style label1 $theme]
-	$grid.visibility_val configure -bg $bartheme -fg [dict get $style value2 $theme]
-	$grid.clouds configure -bg $bartheme -fg [dict get $style label1 $theme]
-	$grid.clouds_val configure -bg $bartheme -fg [dict get $style value2 $theme]
-	$grid.precips configure -bg $bartheme -fg [dict get $style label1 $theme]
-	$grid.precips_val configure -bg $bartheme -fg [dict get $style value2 $theme]
+	$grid configure -background $bgcolor
+	$grid.title configure -bg $bgcolor -fg [dict get $style title1 $theme]
+	$grid.wind configure -bg $bgcolor -fg [dict get $style label1 $theme]
+	$grid.wind_val configure -bg $bgcolor -fg [dict get $style value2 $theme]
+	$grid.gust configure -bg $bgcolor -fg [dict get $style label1 $theme]
+	$grid.gust_val configure -bg $bgcolor -fg [dict get $style value2 $theme]
+	$grid.dew configure -bg $bgcolor -fg [dict get $style label1 $theme]
+	$grid.dew_val configure -bg $bgcolor -fg [dict get $style value2 $theme]
+	$grid.rhumidity configure -bg $bgcolor -fg [dict get $style label1 $theme]
+	$grid.rhumidity_val configure -bg $bgcolor -fg [dict get $style value2 $theme]
+	$grid.pressure configure -bg $bgcolor -fg [dict get $style label1 $theme]
+	$grid.pressure_val configure -bg $bgcolor -fg [dict get $style value2 $theme]
+	$grid.visibility configure -bg $bgcolor -fg [dict get $style label1 $theme]
+	$grid.visibility_val configure -bg $bgcolor -fg [dict get $style value2 $theme]
+	$grid.clouds configure -bg $bgcolor -fg [dict get $style label1 $theme]
+	$grid.clouds_val configure -bg $bgcolor -fg [dict get $style value2 $theme]
+	$grid.precips configure -bg $bgcolor -fg [dict get $style label1 $theme]
+	$grid.precips_val configure -bg $bgcolor -fg [dict get $style value2 $theme]
 }
 
 proc zstatus::metar::set_theme {newtheme} {
-	variable station
-
 	variable theme
-	set theme $newtheme
+	variable bgcolor
+	variable fgcolor
+	variable sepcolor
 
-	variable bartheme
-	set bartheme [dict get $::color background $theme]
-	variable septheme
-	set septheme [dict get $::color separator $theme]
+	set theme $newtheme
+	set bgcolor [dict get $::widgetdict metar bg $theme]
+	set fgcolor [dict get $::widgetdict metar fg $theme]
+	set sepcolor [dict get $::widgetdict separator bg $theme]
 
 	variable popup_visible
 	if {$popup_visible} {
 		variable popup
-		$popup configure -background $bartheme
+		$popup configure -background $bgcolor
 		set_theme_header $popup.header
 		set_theme_summary $popup.summary
 		set_theme_grid $popup.grid
@@ -277,14 +277,14 @@ proc zstatus::metar::update_grid {grid} {
 }
 
 proc zstatus::metar::update {} {
-	variable metar_code
+	variable metarcode
 	variable station
 	variable locale
 	variable labeldict
 	variable report
 
 	if ![dict exists $station icaoId] {
-		set station [decode::fetch_station $metar_code]
+		set station [decode::fetch_station $metarcode]
 		if ![dict size $station] {
 			set report(statusbar) "<?>"
 			set report(tooltip) [dict get $labeldict nostation $locale]
@@ -304,7 +304,6 @@ proc zstatus::metar::update {} {
 
 proc zstatus::metar::setup_header { header } {
 	variable style
-	variable theme
 	variable locale
 	variable labeldict
 	variable report
@@ -334,7 +333,6 @@ proc zstatus::metar::setup_header { header } {
 
 proc zstatus::metar::setup_summary { summary } {
 	variable style
-	variable theme
 	variable locale
 	variable labeldict
 	variable report
@@ -374,7 +372,6 @@ proc zstatus::metar::setup_summary { summary } {
 
 proc zstatus::metar::setup_grid { grid } {
 	variable style
-	variable theme
 	variable locale
 	variable labeldict
 	variable report
@@ -452,9 +449,10 @@ proc zstatus::metar::setup_grid { grid } {
 }
 
 proc zstatus::metar::setup {bar widget} {
-	variable theme
 	variable barwidget
 	variable metarwidget
+	variable metarfont
+	variable metarcode
 
 	if ![dict exists $::widgetdict metar station] {
 		variable report
@@ -465,8 +463,8 @@ proc zstatus::metar::setup {bar widget} {
 	set barwidget $bar
 	set metarwidget $bar.$widget
 
-	variable metar_code
-	set metar_code [dict get $::widgetdict metar station]
+	set metarfont [dict get $::widgetdict metar font]
+	set metarcode [dict get $::widgetdict metar station]
 
 	variable metar_locales
 	variable timezone

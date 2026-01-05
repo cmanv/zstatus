@@ -21,18 +21,18 @@ proc zstatus::workspace::send_message {msg} {
 }
 
 proc zstatus::workspace::set_theme {theme} {
-	variable bartheme
-	variable wslisttheme
+	variable bgcolor
+	variable fgcolor
 	variable wslistbar
 	variable wslistframe
 
-	set bartheme [dict get $::color background $theme]
-	set wslisttheme [dict get $::widgetdict wslist $theme]
+	set bgcolor [dict get $::widgetdict wslist bg $theme]
+	set fgcolor [dict get $::widgetdict wslist fg $theme]
 
-	$wslistbar configure -background $bartheme
-	$wslistframe configure -background $bartheme
+	$wslistbar configure -background $bgcolor
+	$wslistframe configure -background $bgcolor
 	foreach slave [pack slaves $wslistframe] {
-		$slave configure -bg $bartheme -fg $wslisttheme
+		$slave configure -bg $bgcolor -fg $fgcolor
 	}
 }
 
@@ -63,15 +63,15 @@ proc zstatus::workspace::unset_wintitle {value} {
 }
 
 proc zstatus::workspace::set_wslist {value} {
-	variable bartheme
-	variable wslisttheme
+	variable bgcolor
+	variable fgcolor
 	variable wslistbar
 	variable wslistframe
 
 	destroy $wslistframe
 	pack [frame $wslistframe]
-	$wslistbar configure -background $bartheme
-	$wslistframe configure -background $bartheme
+	$wslistbar configure -background $bgcolor
+	$wslistframe configure -background $bgcolor
 
 	foreach name [split $value "|"] {
 		if {![string length $name]} {
@@ -94,7 +94,7 @@ proc zstatus::workspace::set_wslist {value} {
 		set slave $wslistframe.$num
 		pack [label $slave -font $font -text "$name" -padx 2] -side left
 
-		$slave configure -bg $bartheme -fg $wslisttheme
+		$slave configure -bg $bgcolor -fg $fgcolor
 		if {$active} {
 			continue
 		}

@@ -14,16 +14,16 @@ proc zstatus::music::set_theme { theme } {
 	variable socket_valid
 	if {!$socket_valid} { return }
 
-	variable bartheme
-	variable musictheme
-	set bartheme [dict get $::color background $theme]
-	set septheme [dict get $::color separator $theme]
-	set musictheme [dict get $::widgetdict music $theme]
+	variable bgcolor
+	variable fgcolor
+	set bgcolor [dict get $::widgetdict music bg $theme]
+	set fgcolor [dict get $::widgetdict music fg $theme]
+	set sepcolor [dict get $::widgetdict separator bg $theme]
 
 	variable musicframe
 	variable musicsep
-	$musicframe configure -bg $bartheme -fg $musictheme
-	$musicsep configure -background $septheme
+	$musicframe configure -bg $bgcolor -fg $fgcolor
+	$musicsep configure -background $sepcolor
 }
 
 proc zstatus::music::update {} {
@@ -115,13 +115,13 @@ proc zstatus::music::show_tooltip {} {
 	variable tooltip_active
 	variable mpdtext
 	variable musicfont
-	variable bartheme
+	variable bgcolor
 	variable barwidget
 	variable musicframe
 
 	set tooltip_active 1
 	set tooltip [toplevel .musictooltip -highlightthickness 0\
-			-background $bartheme]
+			-background $bgcolor]
 
 	set xpos [winfo x $musicframe]
 	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
@@ -150,8 +150,8 @@ proc zstatus::music::hide_tooltip {} {
 proc zstatus::music::update_tooltip { } {
 	variable music
 	variable mpdtext
-	variable bartheme
-	variable musictheme
+	variable bgcolor
+	variable fgcolor
 
 	set info [mpd::currenttitle]
 	set title "[lindex $info 0] - [lindex $info 1]\n"
@@ -165,7 +165,7 @@ proc zstatus::music::update_tooltip { } {
 	}
 	$mpdtext delete 1.0 end
 	$mpdtext insert 1.0 $title
-	$mpdtext configure -width $width -fg $musictheme -bg $bartheme
+	$mpdtext configure -width $width -fg $fgcolor -bg $bgcolor
 }
 
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

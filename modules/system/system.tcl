@@ -25,7 +25,7 @@ namespace eval zstatus::system {
 		ipv6 {C "IPv6:" fr "IPv6 :"}\
 		trf {C "Transfers:" fr "Transferts :"}]
 
-	array set linecolor { light DeepSkyBlue dark SeaGreen }
+	dict set ::color line { light DeepSkyBlue dark SeaGreen }
 
 	variable loadgraph_visible 0
 	variable memstats_visible 0
@@ -36,14 +36,13 @@ namespace eval zstatus::system {
 }
 
 proc zstatus::system::set_theme {theme} {
-	variable bartheme
-	variable systheme
+	variable bgcolor
+	variable fgcolor
 	variable linecolor
-	variable linetheme
 
-	set bartheme [dict get $::color background $theme]
-	set linetheme $linecolor($theme)
-	set systheme [dict get $::widgetdict loadavg $theme]
+	set bgcolor [dict get $::color background $theme]
+	set fgcolor [dict get $::color foreground $theme]
+	set linecolor [dict get $::color line $theme]
 
 	variable loadgraph_visible
 	if {$loadgraph_visible} { set_theme_loadgraph }
@@ -55,47 +54,47 @@ proc zstatus::system::set_theme {theme} {
 
 proc zstatus::system::set_theme_loadgraph {} {
 	variable loadgraph
-	variable bartheme
-	$loadgraph configure -bg $bartheme
+	variable bgcolor
+	$loadgraph configure -bg $bgcolor
 	update_loadgraph
 }
 
 proc zstatus::system::set_theme_memstats {} {
-	variable systheme
-	variable bartheme
+	variable fgcolor
+	variable bgcolor
 	variable memgrid
 
-	.memstats configure -background $bartheme
-	$memgrid configure -background $bartheme
-	$memgrid.used configure -bg $bartheme -fg $systheme
-	$memgrid.total configure -bg $bartheme -fg $systheme
-	$memgrid.memory configure -bg $bartheme -fg $systheme
-	$memgrid.mem_used configure -bg $bartheme -fg $systheme
-	$memgrid.mem_free configure -bg $bartheme -fg $systheme
-	$memgrid.mem_total configure -bg $bartheme -fg $systheme
-	$memgrid.arc configure -bg $bartheme -fg $systheme
-	$memgrid.arc_used configure -bg $bartheme -fg $systheme
-	$memgrid.arc_free configure -bg $bartheme -fg $systheme
-	$memgrid.arc_total configure -bg $bartheme -fg $systheme
-	$memgrid.swap configure -bg $bartheme -fg $systheme
-	$memgrid.swap_used configure -bg $bartheme -fg $systheme
-	$memgrid.swap_free configure -bg $bartheme -fg $systheme
-	$memgrid.swap_total configure -bg $bartheme -fg $systheme
+	.memstats configure -background $bgcolor
+	$memgrid configure -background $bgcolor
+	$memgrid.used configure -bg $bgcolor -fg $fgcolor
+	$memgrid.total configure -bg $bgcolor -fg $fgcolor
+	$memgrid.memory configure -bg $bgcolor -fg $fgcolor
+	$memgrid.mem_used configure -bg $bgcolor -fg $fgcolor
+	$memgrid.mem_free configure -bg $bgcolor -fg $fgcolor
+	$memgrid.mem_total configure -bg $bgcolor -fg $fgcolor
+	$memgrid.arc configure -bg $bgcolor -fg $fgcolor
+	$memgrid.arc_used configure -bg $bgcolor -fg $fgcolor
+	$memgrid.arc_free configure -bg $bgcolor -fg $fgcolor
+	$memgrid.arc_total configure -bg $bgcolor -fg $fgcolor
+	$memgrid.swap configure -bg $bgcolor -fg $fgcolor
+	$memgrid.swap_used configure -bg $bgcolor -fg $fgcolor
+	$memgrid.swap_free configure -bg $bgcolor -fg $fgcolor
+	$memgrid.swap_total configure -bg $bgcolor -fg $fgcolor
 }
 
 proc zstatus::system::set_theme_netstat {} {
-	variable systheme
-	variable bartheme
+	variable fgcolor
+	variable bgcolor
 	variable netgrid
 
-	.netstat configure -background $bartheme
-	$netgrid configure -background $bartheme
-	$netgrid.ipv4 configure -bg $bartheme -fg $systheme
-	$netgrid.ipv4_addr configure -bg $bartheme -fg $systheme
-	$netgrid.ipv6 configure -bg $bartheme -fg $systheme
-	$netgrid.ipv6_addr configure -bg $bartheme -fg $systheme
-	$netgrid.transfer configure -bg $bartheme -fg $systheme
-	$netgrid.transfer_val configure -bg $bartheme -fg $systheme
+	.netstat configure -background $bgcolor
+	$netgrid configure -background $bgcolor
+	$netgrid.ipv4 configure -bg $bgcolor -fg $fgcolor
+	$netgrid.ipv4_addr configure -bg $bgcolor -fg $fgcolor
+	$netgrid.ipv6 configure -bg $bgcolor -fg $fgcolor
+	$netgrid.ipv6_addr configure -bg $bgcolor -fg $fgcolor
+	$netgrid.transfer configure -bg $bgcolor -fg $fgcolor
+	$netgrid.transfer_val configure -bg $bgcolor -fg $fgcolor
 }
 
 proc zstatus::system::set_loadavg {} {
@@ -123,8 +122,8 @@ proc zstatus::system::hide_loadgraph {} {
 }
 
 proc zstatus::system::show_loadgraph {} {
-	variable bartheme
-	variable systheme
+	variable bgcolor
+	variable fgcolor
 	variable sysfont
 	variable barwidget
 	variable loadwidget
@@ -133,7 +132,7 @@ proc zstatus::system::show_loadgraph {} {
 
 	set loadgraph_visible 1
 	set loadframe [toplevel .loadgraph -highlightthickness 0\
-				 -background $bartheme]
+				 -background $bgcolor]
 
 	set xpos [winfo x $loadwidget]
 	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
@@ -143,14 +142,14 @@ proc zstatus::system::show_loadgraph {} {
 	wm geometry $loadframe +$xpos+$ypos
 
 	set loadgraph $loadframe.graphics
-	pack [canvas $loadgraph -width 180 -height 60 -highlightthickness 0 -bg $bartheme]
+	pack [canvas $loadgraph -width 180 -height 60 -highlightthickness 0 -bg $bgcolor]
 	update_loadgraph
 }
 
 proc zstatus::system::update_loadgraph {} {
-	variable bartheme
-	variable linetheme
-	variable systheme
+	variable bgcolor
+	variable fgcolor
+	variable linecolor
 	variable loadgraph
 	variable load_queue
 
@@ -161,13 +160,13 @@ proc zstatus::system::update_loadgraph {} {
 	set xpos 1
 	foreach value $load_queue {
 		set ypos [tcl::mathfunc::round [expr 60 * ($ymax - $value) / $ymax]]
-		$loadgraph create line $xpos 60 $xpos $ypos -fill $linetheme
+		$loadgraph create line $xpos 60 $xpos $ypos -fill $linecolor
 		incr xpos
 	}
 	set hline 1
 	while {$hline < $ymax} {
 		set ypos [tcl::mathfunc::round [expr 60 * ($ymax - $hline) / $ymax ]]
-		$loadgraph create line 1 $ypos 180 $ypos -fill $systheme
+		$loadgraph create line 1 $ypos 180 $ypos -fill $fgcolor
 		incr hline
 	}
 }
@@ -190,8 +189,8 @@ proc zstatus::system::show_memstats {} {
 	variable memstats_visible
 	variable sysdict
 	variable locale
-	variable bartheme
-	variable systheme
+	variable bgcolor
+	variable fgcolor
 	variable sysfont
 	variable barwidget
 	variable memwidget
@@ -199,7 +198,7 @@ proc zstatus::system::show_memstats {} {
 
 	set memstats_visible 1
 	set memstats [toplevel .memstats -highlightthickness 0\
-				 -background $bartheme]
+				 -background $bgcolor]
 
 	set xpos [winfo x $memwidget]
 	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
@@ -211,48 +210,48 @@ proc zstatus::system::show_memstats {} {
 	set memgrid $memstats.grid
 
 	set row 0
-	pack [frame $memgrid -background $bartheme] -padx 5 -pady 5 -side top -anchor w
+	pack [frame $memgrid -background $bgcolor] -padx 5 -pady 5 -side top -anchor w
 	label $memgrid.title -font $sysfont -text [dict get $sysdict memstats $locale]\
-		-bg $bartheme -fg $systheme
+		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.title -row $row -column 0 -sticky w
 	label $memgrid.used -font $sysfont  -text [dict get $sysdict used $locale]\
-		-bg $bartheme -fg $systheme
+		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.used -row $row -column 1 -sticky e
 	label $memgrid.free -font $sysfont -text [dict get $sysdict free $locale]\
-		 -bg $bartheme -fg $systheme
+		 -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.free -row $row -column 2 -sticky e
 	label $memgrid.total -font $sysfont -text [dict get $sysdict total $locale]\
-		-bg $bartheme -fg $systheme
+		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.total -row $row -column 3 -sticky e
 	incr row
 	label $memgrid.memory -font $sysfont -text [dict get $sysdict mem $locale]\
-		-bg $bartheme -fg $systheme
+		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.memory -row $row -column 0 -sticky w
-	label $memgrid.mem_used -font $sysfont -bg $bartheme -fg $systheme
+	label $memgrid.mem_used -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.mem_used -row $row -column 1 -sticky e
-	label $memgrid.mem_free -font $sysfont -bg $bartheme -fg $systheme
+	label $memgrid.mem_free -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.mem_free -row $row -column 2 -sticky e
-	label $memgrid.mem_total -font $sysfont -bg $bartheme -fg $systheme
+	label $memgrid.mem_total -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.mem_total -row $row -column 3 -sticky e
 	incr row
 	label $memgrid.arc -font $sysfont -text [dict get $sysdict arc $locale]\
-		-bg $bartheme -fg $systheme
+		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.arc -row $row -column 0 -sticky w
-	label $memgrid.arc_used -font $sysfont -bg $bartheme -fg $systheme
+	label $memgrid.arc_used -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.arc_used -row $row -column 1 -sticky e
-	label $memgrid.arc_free -font $sysfont -bg $bartheme -fg $systheme
+	label $memgrid.arc_free -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.arc_free -row $row -column 2 -sticky e
-	label $memgrid.arc_total -font $sysfont -bg $bartheme -fg $systheme
+	label $memgrid.arc_total -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.arc_total -row $row -column 3 -sticky e
 	incr row
 	label $memgrid.swap -font $sysfont -text [dict get $sysdict swap $locale]\
-		 -bg $bartheme -fg $systheme
+		 -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.swap -row $row -column 0 -sticky w
-	label $memgrid.swap_used -font $sysfont -bg $bartheme -fg $systheme
+	label $memgrid.swap_used -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.swap_used -row $row -column 1 -sticky e
-	label $memgrid.swap_free -font $sysfont -bg $bartheme -fg $systheme
+	label $memgrid.swap_free -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.swap_free -row $row -column 2 -sticky e
-	label $memgrid.swap_total -font $sysfont -bg $bartheme -fg $systheme
+	label $memgrid.swap_total -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.swap_total -row $row -column 3 -sticky e
 
 	grid columnconfigure $memgrid 0 -pad 5
@@ -266,8 +265,8 @@ proc zstatus::system::show_memstats {} {
 
 proc zstatus::system::update_memstats {} {
 	variable memgrid
-	variable bartheme
-	variable systheme
+	variable bgcolor
+	variable fgcolor
 
 	set memstats [freebsd::getmemused]
 	$memgrid.mem_total configure -text [lindex $memstats 0]
@@ -292,8 +291,8 @@ proc zstatus::system::hide_netstat {} {
 proc zstatus::system::show_netstat {} {
 	variable netstat_visible
 	variable netgrid
-	variable bartheme
-	variable systheme
+	variable bgcolor
+	variable fgcolor
 	variable sysfont
 	variable sysdict
 	variable locale
@@ -302,7 +301,7 @@ proc zstatus::system::show_netstat {} {
 
 	set netstat_visible 1
 	set netstat [toplevel .netstat -highlightthickness 0\
-				 -background $bartheme]
+				 -background $bgcolor]
 
 	set xpos [winfo x $netwidget]
 	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
@@ -314,25 +313,25 @@ proc zstatus::system::show_netstat {} {
 	set netgrid $netstat.grid
 
 	set row 0
-	pack [frame $netgrid -background $bartheme] -padx 5 -pady 5 -side top -anchor w
+	pack [frame $netgrid -background $bgcolor] -padx 5 -pady 5 -side top -anchor w
 	label $netgrid.ipv4 -font $sysfont -text [dict get $sysdict ipv4 $locale]\
-		-bg $bartheme -fg $systheme
+		-bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.ipv4 -row $row -column 0 -sticky w
-	label $netgrid.ipv4_addr -font $sysfont -bg $bartheme -fg $systheme
+	label $netgrid.ipv4_addr -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.ipv4_addr -row $row -column 1 -sticky e
 
 	incr row
 	label $netgrid.ipv6 -font $sysfont -text [dict get $sysdict ipv6 $locale]\
-		-bg $bartheme -fg $systheme
+		-bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.ipv6 -row $row -column 0 -sticky w
-	label $netgrid.ipv6_addr -font $sysfont -bg $bartheme -fg $systheme
+	label $netgrid.ipv6_addr -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.ipv6_addr -row $row -column 1 -sticky e
 
 	incr row
 	label $netgrid.transfer -font $sysfont -text [dict get $sysdict trf $locale]\
-		-bg $bartheme -fg $systheme
+		-bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.transfer -row $row -column 0 -sticky w
-	label $netgrid.transfer_val -font $sysfont -bg $bartheme -fg $systheme
+	label $netgrid.transfer_val -font $sysfont -bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.transfer_val -row $row -column 1 -sticky e
 
 	grid columnconfigure $netgrid 0 -pad 5

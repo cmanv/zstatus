@@ -8,20 +8,20 @@ namespace eval zstatus::mail {
 }
 
 proc zstatus::mail::set_theme { theme } {
-	variable bartheme
-	variable mailtheme
-	variable septheme
-	set bartheme [dict get $::color background $theme]
-	set mailtheme [dict get $::widgetdict mail $theme]
-	set septheme [dict get $::color separator $theme]
+	variable bgcolor
+	variable fgcolor
+	variable sepcolor
+	set bgcolor [dict get $::widgetdict mail bg $theme]
+	set fgcolor [dict get $::widgetdict mail fg $theme]
+	set sepcolor [dict get $::widgetdict separator bg $theme]
 
 	variable mailframe
 	variable mailsep
 	variable mailboxes
-	$mailframe configure -background $bartheme
-	$mailsep configure -background $septheme
+	$mailframe configure -background $bgcolor
+	$mailsep configure -background $sepcolor
 	foreach index [dict keys $mailboxes] {
-		$mailframe.$index configure -bg $bartheme\
+		$mailframe.$index configure -bg $bgcolor\
 			-fg [dict get $mailboxes $index $theme]
 	}
 }
@@ -77,13 +77,13 @@ proc zstatus::mail::convert_header { header } {
 # Popup after button event on mail icon
 proc zstatus::mail::new { index } {
 	variable activepopup
+	variable barwidget
 	variable mail
 	variable mailfont
-	variable mailtheme
 	variable mailframe
-	variable barwidget
-	variable bartheme
-	variable septheme
+	variable bgcolor
+	variable fgcolor
+	variable sepcolor
 
 	if {$activepopup} {
 		destroy .mailpopup
@@ -91,7 +91,7 @@ proc zstatus::mail::new { index } {
 		set activepopup 1
 	}
 
-	set mailpopup [toplevel .mailpopup -background $bartheme -class Newmail]
+	set mailpopup [toplevel .mailpopup -background $bgcolor -class Newmail]
 
 	set xpos [winfo x $mailframe]
 	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
@@ -105,12 +105,12 @@ proc zstatus::mail::new { index } {
 	variable mailboxes
 	set mailboxname [dict get $mailboxes $index name]
 	set mailboxpath [dict get $mailboxes $index path]
-	pack [frame $mailpopup.$index -background $bartheme]\
+	pack [frame $mailpopup.$index -background $bgcolor]\
 		-expand 1 -fill x -side top
-	pack [label $mailpopup.$index.label -font bold -bg $bartheme\
-		-fg $mailtheme -text "-- $mailboxname --"] \
+	pack [label $mailpopup.$index.label -font bold -bg $bgcolor\
+		-fg $fgcolor -text "-- $mailboxname --"] \
 		-expand 1 -side left
-	pack [frame $mailpopup.headersep -background $septheme\
+	pack [frame $mailpopup.headersep -background $sepcolor\
 		-height 1] -fill x -side top
 
 	set count 0
@@ -124,17 +124,17 @@ proc zstatus::mail::new { index } {
 		set from [convert_header [lindex [mime::getheader $tokens From] 0]]
 		set subject [convert_header [lindex [mime::getheader $tokens Subject] 0]]
 
-		pack [frame $mailpopup.date$count -background $bartheme]\
+		pack [frame $mailpopup.date$count -background $bgcolor]\
 			-expand 1 -fill x
 		pack [label $mailpopup.date$count.label -text $date\
-			-font $mailfont -bg $bartheme\
-			-fg $mailtheme] -side left -padx 5
-		pack [frame $mailpopup.from$count -background $bartheme]\
+			-font $mailfont -bg $bgcolor\
+			-fg $fgcolor] -side left -padx 5
+		pack [frame $mailpopup.from$count -background $bgcolor]\
 			-expand 1 -fill x
 		pack [label $mailpopup.from$count.label -text $from\
-			-font $mailfont -bg $bartheme\
-			-fg $mailtheme] -side left -padx 5
-		pack [frame $mailpopup.subject$count -background $bartheme]\
+			-font $mailfont -bg $bgcolor\
+			-fg $fgcolor] -side left -padx 5
+		pack [frame $mailpopup.subject$count -background $bgcolor]\
 			-expand 1 -fill x
 
 		set textlen [string length $subject]
@@ -143,8 +143,8 @@ proc zstatus::mail::new { index } {
 
 		set tsubject [text $mailpopup.subject$count.text -font $mailfont\
 			-wrap word -borderwidth 0 -highlightthickness 0\
-			-height $height -width $width -fg $mailtheme\
-			-bg $bartheme]
+			-height $height -width $width -fg $fgcolor\
+			-bg $bgcolor]
 
 		pack $tsubject -side left -padx 5
 		$tsubject tag configure emoji -font emoji
@@ -153,7 +153,7 @@ proc zstatus::mail::new { index } {
 			$tsubject tag add emoji $i
 		}
 
-		pack [frame $mailpopup.msgsep$count -background $septheme\
+		pack [frame $mailpopup.msgsep$count -background $sepcolor\
 			-height 1] -side top -fill x
 		incr count
 	}

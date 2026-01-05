@@ -6,25 +6,25 @@ namespace eval zstatus::devices {
 }
 
 proc zstatus::devices::set_theme {theme} {
-	variable bartheme
-	variable devicetheme
-	set bartheme [dict get $::color background $theme]
-	set devicetheme [dict get $::widgetdict devices $theme]
+	variable bgcolor
+	variable fgcolor
+	set bgcolor [dict get $::widgetdict devices bg $theme]
+	set fgcolor [dict get $::widgetdict devices fg $theme]
 
 	variable devframe
 	variable devsep
-	$devframe configure -background $bartheme
-	$devsep configure -background [dict get $::widgetdict separator $theme]
+	$devframe configure -background $bgcolor
+	$devsep configure -background [dict get $::widgetdict separator bg $theme]
 
 	variable devicelist
 	foreach device $devicelist {
-		$devframe.$device configure -bg $bartheme -fg $devicetheme
+		$devframe.$device configure -bg $bgcolor -fg $fgcolor
 	}
 }
 
 proc zstatus::devices::update {} {
-	variable bartheme
-	variable devicetheme
+	variable bgcolor
+	variable fgcolor
 	variable devicefont
 
 	variable devframe
@@ -48,8 +48,8 @@ proc zstatus::devices::update {} {
 			}
 			pack [label $devframe.$device -font $devicefont\
 				 -text "$device"] -side left
-			$devframe.$device configure -fg $devicetheme\
-				 -bg $bartheme
+			$devframe.$device configure -fg $fgcolor\
+				 -bg $bgcolor
 		}
 	}
 

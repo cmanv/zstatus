@@ -32,7 +32,7 @@ set widgetdict [dict create\
 		proc system::update_netstat interface em0\
 		settheme system::set_theme}\
 	osversion {type string source zstatus::osversion}\
-	separator {type separator light black dark gray}\
+	separator {type separator bg {light black dark gray}}\
 	wintitle {type text module workspace expand 0 maxlength 120}]
 
 set messagedict [dict create set_theme {action set_theme arg 1}]
@@ -108,10 +108,9 @@ proc zstatus::set_theme {newtheme} {
 
 	variable bar
 	variable widgetlist
-	set bartheme [dict get $::color background $theme]
 
 	set count 0
-	$bar configure -background $bartheme
+	$bar configure -background [dict get $::color background $theme]
 	foreach item $widgetlist {
 		switch [dict get $::widgetdict $item type] {
 		bar {}
@@ -123,7 +122,7 @@ proc zstatus::set_theme {newtheme} {
 		separator {
 			incr count
 			$bar.$item$count configure\
-				-background [dict get $::widgetdict $item $theme]
+				-background [dict get $::widgetdict $item bg $theme]
 		}
 		widget {
 			if [dict exists $::widgetdict $item settheme] {
@@ -131,8 +130,9 @@ proc zstatus::set_theme {newtheme} {
 			}
 		}
 		default {
-			$bar.$item configure -bg $bartheme\
-				-fg [dict get $::widgetdict $item $theme]
+			$bar.$item configure\
+				-bg [dict get $::widgetdict $item bg $theme]\
+				-fg [dict get $::widgetdict $item fg $theme]
 			if [dict exists $::widgetdict $item settheme] {
 				[dict get $::widgetdict $item settheme] $theme
 			}
@@ -194,11 +194,11 @@ proc zstatus::add_widgets {side widgets} {
 		if {![dict exists $::widgetdict $item font]} {
 			dict set ::widgetdict $item font normal
 		}
-		if {![dict exists $::widgetdict $item light]} {
-			dict set ::widgetdict $item light "[dict get $::color foreground light]"
+		if {![dict exists $::widgetdict $item fg]} {
+			dict set ::widgetdict $item fg [dict get $::color foreground]
 		}
-		if {![dict exists $::widgetdict $item dark]} {
-			dict set ::widgetdict $item dark "[dict get $::color foreground dark]"
+		if {![dict exists $::widgetdict $item bg]} {
+			dict set ::widgetdict $item bg [dict get $::color background]
 		}
 
 		switch [dict get $::widgetdict $item type] {
