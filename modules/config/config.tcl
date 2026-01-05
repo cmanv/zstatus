@@ -57,7 +57,7 @@ proc zstatus::config::get {key configfile} {
 				continue
 			}
 			if ![string length $context] { continue }
-			if [regexp "^$key=(.+)" $line -> $value] {
+			if [regexp "^$key=(.+)" $line -> value] {
 				break
 			}
 		}
@@ -104,6 +104,17 @@ proc zstatus::config::read {configfile} {
 				continue
 			}
 			if ![string length $context] { continue }
+			if [regexp {^([a-z_]+):([a-z_]+)=(.+)} $line -> key1 key2 value] {
+				if {$context == "main"} {
+					dict set config $key1 $key2 $value
+				} elseif {$context == "maildir"} {
+					dict set mailboxes $index $key1 $key2 $value
+				} else {
+					puts "Set $context $key1 $key2 $value"
+					dict set ::widgetdict $context $key1 $key2 $value
+				}
+				continue
+			}
 			if [regexp {^([a-z_]+)=(.+)} $line -> key value] {
 				if {[lsearch $immutables $key] >= 0} {
 					continue

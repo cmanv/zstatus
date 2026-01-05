@@ -13,7 +13,7 @@ proc zstatus::mail::set_theme { theme } {
 	variable sepcolor
 	set bgcolor [dict get $::widgetdict mail bg $theme]
 	set fgcolor [dict get $::widgetdict mail fg $theme]
-	set sepcolor [dict get $::color separator $theme]
+	set sepcolor [dict get $::widgetdict separator bg $theme]
 
 	variable mailframe
 	variable mailsep

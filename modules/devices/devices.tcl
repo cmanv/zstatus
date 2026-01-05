@@ -10,11 +10,12 @@ proc zstatus::devices::set_theme {theme} {
 	variable fgcolor
 	set bgcolor [dict get $::widgetdict devices bg $theme]
 	set fgcolor [dict get $::widgetdict devices fg $theme]
+	set sepcolor [dict get $::widgetdict separator bg $theme]
 
 	variable devframe
 	variable devsep
 	$devframe configure -background $bgcolor
-	$devsep configure -background [dict get $::color separator $theme]
+	$devsep configure -background $sepcolor
 
 	variable devicelist
 	foreach device $devicelist {
