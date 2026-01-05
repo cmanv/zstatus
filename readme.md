@@ -1,6 +1,6 @@
 % zstatus(1) zstatus version alpha1 | zstatus user's manual
 % cmanv
-% September 2025
+% January 2026
 
 # NAME
 
@@ -91,14 +91,6 @@ These are the options can be specified in the __[main]__ section.
 
 > Default theme. ('dark' or 'light')
 
-* __barsocket__
-
-> Unix socket of the statusbar. (Default: _$HOME/.cache/zstatus/socket_)
-
-* __zwmsocket__
-
-> Unix socket of the window manager. (Default: _$HOME/.cache/zwm/socket_)
-
 * __leftside__
 
 > List of widgets in the statusbar starting from the left. (Default: _wsmode separator wslist separator wsname separator wintitle_)
@@ -113,79 +105,88 @@ These are the options can be specified in the __[main]__ section.
 
 The list of valid widgets are:
 
-> __arcsize__, __datetime__, __wslist__, __wsmode__, __wsname__, __devices__,
-> __loadavg__, __mail__, __memused__, __metar__, __mixer__, __music__, __netin__,
-> __netout__,  __separator__, __wintitle__
+> __datetime__, __wslist__, __wsmode__, __wsname__, __devices__, __loadavg__,
+> __mail__, __memused__, __metar__, __mixer__, __music__, __netstat__,
+> __separator__, __wintitle__
 
 Each of these widgets can be customized with options:
-
-- __[arcsize]__: Shows current usage of the ZFS ARC.
-
-> Options:
-> - _exec_: Command to execute on mouse click.
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
 
 - __[datetime]__: Shows current date and time in the defined _timezone_
 
 > Options:
 > - _format_: Format of the date and time (as defined in strftime(3))
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 - __[wslist]__: List of workspaces currently in use.
 
 > Options:
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 - __[wsmode]__: Mode of the active workspace.
 
 > Options:
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 - __[wsname]__: Name of the active workspace.
 
 > Options:
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 - __[devices]__: Show some devices present under /dev.
 
 > Options:
 > - _searchlist_: List of devices to watch. (Default: _da[0-9] ulpt[0-9]_)
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 - __[loadavg]__: Shows current CPU load average.
 
 > Options:
 > - _exec_: Command to execute on mouse click.
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 - __[mail]__: Shows icons of new mail. There must be at least one maildir section defined.
 
 > Options:
 > - _exec_: Command to execute on mouse click.
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
-- __[memused]__: Shows current used memory and swap usage if applicable.
+- __[memused]__: Shows percentage of used memory.
 
 > Options:
 > - _exec_: Command to execute on mouse click.
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 - __[metar]__: Shows an icon and current temperature from a METAR station.
 Clicking on it opens a window showing current weather conditions.
@@ -194,16 +195,20 @@ Clicking on it opens a window showing current weather conditions.
 > - _code_: The 4 characters code of the METAR station. (required)
 > - _delay_: Time between updates in minutes. (Default 10)
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 - __[mixer]__: Shows an icon and the volume level of _/dev/mixer_.
 
 > Options:
 > - _exec_: Command to execute on mouse click.
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 - __[music]__: Shows an icon when the music player daemon is in use. Hovering on
 it shows the currently playing track.
@@ -212,32 +217,27 @@ it shows the currently playing track.
 > - _socket_: Unix or tcp socket for connecting to mpd. If not defined, the value
 > of _MPD\_HOST_ is used instead.
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
-- __[netin]__: Shows the amount of inbound traffic on a given network interface.
-
-> Options:
-> - _interface_: Network interface to monitor. (required)
-> - _exec_: Command to execute on mouse click.
-> - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
-
-- __[netout]__: Shows the amount of outbound traffic on a given network interface.
+- __[netstat]__: Shows net statistics the given network interface.
 
 > Options:
 > - _interface_: Network interface to monitor. (required)
 > - _exec_: Command to execute on mouse click.
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 - __[separator]__: Widget acting as vertical separators between two widgets.
 
 > Options:
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: color in light mode.
+> - _bg_:_dark_: color in dark mode.
 
 - __[wintitle]__: Displays the title of the currently active window.
 
@@ -245,8 +245,10 @@ it shows the currently playing track.
 > - _expand_: The widget expands to occupy all available space.
 > - _maxlength_: Maximum length of text to display. (Default 100 characters)
 > - _font_: font to use for text (normal, italic or bold).
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 ## OTHER SECTIONS
 
@@ -257,14 +259,10 @@ are allowed for multiple mailboxes.
 > Options:
 > - _name_: Name of the maildir (required)
 > - _path_: Path of the maildir (required)
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
-
-- __[statusbar]__: Used to define the background color of the statusbar.
-
-> Options:
-> - _light_: color in light mode.
-> - _dark_: color in dark mode.
+> - _bg_:_light_: background color in light mode.
+> - _bg_:_dark_: background color in dark mode.
+> - _fg_:_light_: foreground color in light mode.
+> - _fg_:_dark_: foreground color in dark mode.
 
 # FILES
 
