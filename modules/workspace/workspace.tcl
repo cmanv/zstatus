@@ -23,11 +23,13 @@ proc zstatus::workspace::send_message {msg} {
 proc zstatus::workspace::set_theme {theme} {
 	variable bgcolor
 	variable fgcolor
+	variable highlight
 	variable wslistbar
 	variable wslistframe
 
 	set bgcolor [dict get $::widgetdict wslist bg $theme]
 	set fgcolor [dict get $::widgetdict wslist fg $theme]
+	set highlight [dict get $::color highlight $theme]
 
 	$wslistbar configure -background $bgcolor
 	$wslistframe configure -background $bgcolor
@@ -65,6 +67,7 @@ proc zstatus::workspace::unset_wintitle {value} {
 proc zstatus::workspace::set_wslist {value} {
 	variable bgcolor
 	variable fgcolor
+	variable highlight
 	variable wslistbar
 	variable wslistframe
 
@@ -92,12 +95,13 @@ proc zstatus::workspace::set_wslist {value} {
 		}
 
 		set slave $wslistframe.$num
-		pack [label $slave -font $font -text "$name" -padx 2] -side left
+		pack [label $slave -font $font -text "$name"] -side left
 
-		$slave configure -bg $bgcolor -fg $fgcolor
 		if {$active} {
+			$slave configure -bg $highlight -fg $fgcolor
 			continue
 		}
+		$slave configure -bg $bgcolor -fg $fgcolor
 
 		bind $slave <1> "zstatus::workspace::send_message desktop-switch-$num"
 	}

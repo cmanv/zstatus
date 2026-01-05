@@ -7,12 +7,12 @@ package require zstatus::remixicon
 set color [dict create\
 	foreground {light black dark LightGray}\
 	background {light gray90 dark gray20}\
-	highlight {light gray70 dark gray40}]
+	highlight {light gray80 dark gray30}]
 
 set widgetdict [dict create\
 	datetime {type string source zstatus::datetime proc set_datetime\
 		format {%d %b %H:%M} }\
-	wslist {type widget module workspace settheme workspace::set_theme}\
+	wslist {type widget module workspace settheme workspace::set_theme font mono}\
 	wsmode {type string module workspace source zstatus::workspace::wsmode}\
 	wsname {type string module workspace source zstatus::workspace::wsname}\
 	devices {type transient module devices proc devices::update\
@@ -278,6 +278,7 @@ proc zstatus::make_font {} {
 	font create large2 -family $fontname -size [expr $fontsize + 2]
 	font create remix1 -family remixicon -size [expr $fontsize]
 	font create remix2 -family remixicon -size [expr $fontsize + 1]
+	font create mono -family "$fontname Mono" -size $fontsize
 
 	if [dict exists $::config emojifont] {
 		set emojifont [dict get $::config emojifont]

@@ -110,7 +110,6 @@ proc zstatus::config::read {configfile} {
 				} elseif {$context == "maildir"} {
 					dict set mailboxes $index $key1 $key2 $value
 				} else {
-					puts "Set $context $key1 $key2 $value"
 					dict set ::widgetdict $context $key1 $key2 $value
 				}
 				continue
