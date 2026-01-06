@@ -21,8 +21,9 @@ proc zstatus::mail::set_theme { theme } {
 	$mailframe configure -background $bgcolor
 	$mailsep configure -background $sepcolor
 	foreach index [dict keys $mailboxes] {
-		$mailframe.$index configure -bg $bgcolor\
-			-fg [dict get $mailboxes $index $theme]
+		$mailframe.$index configure\
+			-bg [dict get $mailboxes $index bg $theme]\
+			-fg [dict get $mailboxes $index fg $theme]
 	}
 }
 

@@ -131,11 +131,11 @@ proc zstatus::config::read {configfile} {
 
 	# Validate mailboxes
 	foreach index [dict keys $mailboxes] {
-		if ![dict exists $mailboxes $index light] {
-			dict set mailboxes $index light black
+		if ![dict exists $mailboxes $index fg] {
+			dict set mailboxes $index fg [dict get $::color foreground]
 		}
-		if ![dict exists $mailboxes $index dark] {
-			dict set mailboxes $index dark LightGray
+		if ![dict exists $mailboxes $index bg] {
+			dict set mailboxes $index bg [dict get $::color background]
 		}
 		if {![dict exists $mailboxes $index name]||\
 			 ![dict exists $mailboxes $index path]} {
