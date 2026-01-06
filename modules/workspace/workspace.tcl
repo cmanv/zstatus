@@ -23,18 +23,23 @@ proc zstatus::workspace::send_message {msg} {
 proc zstatus::workspace::set_theme {theme} {
 	variable bgcolor
 	variable fgcolor
-	variable highlight
+	variable hicolor
 	variable wslistbar
 	variable wslistframe
+	variable activeslave
 
 	set bgcolor [dict get $::widgetdict wslist bg $theme]
 	set fgcolor [dict get $::widgetdict wslist fg $theme]
-	set highlight [dict get $::color highlight $theme]
+	set hicolor [dict get $::color highlight $theme]
 
 	$wslistbar configure -background $bgcolor
 	$wslistframe configure -background $bgcolor
 	foreach slave [pack slaves $wslistframe] {
-		$slave configure -bg $bgcolor -fg $fgcolor
+		if {$slave == $activeslave} {
+			$slave configure -bg $hicolor -fg $fgcolor
+		} else {
+			$slave configure -bg $bgcolor -fg $fgcolor
+		}
 	}
 }
 
@@ -67,9 +72,10 @@ proc zstatus::workspace::unset_wintitle {value} {
 proc zstatus::workspace::set_wslist {value} {
 	variable bgcolor
 	variable fgcolor
-	variable highlight
+	variable hicolor
 	variable wslistbar
 	variable wslistframe
+	variable activeslave
 
 	destroy $wslistframe
 	pack [frame $wslistframe]
@@ -98,7 +104,8 @@ proc zstatus::workspace::set_wslist {value} {
 		pack [label $slave -font $font -text "$name"] -side left
 
 		if {$active} {
-			$slave configure -bg $highlight -fg $fgcolor
+			set activeslave $slave
+			$slave configure -bg $hicolor -fg $fgcolor
 			continue
 		}
 		$slave configure -bg $bgcolor -fg $fgcolor

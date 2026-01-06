@@ -3,7 +3,7 @@ package require fileutil
 set color [dict create\
 	foreground {light black dark LightGray}\
 	background {light gray90 dark gray20}\
-	highlight {light gray80 dark gray30}]
+	highlight {light SlateGray2 dark SteelBlue4}]
 
 set widgetdict [dict create\
 	datetime {type string source zstatus::datetime proc set_datetime\
