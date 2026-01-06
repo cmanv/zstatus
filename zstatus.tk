@@ -4,37 +4,6 @@ package require unix_sockets
 package require zstatus::config
 package require zstatus::remixicon
 
-set color [dict create\
-	foreground {light black dark LightGray}\
-	background {light gray90 dark gray20}\
-	highlight {light gray80 dark gray30}]
-
-set widgetdict [dict create\
-	datetime {type string source zstatus::datetime proc set_datetime\
-		format {%d %b %H:%M} }\
-	wslist {type widget module workspace settheme workspace::set_theme font mono}\
-	wsmode {type string module workspace source zstatus::workspace::wsmode}\
-	wsname {type string module workspace source zstatus::workspace::wsname}\
-	devices {type transient module devices proc devices::update\
-		settheme devices::set_theme font bold}\
-	loadavg {type string module system source zstatus::system::loadavg\
-		proc system::set_loadavg}\
-	mail {type transient module mail proc mail::update\
-		settheme mail::set_theme}\
-	memused {type string module system source zstatus::system::memused\
-		proc system::set_memused settheme system::set_theme}\
-	metar {type string module metar source zstatus::metar::report(statusbar)\
-		settheme metar::set_theme delay 10 font remix1}\
-	mixer {type string module system source zstatus::system::mixer}\
-	music {type transient module music proc music::update\
-		settheme music::set_theme}\
-	netstat {type string module system source zstatus::system::interface\
-		proc system::update_netstat interface em0\
-		settheme system::set_theme}\
-	osversion {type string source zstatus::osversion}\
-	separator {type separator bg {light black dark gray}}\
-	wintitle {type text module workspace expand 0 maxlength 120}]
-
 set messagedict [dict create set_theme {action set_theme arg 1}]
 
 proc every {ms cmd} {
@@ -110,10 +79,9 @@ proc zstatus::set_theme {newtheme} {
 	variable widgetlist
 
 	set count 0
-	$bar configure -background [dict get $::color background $theme]
+	$bar configure -background [dict get $::config bg $theme]
 	foreach item $widgetlist {
 		switch [dict get $::widgetdict $item type] {
-		bar {}
 		transient {
 			if [dict exists $::widgetdict $item settheme] {
 				[dict get $::widgetdict $item settheme] $theme
@@ -125,6 +93,8 @@ proc zstatus::set_theme {newtheme} {
 				-background [dict get $::widgetdict separator bg $theme]
 		}
 		widget {
+			$bar.$item configure\
+				-bg [dict get $::widgetdict $item bg $theme]
 			if [dict exists $::widgetdict $item settheme] {
 				[dict get $::widgetdict $item settheme] $theme
 			}
@@ -158,7 +128,6 @@ proc zstatus::read_message {channel} {
 	} else {
 		return
 	}
-
 	if { ![dict exists $::messagedict $key] } { return }
 	set action [dict get $::messagedict $key action]
 	set arg [dict get $::messagedict $key arg]
@@ -194,11 +163,21 @@ proc zstatus::add_widgets {side widgets} {
 		if {![dict exists $::widgetdict $item font]} {
 			dict set ::widgetdict $item font normal
 		}
-		if {![dict exists $::widgetdict $item fg]} {
-			dict set ::widgetdict $item fg [dict get $::color foreground]
+		if {![dict exists $::widgetdict $item fg light]} {
+			dict set ::widgetdict $item fg light\
+				 [dict get $::color foreground light]
 		}
-		if {![dict exists $::widgetdict $item bg]} {
-			dict set ::widgetdict $item bg [dict get $::color background]
+		if {![dict exists $::widgetdict $item fg dark]} {
+			dict set ::widgetdict $item fg dark\
+				 [dict get $::color foreground dark]
+		}
+		if {![dict exists $::widgetdict $item bg light]} {
+			dict set ::widgetdict $item bg light\
+				[dict get $::color background light]
+		}
+		if {![dict exists $::widgetdict $item bg dark]} {
+			dict set ::widgetdict $item bg dark\
+				[dict get $::color background dark]
 		}
 
 		switch [dict get $::widgetdict $item type] {
@@ -357,12 +336,10 @@ wm attributes . -topmost 1 -type dock
 
 # Unicode mapping from remixicon v4.6.0
 array set unicode [zstatus::remixicon::get]
-# Read config
-set config [zstatus::config::read $params(config)]
-
+zstatus::config::read $params(config)
 zstatus::setup
-every [dict get $config delay] zstatus::update
+every [dict get $::config delay] zstatus::update
 
-set barsocket "[dict get $config cache_prefix]/zstatus/socket"
+set barsocket "[dict get $::config cache_prefix]/zstatus/socket"
 unix_sockets::listen $barsocket zstatus::server_accept
 vwait forever

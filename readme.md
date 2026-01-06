@@ -101,6 +101,14 @@ These are the options can be specified in the __[main]__ section.
 > List of widgets in the statusbar starting from the right. (Default: _datetime_)
 > Note: _separator_ can be abbreviated as _sep_.
 
+* __bg.light__
+
+> Background color in light mode.
+
+* __bg.dark__
+
+> Background color in dark mode.
+
 ## WIDGETS SECTIONS
 
 The list of valid widgets are:

@@ -1,5 +1,36 @@
 package require fileutil
 
+set color [dict create\
+	foreground {light black dark LightGray}\
+	background {light gray90 dark gray20}\
+	highlight {light gray80 dark gray30}]
+
+set widgetdict [dict create\
+	datetime {type string source zstatus::datetime proc set_datetime\
+		format {%d %b %H:%M} }\
+	wslist {type widget module workspace settheme workspace::set_theme font mono}\
+	wsmode {type string module workspace source zstatus::workspace::wsmode}\
+	wsname {type string module workspace source zstatus::workspace::wsname}\
+	devices {type transient module devices proc devices::update\
+		settheme devices::set_theme font bold}\
+	loadavg {type string module system source zstatus::system::loadavg\
+		proc system::set_loadavg}\
+	mail {type transient module mail proc mail::update\
+		settheme mail::set_theme}\
+	memused {type string module system source zstatus::system::memused\
+		proc system::set_memused settheme system::set_theme}\
+	metar {type string module metar source zstatus::metar::report(statusbar)\
+		settheme metar::set_theme delay 10 font remix1}\
+	mixer {type string module system source zstatus::system::mixer}\
+	music {type transient module music proc music::update\
+		settheme music::set_theme}\
+	netstat {type string module system source zstatus::system::interface\
+		proc system::update_netstat interface em0\
+		settheme system::set_theme}\
+	osversion {type string source zstatus::osversion}\
+	separator {type separator bg {light black dark gray}}\
+	wintitle {type text module workspace expand 0 maxlength 120}]
+
 namespace eval zstatus::config {
 	if [info exists ::env(XDG_CONFIG_HOME)] {
 		set config_prefix $::env(XDG_CONFIG_HOME)
@@ -14,18 +45,19 @@ namespace eval zstatus::config {
 		set cache_prefix $::env(HOME)/.cache
 	}
 
-	set config [dict create\
+	set ::config [dict create\
 		timezone 	[exec date +%Z]\
 		delay		2000\
 		fontname	"Dejavu Sans"\
 		fontsize	11\
 		position	top\
+		bg		[dict get $::color background]\
 		cache_prefix	"$cache_prefix"]
 
 	if [info exists ::env(LANG)] {
-		dict set config lang $::env(LANG)
+		dict set ::config lang $::env(LANG)
 	} else {
-		dict set config lang C
+		dict set ::config lang C
 	}
 
 	namespace export read get
@@ -33,15 +65,14 @@ namespace eval zstatus::config {
 
 proc zstatus::config::get {key configfile} {
 	variable defaultfile
-	variable config
 
 	if {$configfile == "default"} {
 		set configfile $defaultfile
 	}
 
 	set value ""
-	if [dict exists $config $key] {
-		set value [dict get $config $key]
+	if [dict exists $::config $key] {
+		set value [dict get $::config $key]
 	}
 
 	if [file exists $configfile] {
@@ -68,7 +99,6 @@ proc zstatus::config::get {key configfile} {
 
 proc zstatus::config::read {configfile} {
 	variable defaultfile
-	variable config
 
 	# List of valid contexts in config file
 	set contexts { main arcsize datetime devices loadavg mail\
@@ -82,9 +112,9 @@ proc zstatus::config::read {configfile} {
 		set configfile $defaultfile
 	}
 
-	dict set config leftside {deskmode separator desklist separator\
+	dict set ::config leftside {deskmode separator desklist separator\
 					deskname separator wintitle}
-	dict set config rightside datetime
+	dict set ::config rightside datetime
 
 	set mailboxes {}
 	if [file exists $configfile] {
@@ -106,7 +136,7 @@ proc zstatus::config::read {configfile} {
 			if ![string length $context] { continue }
 			if [regexp {^([a-z_]+)\.([a-z_]+)=(.+)} $line -> key1 key2 value] {
 				if {$context == "main"} {
-					dict set config $key1 $key2 $value
+					dict set ::config $key1 $key2 $value
 				} elseif {$context == "maildir"} {
 					dict set mailboxes $index $key1 $key2 $value
 				} else {
@@ -119,7 +149,7 @@ proc zstatus::config::read {configfile} {
 					continue
 				}
 				if {$context == "main"} {
-					dict set config $key $value
+					dict set ::config $key $value
 				} elseif {$context == "maildir"} {
 					dict set mailboxes $index $key $value
 				} else {
@@ -142,8 +172,6 @@ proc zstatus::config::read {configfile} {
 			dict unset mailboxes $index
 		}
 	}
-	dict set config mailboxes $mailboxes
-
-	return $config
+	dict set ::config mailboxes $mailboxes
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@
