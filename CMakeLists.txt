@@ -19,7 +19,7 @@ add_subdirectory(modules/metar)
 add_subdirectory(modules/music)
 add_subdirectory(modules/remixicon)
 add_subdirectory(modules/system)
-add_subdirectory(modules/workspace)
+add_subdirectory(modules/zwm)
 
 # Substitute some variable names
 set(LIBDIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})

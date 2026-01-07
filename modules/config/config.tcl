@@ -8,9 +8,9 @@ set color [dict create\
 set widgetdict [dict create\
 	datetime {type string source zstatus::datetime proc set_datetime\
 		format {%d %b %H:%M} }\
-	wslist {type widget module workspace settheme workspace::set_theme font mono}\
-	wsmode {type string module workspace source zstatus::workspace::wsmode}\
-	wsname {type string module workspace source zstatus::workspace::wsname}\
+	wslist {type widget module zwm settheme zwm::set_theme font mono}\
+	wsmode {type string module zwm source zstatus::zwm::wsmode}\
+	wsname {type string module zwm source zstatus::zwm::wsname}\
 	devices {type transient module devices proc devices::update\
 		settheme devices::set_theme font bold}\
 	loadavg {type string module system source zstatus::system::loadavg\
@@ -29,7 +29,7 @@ set widgetdict [dict create\
 		settheme system::set_theme}\
 	osversion {type string source zstatus::osversion}\
 	separator {type separator bg {light black dark gray}}\
-	wintitle {type text module workspace expand 0 maxlength 120}]
+	wintitle {type text module zwm expand 0 maxlength 120}]
 
 namespace eval zstatus::config {
 	if [info exists ::env(XDG_CONFIG_HOME)] {

@@ -1,5 +1,5 @@
 #!/usr/bin/env wish9.0
-namespace eval zstatus::workspace {
+namespace eval zstatus::zwm {
 	array set modes {Monocle M VTiled V HTiled H Stacked S}
 	namespace export set_wintitle unset_wintitle set_wslist set_wsname\
 			set_wsmode set_theme
@@ -8,7 +8,7 @@ namespace eval zstatus::workspace {
 	variable zwmsocket "[dict get $::config cache_prefix]/zwm/socket"
 }
 
-proc zstatus::workspace::send_message {msg} {
+proc zstatus::zwm::send_message {msg} {
 	variable screen
 	variable zwmsocket
 
@@ -20,7 +20,7 @@ proc zstatus::workspace::send_message {msg} {
 	close $channel
 }
 
-proc zstatus::workspace::set_theme {theme} {
+proc zstatus::zwm::set_theme {theme} {
 	variable bgcolor
 	variable fgcolor
 	variable hicolor
@@ -43,7 +43,7 @@ proc zstatus::workspace::set_theme {theme} {
 	}
 }
 
-proc zstatus::workspace::set_wintitle {value} {
+proc zstatus::zwm::set_wintitle {value} {
 	set maxlength [dict get $::widgetdict wintitle maxlength]
 	set length [tcl::mathfunc::min [string length $value] $maxlength]
 	variable wintitle
@@ -62,14 +62,14 @@ proc zstatus::workspace::set_wintitle {value} {
 	$wintitle configure -state disabled
 }
 
-proc zstatus::workspace::unset_wintitle {value} {
+proc zstatus::zwm::unset_wintitle {value} {
 	variable wintitle
 	$wintitle configure -state normal
 	$wintitle delete 1.0 end
 	$wintitle configure -state disabled
 }
 
-proc zstatus::workspace::set_wslist {value} {
+proc zstatus::zwm::set_wslist {value} {
 	variable bgcolor
 	variable fgcolor
 	variable hicolor
@@ -101,7 +101,7 @@ proc zstatus::workspace::set_wslist {value} {
 		}
 
 		set slave $wslistframe.$num
-		pack [label $slave -font $font -text "$name"] -side left
+		pack [label $slave -font $font -text $num] -padx 0 -ipadx 4 -side left
 
 		if {$active} {
 			set activeslave $slave
@@ -110,11 +110,11 @@ proc zstatus::workspace::set_wslist {value} {
 		}
 		$slave configure -bg $bgcolor -fg $fgcolor
 
-		bind $slave <1> "zstatus::workspace::send_message desktop-switch-$num"
+		bind $slave <1> "zstatus::zwm::send_message desktop-switch-$num"
 	}
 }
 
-proc zstatus::workspace::set_wsmode {value} {
+proc zstatus::zwm::set_wsmode {value} {
 	variable modes
 	variable wsmode
 	if [info exists modes($value)] {
@@ -124,18 +124,18 @@ proc zstatus::workspace::set_wsmode {value} {
 	}
 }
 
-proc zstatus::workspace::set_wsname {value} {
+proc zstatus::zwm::set_wsname {value} {
 	variable wsname
 	set wsname $value
 }
 
-proc zstatus::workspace::setup {bar item} {
+proc zstatus::zwm::setup {bar item} {
 	switch $item {
 	wintitle {
 		dict set ::messagedict window_active\
-				{action workspace::set_wintitle arg 1}
+				{action zwm::set_wintitle arg 1}
 		dict set ::messagedict no_window_active\
-				{action workspace::unset_wintitle arg 1}
+				{action zwm::unset_wintitle arg 1}
 		variable wintitle
 		set wintitle [text $bar.$item\
 			-font [dict get $::widgetdict wintitle font]\
@@ -151,17 +151,17 @@ proc zstatus::workspace::setup {bar item} {
 		$wintitle configure -state disabled
 	}
 	wsmode {
-		dict set ::messagedict ws_mode {action workspace::set_wsmode arg 1}
+		dict set ::messagedict ws_mode {action zwm::set_wsmode arg 1}
 		bind $bar.wsmode <MouseWheel> {
 			if {%D < 0} {
-				zstatus::workspace::send_message "desktop-mode-next"
+				zstatus::zwm::send_message "desktop-mode-next"
 			} else {
-				zstatus::workspace::send_message "desktop-mode-prev"
+				zstatus::zwm::send_message "desktop-mode-prev"
 			}
 		}
 	}
 	wslist {
-		dict set ::messagedict ws_list {action workspace::set_wslist arg 1}
+		dict set ::messagedict ws_list {action zwm::set_wslist arg 1}
 		variable wslistbar
 		variable wslistframe
 		set wslistbar [frame $bar.$item]
@@ -170,7 +170,7 @@ proc zstatus::workspace::setup {bar item} {
 		pack $wslistframe
 	}
 	wsname {
-		dict set ::messagedict ws_name {action workspace::set_wsname arg 1}
+		dict set ::messagedict ws_name {action zwm::set_wsname arg 1}
 	}}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@
