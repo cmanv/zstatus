@@ -1,35 +1,85 @@
 package require fileutil
 
 set color [dict create\
-	foreground {light black dark LightGray}\
-	background {light gray90 dark gray20}\
-	highlight {light SlateGray2 dark SteelBlue4}]
+	foreground { light black dark LightGray }\
+	background { light gray90 dark gray20 }\
+	highlight { light SlateGray2 dark SteelBlue4 }]
 
 set widgetdict [dict create\
-	datetime {type string source zstatus::datetime proc set_datetime\
-		format {%d %b %H:%M} }\
-	wslist {type widget module zwm settheme zwm::set_theme font mono}\
-	wsmode {type string module zwm source zstatus::zwm::wsmode}\
-	wsname {type string module zwm source zstatus::zwm::wsname}\
-	devices {type transient module devices proc devices::update\
-		settheme devices::set_theme font bold}\
-	loadavg {type string module system source zstatus::system::loadavg\
-		proc system::set_loadavg}\
-	mail {type transient module mail proc mail::update\
-		settheme mail::set_theme}\
-	memused {type string module system source zstatus::system::memused\
-		proc system::set_memused settheme system::set_theme}\
-	metar {type string module metar source zstatus::metar::report(statusbar)\
-		settheme metar::set_theme delay 10 font remix1}\
-	mixer {type string module system source zstatus::system::mixer}\
-	music {type transient module music proc music::update\
-		settheme music::set_theme}\
-	netstat {type string module system source zstatus::system::interface\
-		proc system::update_netstat interface em0\
-		settheme system::set_theme}\
-	osversion {type string source zstatus::osversion}\
-	separator {type separator bg {light black dark gray}}\
-	wintitle {type text module zwm expand 0 maxlength 120}]
+	datetime {
+		type string
+		format {%d %b %H:%M}
+		proc set_datetime
+		source zstatus::datetime
+	} devices {
+		type transient
+		module devices
+		proc devices::update
+		settheme devices::set_theme
+		font bold
+	} loadavg {
+		type string
+		module system
+		proc system::set_loadavg
+		source zstatus::system::loadavg
+	} mail {
+		type transient
+		module mail
+		proc mail::update
+		settheme mail::set_theme
+	} memused {
+		type string
+		module system
+		proc system::set_memused
+		source zstatus::system::memused
+		settheme system::set_theme
+	} metar {
+		type string module metar
+		source zstatus::metar::report(statusbar)
+		settheme metar::set_theme
+		delay 10
+		font remix1
+	} mixer {
+		type string
+		module system
+		source zstatus::system::mixer
+	} music {
+		type transient
+		module music
+		proc music::update
+		settheme music::set_theme
+	} netstat {
+		type string
+		module system
+		interface em0
+		proc system::update_netstat
+		source zstatus::system::interface
+		settheme system::set_theme
+	} osversion {
+		type string
+		source zstatus::osversion
+	} separator {
+		type separator
+		bg { light black dark gray }
+	} wintitle {
+		type text
+		module zwm
+		expand 0
+		maxlength 120
+	} wslist {
+		type widget
+		module zwm
+		settheme zwm::set_theme
+		font mono
+	} wsmode {
+		type string
+		module zwm
+		source zstatus::zwm::wsmode
+	} wsname {
+		type string
+		module zwm
+		source zstatus::zwm::wsname
+	}]
 
 namespace eval zstatus::config {
 	if [info exists ::env(XDG_CONFIG_HOME)] {
@@ -101,8 +151,8 @@ proc zstatus::config::read {configfile} {
 	variable defaultfile
 
 	# List of valid contexts in config file
-	set contexts { main arcsize datetime devices loadavg mail\
-		maildir memused metar mixer music netin netout netstat\
+	set contexts { main datetime devices loadavg mail maildir\
+		memused metar mixer music netin netout netstat\
 		osversion separator wintitle wslist wsmode wsname}
 
 	# Cant change these from config file
