@@ -152,8 +152,8 @@ proc zstatus::config::read {configfile} {
 
 	# List of valid contexts in config file
 	set contexts { main datetime devices loadavg mail maildir\
-		memused metar mixer music netin netout netstat\
-		osversion separator wintitle wslist wsmode wsname}
+		memused metar mixer music netstat osversion separator\
+		wintitle wslist wsmode wsname}
 
 	# Cant change these from config file
 	set immutables {type source proc setup settheme}

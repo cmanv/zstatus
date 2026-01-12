@@ -159,13 +159,13 @@ proc zstatus::system::update_loadgraph {} {
 	}
 	set xpos 1
 	foreach value $load_queue {
-		set ypos [tcl::mathfunc::round [expr 60 * ($ymax - $value) / $ymax]]
+		set ypos [tcl::mathfunc::round [expr 60.0 * ($ymax - $value) / $ymax]]
 		$loadgraph create line $xpos 60 $xpos $ypos -fill $linecolor
 		incr xpos
 	}
 	set hline 1
 	while {$hline < $ymax} {
-		set ypos [tcl::mathfunc::round [expr 60 * ($ymax - $hline) / $ymax ]]
+		set ypos [tcl::mathfunc::round [expr 60.0 * ($ymax - $hline) / $ymax ]]
 		$loadgraph create line 1 $ypos 180 $ypos -fill $fgcolor
 		incr hline
 	}

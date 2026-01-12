@@ -6,6 +6,8 @@ namespace eval zstatus::zwm {
 
 	variable screen [lindex [split [winfo screen .] "."] 1]
 	variable zwmsocket "[dict get $::config cache_prefix]/zwm/socket"
+	variable wintext ""
+	variable winmaxlen [dict get $::widgetdict wintitle maxlength]
 }
 
 proc zstatus::zwm::send_message {msg} {
@@ -44,13 +46,16 @@ proc zstatus::zwm::set_theme {theme} {
 }
 
 proc zstatus::zwm::set_wintitle {value} {
-	set maxlength [dict get $::widgetdict wintitle maxlength]
-	set length [tcl::mathfunc::min [string length $value] $maxlength]
+	variable wintext
+	variable winmaxlen
+
+	set wintext $value
+	set length [tcl::mathfunc::min [string length $wintext] $winmaxlen]
 	variable wintitle
 	$wintitle configure -state normal
 	$wintitle delete 1.0 end
 	$wintitle configure -width $length
-	$wintitle insert 1.0 $value
+	$wintitle insert 1.0 $wintext
 
 	variable emojis
 	if {$emojis} {
@@ -137,6 +142,7 @@ proc zstatus::zwm::setup {bar item} {
 		dict set ::messagedict no_window_active\
 				{action zwm::unset_wintitle arg 1}
 		variable wintitle
+		variable wintext
 		set wintitle [text $bar.$item\
 			-font [dict get $::widgetdict wintitle font]\
 			-height 1 -borderwidth 0\
@@ -148,6 +154,11 @@ proc zstatus::zwm::setup {bar item} {
 			set emojis 1
 			$wintitle tag configure emoji -font emoji
 		}
+
+		variable winmaxlen
+		set length [tcl::mathfunc::min [string length $wintext] $winmaxlen]
+		$wintitle insert 1.0 $wintext
+		$wintitle configure -width $length
 		$wintitle configure -state disabled
 	}
 	wsmode {

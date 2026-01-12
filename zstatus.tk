@@ -4,7 +4,12 @@ package require unix_sockets
 package require zstatus::config
 package require zstatus::remixicon
 
-set messagedict [dict create set_theme {action set_theme arg 1}]
+set messagedict [dict create\
+	reload_config {
+		action reload_config arg 0
+	} set_theme {
+		action set_theme arg 1
+	}]
 
 proc every {ms cmd} {
 	after $ms [namespace code [info level 0]]
@@ -72,8 +77,10 @@ proc zstatus::set_datetime {} {
 
 proc zstatus::set_theme {newtheme} {
 	variable theme
-	if {$theme == $newtheme} { return }
 	set theme $newtheme
+	if {$theme != "light" && $theme != "dark"} {
+		set theme "light"
+	}
 
 	variable bar
 	variable widgetlist
@@ -160,22 +167,27 @@ proc zstatus::add_widgets {side widgets} {
 			set item "separator"
 		}
 		if ![dict exists $::widgetdict $item] { continue }
-		if {![dict exists $::widgetdict $item font]} {
+		if { ![dict exists $::widgetdict $item font] ||
+			[dict get $::widgetdict $item font] == "default"} {
 			dict set ::widgetdict $item font normal
 		}
-		if {![dict exists $::widgetdict $item fg light]} {
+		if { ![dict exists $::widgetdict $item fg light] ||
+			[dict get $::widgetdict $item fg light] == "default"} {
 			dict set ::widgetdict $item fg light\
 				 [dict get $::color foreground light]
 		}
-		if {![dict exists $::widgetdict $item fg dark]} {
+		if { ![dict exists $::widgetdict $item fg dark] ||
+			[dict get $::widgetdict $item fg dark] == "default"} {
 			dict set ::widgetdict $item fg dark\
 				 [dict get $::color foreground dark]
 		}
-		if {![dict exists $::widgetdict $item bg light]} {
+		if { ![dict exists $::widgetdict $item bg light] ||
+			[dict get $::widgetdict $item bg light] == "default"} {
 			dict set ::widgetdict $item bg light\
 				[dict get $::color background light]
 		}
-		if {![dict exists $::widgetdict $item bg dark]} {
+		if { ![dict exists $::widgetdict $item bg dark] ||
+			[dict get $::widgetdict $item bg dark] == "default"} {
 			dict set ::widgetdict $item bg dark\
 				[dict get $::color background dark]
 		}
@@ -247,19 +259,22 @@ proc zstatus::make_font {} {
 	regsub -all {\-} $fontname {} fontname
 	regsub -all { } $fontname {} fontname
 
-	font create small -family $fontname -size [expr $fontsize - 1]
-	font create normal -family $fontname -size $fontsize
-	font create italic -family $fontname -size $fontsize -slant italic
-	font create italic2 -family $fontname -size [expr $fontsize + 1] -slant italic
-	font create bold -family $fontname -size $fontsize -weight bold
-	font create bold2 -family $fontname -size [expr $fontsize + 1] -weight bold
-	font create large -family $fontname -size [expr $fontsize + 1]
-	font create large2 -family $fontname -size [expr $fontsize + 2]
-	font create remix1 -family remixicon -size [expr $fontsize]
-	font create remix2 -family remixicon -size [expr $fontsize + 1]
-	font create mono -family "$fontname Mono" -size $fontsize
-
-	if [dict exists $::config emojifont] {
+	if {[llength [font actual normal]] == 0} {
+		font create small -family $fontname -size [expr $fontsize - 1]
+		font create normal -family $fontname -size $fontsize
+		font create italic -family $fontname -size $fontsize -slant italic
+		font create italic2 -family $fontname -size [expr $fontsize + 1]\
+			 -slant italic
+		font create bold -family $fontname -size $fontsize -weight bold
+		font create bold2 -family $fontname -size [expr $fontsize + 1]\
+			 -weight bold
+		font create large -family $fontname -size [expr $fontsize + 1]
+		font create large2 -family $fontname -size [expr $fontsize + 2]
+		font create remix1 -family remixicon -size [expr $fontsize]
+		font create remix2 -family remixicon -size [expr $fontsize + 1]
+		font create mono -family "$fontname Mono" -size $fontsize
+	}
+	if {[dict exists $::config emojifont] && [llength [font actual normal]] == 0} {
 		set emojifont [dict get $::config emojifont]
 		regsub -all {\"} $emojifont {} emojifont
 		regsub -all {\-} $emojifont {} emojifont
@@ -272,8 +287,16 @@ proc zstatus::make_font {} {
 	return [expr $ascent + $descent]
 }
 
+proc zstatus::reload_config {} {
+	variable bar
+	destroy $bar
+	config::read $::params(config)
+	setup
+}
+
 proc zstatus::setup {} {
 	variable bar
+	variable theme
 	variable widgetlist
 	variable datetime_format
 	variable locale
@@ -302,16 +325,6 @@ proc zstatus::setup {} {
 	set datetime_format [dict get $::widgetdict datetime format]
 	set locale [dict get $::config lang]
 	set osversion [exec uname -rs]
-
-	set theme ""
-	if [dict exists $::config theme] {
-		set theme [dict get $::config theme]
-	} elseif [string length $::params(theme)] {
-		set theme $::params(theme)
-	}
-	if {$theme != "light" && $theme != "dark"} {
-		set theme "light"
-	}
 	set_theme $theme
 }
 
@@ -337,6 +350,11 @@ wm attributes . -topmost 1 -type dock
 # Unicode mapping from remixicon v4.6.0
 array set unicode [zstatus::remixicon::get]
 zstatus::config::read $params(config)
+if [string length $::params(theme)] {
+	set zstatus::theme $::params(theme)
+} elseif [dict exists $::config theme] {
+	set zstatus::theme [dict get $::config theme]
+}
 zstatus::setup
 every [dict get $::config delay] zstatus::update
 
