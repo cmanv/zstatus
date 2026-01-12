@@ -259,22 +259,32 @@ proc zstatus::make_font {} {
 	regsub -all {\-} $fontname {} fontname
 	regsub -all { } $fontname {} fontname
 
-	if {[llength [font actual normal]] == 0} {
-		font create small -family $fontname -size [expr $fontsize - 1]
-		font create normal -family $fontname -size $fontsize
-		font create italic -family $fontname -size $fontsize -slant italic
-		font create italic2 -family $fontname -size [expr $fontsize + 1]\
-			 -slant italic
-		font create bold -family $fontname -size $fontsize -weight bold
-		font create bold2 -family $fontname -size [expr $fontsize + 1]\
-			 -weight bold
-		font create large -family $fontname -size [expr $fontsize + 1]
-		font create large2 -family $fontname -size [expr $fontsize + 2]
-		font create remix1 -family remixicon -size [expr $fontsize]
-		font create remix2 -family remixicon -size [expr $fontsize + 1]
-		font create mono -family "$fontname Mono" -size $fontsize
+	set defined_fonts [font names]
+	set fonts { small normal italic italic2 bold bold2\
+				large large2 remix1 remix2 mono emoji }
+
+	foreach f $fonts {
+		set index [lsearch $defined_fonts $f]
+		if {$index >= 0} {
+			font delete $f
+		}
 	}
-	if {[dict exists $::config emojifont] && [llength [font actual normal]] == 0} {
+
+	font create small -family $fontname -size [expr $fontsize - 1]
+	font create normal -family $fontname -size $fontsize
+	font create italic -family $fontname -size $fontsize -slant italic
+	font create italic2 -family $fontname -size [expr $fontsize + 1]\
+		 -slant italic
+	font create bold -family $fontname -size $fontsize -weight bold
+	font create bold2 -family $fontname -size [expr $fontsize + 1]\
+		 -weight bold
+	font create large -family $fontname -size [expr $fontsize + 1]
+	font create large2 -family $fontname -size [expr $fontsize + 2]
+	font create remix1 -family remixicon -size [expr $fontsize]
+	font create remix2 -family remixicon -size [expr $fontsize + 1]
+	font create mono -family "$fontname Mono" -size $fontsize
+
+	if {[dict exists $::config emojifont]} {
 		set emojifont [dict get $::config emojifont]
 		regsub -all {\"} $emojifont {} emojifont
 		regsub -all {\-} $emojifont {} emojifont
