@@ -167,30 +167,6 @@ proc zstatus::add_widgets {side widgets} {
 			set item "separator"
 		}
 		if ![dict exists $::widgetdict $item] { continue }
-		if { ![dict exists $::widgetdict $item font] ||
-			[dict get $::widgetdict $item font] == "default"} {
-			dict set ::widgetdict $item font normal
-		}
-		if { ![dict exists $::widgetdict $item fg light] ||
-			[dict get $::widgetdict $item fg light] == "default"} {
-			dict set ::widgetdict $item fg light\
-				 [dict get $::color foreground light]
-		}
-		if { ![dict exists $::widgetdict $item fg dark] ||
-			[dict get $::widgetdict $item fg dark] == "default"} {
-			dict set ::widgetdict $item fg dark\
-				 [dict get $::color foreground dark]
-		}
-		if { ![dict exists $::widgetdict $item bg light] ||
-			[dict get $::widgetdict $item bg light] == "default"} {
-			dict set ::widgetdict $item bg light\
-				[dict get $::color background light]
-		}
-		if { ![dict exists $::widgetdict $item bg dark] ||
-			[dict get $::widgetdict $item bg dark] == "default"} {
-			dict set ::widgetdict $item bg dark\
-				[dict get $::color background dark]
-		}
 
 		switch [dict get $::widgetdict $item type] {
 		text {

@@ -6,8 +6,12 @@ namespace eval zstatus::zwm {
 
 	variable screen [lindex [split [winfo screen .] "."] 1]
 	variable zwmsocket "[dict get $::config cache_prefix]/zwm/socket"
+
+	variable wslist "+?"
+	variable wsmode "?"
 	variable wintext ""
 	variable winmaxlen [dict get $::widgetdict wintitle maxlength]
+	variable theme_defined 0
 }
 
 proc zstatus::zwm::send_message {msg} {
@@ -29,10 +33,12 @@ proc zstatus::zwm::set_theme {theme} {
 	variable wslistbar
 	variable wslistframe
 	variable activeslave
+	variable theme_defined
 
 	set bgcolor [dict get $::widgetdict wslist bg $theme]
 	set fgcolor [dict get $::widgetdict wslist fg $theme]
-	set hicolor [dict get $::color highlight $theme]
+	set hicolor [dict get $::color hl $theme]
+	set theme_defined 1
 
 	$wslistbar configure -background $bgcolor
 	$wslistframe configure -background $bgcolor
@@ -75,18 +81,14 @@ proc zstatus::zwm::unset_wintitle {value} {
 }
 
 proc zstatus::zwm::set_wslist {value} {
-	variable bgcolor
-	variable fgcolor
-	variable hicolor
+	variable wslist
 	variable wslistbar
 	variable wslistframe
 	variable activeslave
 
 	destroy $wslistframe
 	pack [frame $wslistframe]
-	$wslistbar configure -background $bgcolor
-	$wslistframe configure -background $bgcolor
-
+	set wslist $value
 	foreach name [split $value "|"] {
 		if {![string length $name]} {
 			continue
@@ -110,12 +112,27 @@ proc zstatus::zwm::set_wslist {value} {
 
 		if {$active} {
 			set activeslave $slave
-			$slave configure -bg $hicolor -fg $fgcolor
 			continue
 		}
-		$slave configure -bg $bgcolor -fg $fgcolor
 
 		bind $slave <1> "zstatus::zwm::send_message desktop-switch-$num"
+	}
+
+	variable theme_defined
+	if {!$theme_defined} { return }
+
+	variable bgcolor
+	variable fgcolor
+	variable hicolor
+
+	$wslistbar configure -background $bgcolor
+	$wslistframe configure -background $bgcolor
+	foreach slave [pack slaves $wslistframe] {
+		if {$slave == $activeslave} {
+			$slave configure -bg $hicolor -fg $fgcolor
+		} else {
+			$slave configure -bg $bgcolor -fg $fgcolor
+		}
 	}
 }
 
@@ -123,9 +140,9 @@ proc zstatus::zwm::set_wsmode {value} {
 	variable modes
 	variable wsmode
 	if [info exists modes($value)] {
-		set wsmode " $modes($value)"
+		set wsmode $modes($value)
 	} else {
-		set wsmode " $value"
+		set wsmode $value
 	}
 }
 
@@ -154,12 +171,7 @@ proc zstatus::zwm::setup {bar item} {
 			set emojis 1
 			$wintitle tag configure emoji -font emoji
 		}
-
-		variable winmaxlen
-		set length [tcl::mathfunc::min [string length $wintext] $winmaxlen]
-		$wintitle insert 1.0 $wintext
-		$wintitle configure -width $length
-		$wintitle configure -state disabled
+		set_wintitle $wintext
 	}
 	wsmode {
 		dict set ::messagedict ws_mode {action zwm::set_wsmode arg 1}
@@ -173,12 +185,14 @@ proc zstatus::zwm::setup {bar item} {
 	}
 	wslist {
 		dict set ::messagedict ws_list {action zwm::set_wslist arg 1}
+		variable wslist
 		variable wslistbar
 		variable wslistframe
 		set wslistbar [frame $bar.$item]
 		set wslistframe [frame $wslistbar.frame]
 		pack $wslistbar
 		pack $wslistframe
+		set_wslist $wslist
 	}
 	wsname {
 		dict set ::messagedict ws_name {action zwm::set_wsname arg 1}

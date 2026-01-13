@@ -40,8 +40,8 @@ proc zstatus::system::set_theme {theme} {
 	variable fgcolor
 	variable linecolor
 
-	set bgcolor [dict get $::color background $theme]
-	set fgcolor [dict get $::color foreground $theme]
+	set bgcolor [dict get $::color bg $theme]
+	set fgcolor [dict get $::color fg $theme]
 	set linecolor [dict get $::color line $theme]
 
 	variable loadgraph_visible
