@@ -25,8 +25,6 @@ namespace eval zstatus::system {
 		ipv6 {C "IPv6:" fr "IPv6 :"}\
 		trf {C "Transfers:" fr "Transferts :"}]
 
-	dict set ::color line { light DeepSkyBlue dark SeaGreen }
-
 	variable loadgraph_visible 0
 	variable memstats_visible 0
 	variable netstat_visible 0
