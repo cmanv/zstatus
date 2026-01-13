@@ -94,8 +94,8 @@ proc zstatus::mail::new { index } {
 
 	set mailpopup [toplevel .mailpopup -background $bgcolor -class Newmail]
 
-	set xpos [winfo x $mailframe]
-	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
+	set xpos [winfo rootx $mailframe]
+	set ypos [expr [winfo rooty $barwidget] + [winfo height $barwidget] + 1]
 
 	wm attributes $mailpopup -type dialog
 	wm overrideredirect $mailpopup 1

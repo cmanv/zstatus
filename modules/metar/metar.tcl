@@ -46,8 +46,8 @@ proc zstatus::metar::show_tooltip {} {
 	set window [toplevel .metartooltip -highlightthickness 0\
 			-background $bgcolor]
 
-	set xpos [winfo x $metarwidget]
-	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
+	set xpos [winfo rootx $metarwidget]
+	set ypos [expr [winfo rooty $barwidget] + [winfo height $barwidget] + 1]
 
 	wm title $window "Metar Summary"
 	wm attributes $window -type dialog
@@ -96,8 +96,8 @@ proc zstatus::metar::toggle_popup {} {
 		wm overrideredirect $popup 1
 		wm title $popup {Metar Report}
 
-		set xpos [winfo x $metarwidget]
-		set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
+		set xpos [winfo rootx $metarwidget]
+		set ypos [expr [winfo rooty $barwidget] + [winfo height $barwidget] + 1]
 		wm geometry $popup +$xpos+$ypos
 		set popup_visible 1
 
@@ -198,8 +198,8 @@ proc zstatus::metar::set_theme {newtheme} {
 	variable sepcolor
 
 	set theme $newtheme
-	set bgcolor [dict get $::widgetdict metar bg $theme]
-	set fgcolor [dict get $::widgetdict metar fg $theme]
+	set bgcolor [dict get $::color bg $theme]
+	set fgcolor [dict get $::color fg $theme]
 	set sepcolor [dict get $::widgetdict separator bg $theme]
 
 	variable popup_visible

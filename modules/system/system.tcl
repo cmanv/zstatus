@@ -116,7 +116,7 @@ proc zstatus::system::set_loadavg {} {
 proc zstatus::system::hide_loadgraph {} {
 	variable loadgraph_visible
 	set loadgraph_visible 0
-	destroy .loadgraph
+	destroy .loadframe
 }
 
 proc zstatus::system::show_loadgraph {} {
@@ -129,11 +129,11 @@ proc zstatus::system::show_loadgraph {} {
 	variable loadgraph_visible
 
 	set loadgraph_visible 1
-	set loadframe [toplevel .loadgraph -highlightthickness 0\
+	set loadframe [toplevel .loadframe -highlightthickness 0\
 				 -background $bgcolor]
 
-	set xpos [winfo x $loadwidget]
-	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
+	set xpos [winfo rootx $loadwidget]
+	set ypos [expr [winfo rooty $barwidget] + [winfo height $barwidget] + 1]
 	wm title $loadframe "Load average"
 	wm attributes $loadframe -type dialog
 	wm overrideredirect $loadframe 1
@@ -141,6 +141,8 @@ proc zstatus::system::show_loadgraph {} {
 
 	set loadgraph $loadframe.graphics
 	pack [canvas $loadgraph -width 180 -height 60 -highlightthickness 0 -bg $bgcolor]
+
+	bind $loadframe <Map> { zstatus::map_window .loadframe }
 	update_loadgraph
 }
 
@@ -198,8 +200,8 @@ proc zstatus::system::show_memstats {} {
 	set memstats [toplevel .memstats -highlightthickness 0\
 				 -background $bgcolor]
 
-	set xpos [winfo x $memwidget]
-	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
+	set xpos [winfo rootx $memwidget]
+	set ypos [expr [winfo rooty $barwidget] + [winfo height $barwidget] + 1]
 	wm title $memstats "Memory stats"
 	wm attributes $memstats -type dialog
 	wm overrideredirect $memstats 1
@@ -301,8 +303,8 @@ proc zstatus::system::show_netstat {} {
 	set netstat [toplevel .netstat -highlightthickness 0\
 				 -background $bgcolor]
 
-	set xpos [winfo x $netwidget]
-	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
+	set xpos [winfo rootx $netwidget]
+	set ypos [expr [winfo rooty $barwidget] + [winfo height $barwidget] + 1]
 	wm title $netstat "Network status"
 	wm attributes $netstat -type dialog
 	wm overrideredirect $netstat 1

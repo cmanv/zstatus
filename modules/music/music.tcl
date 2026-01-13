@@ -123,8 +123,8 @@ proc zstatus::music::show_tooltip {} {
 	set tooltip [toplevel .musictooltip -highlightthickness 0\
 			-background $bgcolor]
 
-	set xpos [winfo x $musicframe]
-	set ypos [expr [winfo y $barwidget] + [winfo height $barwidget] + 1]
+	set xpos [winfo rootx $musicframe]
+	set ypos [expr [winfo rooty $barwidget] + [winfo height $barwidget] + 1]
 
 	wm title $tooltip "Now Playing"
 	wm attributes $tooltip -type dialog

@@ -36,8 +36,8 @@ proc zstatus::map_window {window} {
 	set rheight [winfo vrootheight .]
 	set width [winfo width $window]
 	set height [winfo height $window]
-	set xpos [winfo x $window]
-	set ypos [winfo y $window]
+	set xpos [winfo rootx $window]
+	set ypos [winfo rooty $window]
 
 	set right [expr $xpos + $width]
 	if {$right >= $rwidth} {
