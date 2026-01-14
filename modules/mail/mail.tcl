@@ -17,13 +17,12 @@ proc zstatus::mail::set_theme { theme } {
 
 	variable mailframe
 	variable mailsep
-	variable mailboxes
 	$mailframe configure -background $bgcolor
 	$mailsep configure -background $sepcolor
-	foreach index [dict keys $mailboxes] {
+	foreach index [dict keys $::mailboxes] {
 		$mailframe.$index configure\
-			-bg [dict get $mailboxes $index bg $theme]\
-			-fg [dict get $mailboxes $index fg $theme]
+			-bg [dict get $::mailboxes $index bg $theme]\
+			-fg [dict get $::mailboxes $index fg $theme]
 	}
 }
 
@@ -103,9 +102,8 @@ proc zstatus::mail::new { index } {
 
 	bind $mailpopup <Map> { zstatus::map_window .mailpopup }
 
-	variable mailboxes
-	set mailboxname [dict get $mailboxes $index name]
-	set mailboxpath [dict get $mailboxes $index path]
+	set mailboxname [dict get $::mailboxes $index name]
+	set mailboxpath [dict get $::mailboxes $index path]
 	pack [frame $mailpopup.$index -background $bgcolor]\
 		-expand 1 -fill x -side top
 	pack [label $mailpopup.$index.label -font bold -bg $bgcolor\
@@ -166,17 +164,16 @@ proc zstatus::mail::update {} {
 	variable mailsep
 	variable mailpos
 	variable mailside
-	variable mailboxes
 	variable mailicon
 
-	foreach index [dict keys $mailboxes] {
-		set newmail [dict get $mailboxes $index newmail]
-		set path [dict get $mailboxes $index path]
+	foreach index [dict keys $::mailboxes] {
+		set newmail [dict get $::mailboxes $index newmail]
+		set path [dict get $::mailboxes $index path]
 		set inbox [llength [glob -nocomplain -dir "$path/new" *]]
 		if {$inbox && $newmail != $inbox} {
-			dict set mailboxes $index newmail $inbox
+			dict set ::mailboxes $index newmail $inbox
 			$mailframe.$index configure -text "$mailicon ($inbox)"
-			if ![dict get $mailboxes $index visible] {
+			if ![dict get $::mailboxes $index visible] {
 				if {![string length [pack slaves $mailframe]]} {
 					pack $mailframe -after $mailpos \
 						-side $mailside
@@ -184,16 +181,16 @@ proc zstatus::mail::update {} {
 						-fill y -padx 5 -side $mailside
 				}
 				pack $mailframe.$index -side left
-				dict set mailboxes $index visible 1
+				dict set ::mailboxes $index visible 1
 			}
 		} else {
-			if {!$inbox  && [dict get $mailboxes $index visible]} {
+			if {!$inbox  && [dict get $::mailboxes $index visible]} {
 				pack forget $mailframe.$index
 				if {![string length [pack slaves $mailframe]]} {
 					pack forget $mailframe $mailsep
 				}
-				dict set mailboxes $index newmail 0
-				dict set mailboxes $index visible 0
+				dict set ::mailboxes $index newmail 0
+				dict set ::mailboxes $index visible 0
 			}
 		}
 	}
@@ -224,11 +221,9 @@ proc zstatus::mail::setup { bar position side } {
 	if [dict exists $::widgetdict mail exec] {
 		set mailclient [dict get $::widgetdict mail exec]
 	}
-	variable mailboxes
-	set mailboxes [dict get $::config mailboxes]
-	foreach index [dict keys $mailboxes] {
-		dict set mailboxes $index visible 0
-		dict set mailboxes $index newmail 0
+	foreach index [dict keys $::mailboxes] {
+		dict set ::mailboxes $index visible 0
+		dict set ::mailboxes $index newmail 0
 
 		label $mailframe.$index -font normal -text ""
 		bind $mailframe.$index <Enter> "zstatus::mail::new $index"

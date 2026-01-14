@@ -30,7 +30,8 @@ namespace eval zstatus::system {
 	variable netstat_visible 0
 
 	variable load_queue {}
-	variable load_length 180
+	variable load_length 210
+	variable load_height 80
 }
 
 proc zstatus::system::set_theme {theme} {
@@ -127,6 +128,8 @@ proc zstatus::system::show_loadgraph {} {
 	variable loadwidget
 	variable loadgraph
 	variable loadgraph_visible
+	variable load_length
+	variable load_height
 
 	set loadgraph_visible 1
 	set loadframe [toplevel .loadframe -highlightthickness 0\
@@ -140,7 +143,8 @@ proc zstatus::system::show_loadgraph {} {
 	wm geometry $loadframe +$xpos+$ypos
 
 	set loadgraph $loadframe.graphics
-	pack [canvas $loadgraph -width 180 -height 60 -highlightthickness 0 -bg $bgcolor]
+	pack [canvas $loadgraph -width $load_length -height $load_height\
+		 -highlightthickness 0 -bg $bgcolor]
 
 	bind $loadframe <Map> { zstatus::map_window .loadframe }
 	update_loadgraph
@@ -152,6 +156,8 @@ proc zstatus::system::update_loadgraph {} {
 	variable linecolor
 	variable loadgraph
 	variable load_queue
+	variable load_length
+	variable load_height
 
 	set ymax 1
 	foreach value $load_queue {
@@ -159,14 +165,16 @@ proc zstatus::system::update_loadgraph {} {
 	}
 	set xpos 1
 	foreach value $load_queue {
-		set ypos [tcl::mathfunc::round [expr 60.0 * ($ymax - $value) / $ymax]]
-		$loadgraph create line $xpos 60 $xpos $ypos -fill $linecolor
+		set ypos [tcl::mathfunc::round [expr 1.0 * $load_height * ($ymax - $value)\
+				/ $ymax]]
+		$loadgraph create line $xpos $load_height $xpos $ypos -fill $linecolor
 		incr xpos
 	}
 	set hline 1
 	while {$hline < $ymax} {
-		set ypos [tcl::mathfunc::round [expr 60.0 * ($ymax - $hline) / $ymax ]]
-		$loadgraph create line 1 $ypos 180 $ypos -fill $fgcolor
+		set ypos [tcl::mathfunc::round [expr 1.0 * $load_height *\
+				($ymax - $hline) / $ymax ]]
+		$loadgraph create line 1 $ypos $load_length $ypos -fill $fgcolor
 		incr hline
 	}
 }

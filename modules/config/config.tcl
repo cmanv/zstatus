@@ -175,8 +175,7 @@ proc zstatus::config::read {configfile} {
 	set ::color $color
 	set ::config $config
 	set ::widgetdict $widgetdict
-
-	set mailboxes {}
+	set ::mailboxes {}
 	if [file exists $configfile] {
 		set index 0
 		set context ""
@@ -198,7 +197,7 @@ proc zstatus::config::read {configfile} {
 				if {$context == "main"} {
 					dict set ::config $key1 $key2 $value
 				} elseif {$context == "maildir"} {
-					dict set mailboxes $index $key1 $key2 $value
+					dict set ::mailboxes $index $key1 $key2 $value
 				} else {
 					dict set ::widgetdict $context $key1 $key2 $value
 				}
@@ -211,7 +210,7 @@ proc zstatus::config::read {configfile} {
 				if {$context == "main"} {
 					dict set ::config $key $value
 				} elseif {$context == "maildir"} {
-					dict set mailboxes $index $key $value
+					dict set ::mailboxes $index $key $value
 				} else {
 					dict set ::widgetdict $context $key $value
 				}
@@ -241,24 +240,23 @@ proc zstatus::config::read {configfile} {
 				[dict get $color bg dark]
 		}
 	}
-	foreach index [dict keys $mailboxes] {
-		if ![dict exists $mailboxes $index fg light] {
-			dict set mailboxes $index fg light [dict get $color fg light]
+	foreach index [dict keys $::mailboxes] {
+		if ![dict exists $::mailboxes $index fg light] {
+			dict set ::mailboxes $index fg light [dict get $color fg light]
 		}
-		if ![dict exists $mailboxes $index fg dark] {
-			dict set mailboxes $index fg dark [dict get $color fg dark]
+		if ![dict exists $::mailboxes $index fg dark] {
+			dict set ::mailboxes $index fg dark [dict get $color fg dark]
 		}
-		if ![dict exists $mailboxes $index bg light] {
-			dict set mailboxes $index bg light [dict get $color bg light]
+		if ![dict exists $::mailboxes $index bg light] {
+			dict set ::mailboxes $index bg light [dict get $color bg light]
 		}
-		if ![dict exists $mailboxes $index bg dark] {
-			dict set mailboxes $index bg dark [dict get $color bg dark]
+		if ![dict exists $::mailboxes $index bg dark] {
+			dict set ::mailboxes $index bg dark [dict get $color bg dark]
 		}
-		if {![dict exists $mailboxes $index name]||\
-			 ![dict exists $mailboxes $index path]} {
-			dict unset mailboxes $index
+		if {![dict exists $::mailboxes $index name]||\
+			 ![dict exists $::mailboxes $index path]} {
+			dict unset ::mailboxes $index
 		}
 	}
-	dict set ::config mailboxes $mailboxes
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

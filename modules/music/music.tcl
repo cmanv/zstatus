@@ -2,7 +2,6 @@ package require Tk
 package require zstatus::music::mpd
 
 namespace eval zstatus::music {
-	variable music_active 0
 	variable socket_valid 0
 	variable tooltip_active 0
 	array set mpdstates { 2 play 3 pause }
@@ -101,8 +100,8 @@ proc zstatus::music::setup { bar position side } {
 		}
 	}
 
-	variable socket_valid
-	set socket_valid 0
+	variable music_active 0
+	variable socket_valid 0
 	if [catch {mpd::connect $mpdsocket} error] {
 		puts stderr $error
 	} else {
