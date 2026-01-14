@@ -18,7 +18,6 @@ proc every {ms cmd} {
 
 namespace eval zstatus {
 	variable theme	none
-	variable proclist	{}
 	variable modlist	{}
 }
 
@@ -283,6 +282,7 @@ proc zstatus::reload_config {} {
 proc zstatus::setup {} {
 	variable bar
 	variable theme
+	variable proclist
 	variable widgetlist
 	variable datetime_format
 	variable locale
@@ -304,6 +304,7 @@ proc zstatus::setup {} {
 	wm geometry . [dict get $::config geometry]
 
 	set sepcount 0
+	set proclist {}
 	set widgetlist {}
 	add_widgets left [dict get $::config leftside]
 	add_widgets right [dict get $::config rightside]

@@ -4,7 +4,7 @@ namespace eval zstatus::config {
 	set color [dict create\
 		fg { light black dark LightGray }\
 		bg { light gray90 dark gray20 }\
-		hl { light SlateGray2 dark SteelBlue4 }\
+		hl { light azure dark SteelBlue4 }\
 		line { light DeepSkyBlue dark SeaGreen }]
 
 	set widgetdict [dict create\
