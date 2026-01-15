@@ -40,7 +40,7 @@ proc zstatus::system::set_theme {theme} {
 
 	set bgcolor [dict get $::color bg $theme]
 	set fgcolor [dict get $::color fg $theme]
-	set linecolor [dict get $::widgetdict loadavg fg $theme]
+	set linecolor [dict get $::color line $theme]
 
 	variable loadgraph_visible
 	if {$loadgraph_visible} { set_theme_loadgraph }

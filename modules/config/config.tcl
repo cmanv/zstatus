@@ -3,8 +3,8 @@ package require fileutil
 namespace eval zstatus::config {
 	set color [dict create\
 		fg { light black dark LightGray }\
-		bg { light gray90 dark gray20 }\
-		hl { light azure dark SteelBlue4 }\
+		bg { light seashell dark DarkSlateGray }\
+		hl { light LightSteelBlue dark SteelBlue4 }\
 		line { light DeepSkyBlue dark SeaGreen }]
 
 	set widgetdict [dict create\
@@ -62,7 +62,7 @@ namespace eval zstatus::config {
 			source zstatus::osversion
 		} separator {
 			type separator
-			bg { light black dark gray }
+			bg { light sienna dark gray }
 		} wintitle {
 			type text
 			module zwm
@@ -161,7 +161,7 @@ proc zstatus::config::read {configfile} {
 	variable widgetdict
 
 	# List of valid contexts in config file
-	set contexts { main datetime devices loadavg mail maildir\
+	set contexts { main color datetime devices loadavg mail maildir\
 		memused metar mixer music netstat osversion separator\
 		wintitle wslist wsmode wsname}
 
@@ -196,6 +196,8 @@ proc zstatus::config::read {configfile} {
 			if [regexp {^([a-z_]+)\.([a-z_]+)=(.+)} $line -> key1 key2 value] {
 				if {$context == "main"} {
 					dict set ::config $key1 $key2 $value
+				} elseif {$context == "color"} {
+					dict set ::color $key1 $key2 $value
 				} elseif {$context == "maildir"} {
 					dict set ::mailboxes $index $key1 $key2 $value
 				} else {
@@ -209,6 +211,8 @@ proc zstatus::config::read {configfile} {
 				}
 				if {$context == "main"} {
 					dict set ::config $key $value
+				} elseif {$context == "color"} {
+					dict set ::color $key $value
 				} elseif {$context == "maildir"} {
 					dict set ::mailboxes $index $key $value
 				} else {
@@ -225,19 +229,19 @@ proc zstatus::config::read {configfile} {
 		}
 		if { ![dict exists $::widgetdict $key fg light] } {
 			dict set ::widgetdict $key fg light\
-				[dict get $color fg light]
+				[dict get $::color fg light]
 		}
 		if { ![dict exists $::widgetdict $key fg dark] } {
 			dict set ::widgetdict $key fg dark\
-				[dict get $color fg dark]
+				[dict get $::color fg dark]
 		}
 		if { ![dict exists $::widgetdict $key bg light] } {
 			dict set ::widgetdict $key bg light\
-				[dict get $color bg light]
+				[dict get $::color bg light]
 		}
 		if { ![dict exists $::widgetdict $key bg dark] } {
 			dict set ::widgetdict $key bg dark\
-				[dict get $color bg dark]
+				[dict get $::color bg dark]
 		}
 	}
 	foreach index [dict keys $::mailboxes] {

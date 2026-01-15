@@ -101,21 +101,47 @@ These are the options can be specified in the __[main]__ section.
 > List of widgets in the statusbar starting from the right. (Default: _datetime_)
 > Note: _separator_ can be abbreviated as _sep_.
 
+## COLOR SECTION
+
+* __fg.light__
+
+> Default foreground color in light mode.
+
+* __fg.dark__
+
+> Default foreground color in dark mode.
+
 * __bg.light__
 
-> Background color in light mode.
+> Default background color in light mode.
 
 * __bg.dark__
 
-> Background color in dark mode.
+> Default background color in dark mode.
+
+* __hi.light__
+
+> Highlight color in light mode.
+
+* __hi.dark__
+
+> Highlight color in dark mode.
+
+* __line.light__
+
+> Line color in light mode.
+
+* __line.dark__
+
+> Line color in dark mode.
 
 ## WIDGETS SECTIONS
 
 The list of valid widgets are:
 
-> __datetime__, __wslist__, __wsmode__, __wsname__, __devices__, __loadavg__,
-> __mail__, __memused__, __metar__, __mixer__, __music__, __netstat__,
-> __separator__, __wintitle__
+> __datetime__, __devices__, __loadavg__, __mail__, __memused__,
+> __metar__, __mixer__, __music__, __netstat__, __separator__,
+> __wintitle__, __wslist__, __wsmode__, __wsname__
 
 Each of these widgets can be customized with options:
 

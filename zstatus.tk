@@ -85,7 +85,7 @@ proc zstatus::set_theme {newtheme} {
 	variable widgetlist
 
 	set count 0
-	$bar configure -background [dict get $::config bg $theme]
+	$bar configure -background [dict get $::color bg $theme]
 	foreach item $widgetlist {
 		switch [dict get $::widgetdict $item type] {
 		transient {
