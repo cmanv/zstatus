@@ -187,8 +187,8 @@ proc zstatus::add_widgets {side widgets} {
 			}
 			pack [label $bar.$item\
 				-font [dict get $::widgetdict $item font]\
-				-textvar [dict get $::widgetdict $item source]]\
-				-side $side
+				-textvar [dict get $::widgetdict $item source]\
+				-padx 5] -side $side
 			if [dict exists $::widgetdict $item module] {
 				zstatus::${module}::setup $bar $item
 			}
@@ -206,7 +206,7 @@ proc zstatus::add_widgets {side widgets} {
 		separator {
 			incr sepcount
 			pack [frame $bar.$item$sepcount -width 1]\
-				-fill y -padx 5 -side $side
+				-fill y -side $side
 			set last $item$sepcount
 		}
 		transient {

@@ -4,7 +4,6 @@ namespace eval zstatus::system {
 	namespace export set_loadavg set_memused set_mixer
 
 	variable locale C
-	variable sysfont normal
 	set syslocales {C fr}
 	set lang [dict get $::config lang]
 	set index [lsearch $syslocales [lindex [split $lang "_"] 0]]
@@ -41,7 +40,7 @@ proc zstatus::system::set_theme {theme} {
 
 	set bgcolor [dict get $::color bg $theme]
 	set fgcolor [dict get $::color fg $theme]
-	set linecolor [dict get $::color line $theme]
+	set linecolor [dict get $::widgetdict loadavg fg $theme]
 
 	variable loadgraph_visible
 	if {$loadgraph_visible} { set_theme_loadgraph }
@@ -51,21 +50,23 @@ proc zstatus::system::set_theme {theme} {
 	if {$netstat_visible} { set_theme_netstat }
 }
 
-proc zstatus::system::set_theme_loadgraph {} {
+proc zstatus::system::set_theme_loadgraph { } {
 	variable loadgraph
 	variable bgcolor
 	$loadgraph configure -bg $bgcolor
 	update_loadgraph
 }
 
-proc zstatus::system::set_theme_memstats {} {
-	variable fgcolor
+proc zstatus::system::set_theme_memstats { } {
 	variable bgcolor
+	variable fgcolor
 	variable memgrid
 
 	.memstats configure -background $bgcolor
 	$memgrid configure -background $bgcolor
+	$memgrid.title configure -bg $bgcolor -fg $fgcolor
 	$memgrid.used configure -bg $bgcolor -fg $fgcolor
+	$memgrid.free configure -bg $bgcolor -fg $fgcolor
 	$memgrid.total configure -bg $bgcolor -fg $fgcolor
 	$memgrid.memory configure -bg $bgcolor -fg $fgcolor
 	$memgrid.mem_used configure -bg $bgcolor -fg $fgcolor
@@ -81,10 +82,11 @@ proc zstatus::system::set_theme_memstats {} {
 	$memgrid.swap_total configure -bg $bgcolor -fg $fgcolor
 }
 
-proc zstatus::system::set_theme_netstat {} {
-	variable fgcolor
+proc zstatus::system::set_theme_netstat { } {
 	variable bgcolor
+	variable fgcolor
 	variable netgrid
+	set fgcolor [dict $::widgetdict netstat fg $theme]
 
 	.netstat configure -background $bgcolor
 	$netgrid configure -background $bgcolor
@@ -122,8 +124,6 @@ proc zstatus::system::hide_loadgraph {} {
 
 proc zstatus::system::show_loadgraph {} {
 	variable bgcolor
-	variable fgcolor
-	variable sysfont
 	variable barwidget
 	variable loadwidget
 	variable loadgraph
@@ -199,7 +199,6 @@ proc zstatus::system::show_memstats {} {
 	variable locale
 	variable bgcolor
 	variable fgcolor
-	variable sysfont
 	variable barwidget
 	variable memwidget
 	variable memgrid
@@ -219,47 +218,47 @@ proc zstatus::system::show_memstats {} {
 
 	set row 0
 	pack [frame $memgrid -background $bgcolor] -padx 5 -pady 5 -side top -anchor w
-	label $memgrid.title -font $sysfont -text [dict get $sysdict memstats $locale]\
+	label $memgrid.title -font bold -text [dict get $sysdict memstats $locale]\
 		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.title -row $row -column 0 -sticky w
-	label $memgrid.used -font $sysfont  -text [dict get $sysdict used $locale]\
+	label $memgrid.used -font bold  -text [dict get $sysdict used $locale]\
 		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.used -row $row -column 1 -sticky e
-	label $memgrid.free -font $sysfont -text [dict get $sysdict free $locale]\
+	label $memgrid.free -font bold -text [dict get $sysdict free $locale]\
 		 -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.free -row $row -column 2 -sticky e
-	label $memgrid.total -font $sysfont -text [dict get $sysdict total $locale]\
+	label $memgrid.total -font bold -text [dict get $sysdict total $locale]\
 		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.total -row $row -column 3 -sticky e
 	incr row
-	label $memgrid.memory -font $sysfont -text [dict get $sysdict mem $locale]\
+	label $memgrid.memory -font bold -text [dict get $sysdict mem $locale]\
 		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.memory -row $row -column 0 -sticky w
-	label $memgrid.mem_used -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $memgrid.mem_used -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.mem_used -row $row -column 1 -sticky e
-	label $memgrid.mem_free -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $memgrid.mem_free -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.mem_free -row $row -column 2 -sticky e
-	label $memgrid.mem_total -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $memgrid.mem_total -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.mem_total -row $row -column 3 -sticky e
 	incr row
-	label $memgrid.arc -font $sysfont -text [dict get $sysdict arc $locale]\
+	label $memgrid.arc -font bold -text [dict get $sysdict arc $locale]\
 		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.arc -row $row -column 0 -sticky w
-	label $memgrid.arc_used -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $memgrid.arc_used -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.arc_used -row $row -column 1 -sticky e
-	label $memgrid.arc_free -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $memgrid.arc_free -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.arc_free -row $row -column 2 -sticky e
-	label $memgrid.arc_total -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $memgrid.arc_total -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.arc_total -row $row -column 3 -sticky e
 	incr row
-	label $memgrid.swap -font $sysfont -text [dict get $sysdict swap $locale]\
+	label $memgrid.swap -font bold -text [dict get $sysdict swap $locale]\
 		 -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.swap -row $row -column 0 -sticky w
-	label $memgrid.swap_used -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $memgrid.swap_used -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.swap_used -row $row -column 1 -sticky e
-	label $memgrid.swap_free -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $memgrid.swap_free -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.swap_free -row $row -column 2 -sticky e
-	label $memgrid.swap_total -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $memgrid.swap_total -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.swap_total -row $row -column 3 -sticky e
 
 	grid columnconfigure $memgrid 0 -pad 5
@@ -301,7 +300,6 @@ proc zstatus::system::show_netstat {} {
 	variable netgrid
 	variable bgcolor
 	variable fgcolor
-	variable sysfont
 	variable sysdict
 	variable locale
 	variable barwidget
@@ -322,24 +320,24 @@ proc zstatus::system::show_netstat {} {
 
 	set row 0
 	pack [frame $netgrid -background $bgcolor] -padx 5 -pady 5 -side top -anchor w
-	label $netgrid.ipv4 -font $sysfont -text [dict get $sysdict ipv4 $locale]\
+	label $netgrid.ipv4 -font bold -text [dict get $sysdict ipv4 $locale]\
 		-bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.ipv4 -row $row -column 0 -sticky w
-	label $netgrid.ipv4_addr -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $netgrid.ipv4_addr -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.ipv4_addr -row $row -column 1 -sticky e
 
 	incr row
-	label $netgrid.ipv6 -font $sysfont -text [dict get $sysdict ipv6 $locale]\
+	label $netgrid.ipv6 -font bold -text [dict get $sysdict ipv6 $locale]\
 		-bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.ipv6 -row $row -column 0 -sticky w
-	label $netgrid.ipv6_addr -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $netgrid.ipv6_addr -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.ipv6_addr -row $row -column 1 -sticky e
 
 	incr row
-	label $netgrid.transfer -font $sysfont -text [dict get $sysdict trf $locale]\
+	label $netgrid.transfer -font bold -text [dict get $sysdict trf $locale]\
 		-bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.transfer -row $row -column 0 -sticky w
-	label $netgrid.transfer_val -font $sysfont -bg $bgcolor -fg $fgcolor
+	label $netgrid.transfer_val -font normal -bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.transfer_val -row $row -column 1 -sticky e
 
 	grid columnconfigure $netgrid 0 -pad 5
