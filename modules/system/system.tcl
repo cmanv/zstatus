@@ -355,17 +355,19 @@ proc zstatus::system::show_netstat {} {
 }
 
 proc zstatus::system::update_netstat {} {
+	variable neticon
+	variable netstat_if
+	set netinfo [freebsd::getnetstat $netstat_if]
+	set neticon "$::unicode(arrow-down)[lindex $netinfo 2]"
+
 	variable netstat_visible
 	if {!$netstat_visible} { return }
 
-	variable netstat_if
 	variable netgrid
-
-	set netstat [freebsd::getnetstat $netstat_if]
-	set netin "$::unicode(arrow-down) [lindex $netstat 2]"
-	set netout "$::unicode(arrow-up) [lindex $netstat 3]"
-	$netgrid.ipv4_addr configure -text [lindex $netstat 0]
-	$netgrid.ipv6_addr configure -text [lindex $netstat 1]
+	$netgrid.ipv4_addr configure -text [lindex $netinfo 0]
+	$netgrid.ipv6_addr configure -text [lindex $netinfo 1]
+	set netin "$::unicode(arrow-down) [lindex $netinfo 2]"
+	set netout "$::unicode(arrow-up) [lindex $netinfo 3]"
 	$netgrid.transfer_val configure -text "$netin   $netout"
 }
 
@@ -414,8 +416,6 @@ proc zstatus::system::setup {bar item} {
 
 		variable netstat_if
 		set netstat_if [dict get $::widgetdict netstat interface]
-		variable neticon
-		set neticon "$::unicode(arrow-up-down)"
 
 		bind $netwidget <Enter> { zstatus::system::show_netstat }
 		bind $netwidget <Leave> { zstatus::system::hide_netstat }
