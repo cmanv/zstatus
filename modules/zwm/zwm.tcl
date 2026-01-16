@@ -1,8 +1,9 @@
-#!/usr/bin/env wish9.0
 namespace eval zstatus::zwm {
-	array set modes {Monocle M VTiled V HTiled H Stacked S}
-	namespace export set_wintitle unset_wintitle set_wslist set_wsname\
-			set_wsmode set_theme
+	variable modes [dict create\
+		Monocle	$::unicode(rectangle)\
+		VTiled	$::unicode(layout)\
+		HTiled	$::unicode(layout-row)\
+		Stacked	$::unicode(file-copy)]
 
 	variable screen [lindex [split [winfo screen .] "."] 1]
 	variable zwmsocket "[dict get $::config cache_prefix]/zwm/socket"
@@ -12,6 +13,9 @@ namespace eval zstatus::zwm {
 	variable wintext ""
 	variable winmaxlen [dict get $::widgetdict wintitle maxlength]
 	variable theme_defined 0
+
+	namespace export set_wintitle unset_wintitle set_wslist set_wsname\
+			set_wsmode set_theme
 }
 
 proc zstatus::zwm::send_message {msg} {
@@ -139,8 +143,8 @@ proc zstatus::zwm::set_wslist {value} {
 proc zstatus::zwm::set_wsmode {value} {
 	variable modes
 	variable wsmode
-	if [info exists modes($value)] {
-		set wsmode $modes($value)
+	if [dict exists $modes $value] {
+		set wsmode [dict get $modes $value]
 	} else {
 		set wsmode $value
 	}

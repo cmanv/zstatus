@@ -7,12 +7,19 @@ namespace eval zstatus::remixicon {
 		cloud-windy \ueba1
 		overcast \ueba5
 		code-s-slash \uebad
+		cpu \uebf0
 		download \uec5a
 		drizzle \uec68
+		file-copy \uecd5
 		foggy \ued50
+		fullscreen \ued9c
 		hail \ueded
 		haze \uee00
 		heavy-showers \uee15
+		layout \uee7f
+		layout-column \uee8d
+		layout-grid \uee90
+		layout-row \uee9d
 		mail \ueef3
 		mist \uef5d
 		moon-clear \uef6f
@@ -25,9 +32,11 @@ namespace eval zstatus::remixicon {
 		question-mark \uf046
 		ram \uf456
 		rainy \uf056
+		rectangle \uf3d7
 		showers \uf122
 		snowflake \uf513
 		snowy \uf15e
+		stack \uf181
 		sun-cloudy \uf1bb
 		sun-few-clouds \uf1be
 		sun-clear \uf1bf

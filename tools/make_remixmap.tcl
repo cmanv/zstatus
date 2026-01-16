@@ -3,13 +3,14 @@ package require fileutil
 
 set iconlist {
 	arrow-down-line arrow-up-line arrow-up-down-line bar-chart-fill\
-	cloud-windy-line cloudy-line code-s-slash-line download-line\
-	drizzle-line foggy-line hail-line haze-line heavy-showers-line\
-	mail-fill mist-line moon-clear-line moon-cloudy-line moon-foggy-line\
-	moon-line music-2-fill pause-large-fill play-fill question-mark ram-line\
-	rainy-line showers-line snowflake-line snowy-line sun-cloudy-line\
-	sun-foggy-line sun-line thunderstorms-line tornado-fill upload-line\
-	volume-up-fill windy-line}
+	cloud-windy-line cloudy-line code-s-slash-line cpu-line download-line\
+	drizzle-line file-copy-line foggy-line fullscreen-line hail-line haze-line\
+	heavy-showers-line layout-2-line layout-column-line layout-grid-line\
+	layout-row-line mail-fill mist-line moon-clear-line moon-cloudy-line\
+	moon-foggy-line moon-line music-2-fill pause-large-fill play-fill\
+	question-mark ram-line rainy-line rectangle-line showers-line snowflake-line\
+	snowy-line stack-line sun-cloudy-line sun-foggy-line sun-line thunderstorms-line\
+	tornado-fill upload-line volume-up-fill windy-line}
 
 set file "$::env(HOME)/.local/share/fonts/remixicon.css"
 
