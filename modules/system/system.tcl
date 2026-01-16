@@ -12,14 +12,14 @@ namespace eval zstatus::system {
 	}
 
 	set sysdict [dict create\
-		load {C "L:" fr "C:"}\
-		memstats {C "MemStats" fr "MemStats"}\
+		memstats {C "Memory" fr "Mémoire"}\
 		mem {C "RAM:" fr "RAM :"}\
 		arc {C "ARC:" fr "ARC :"}\
 		swap {C "Swao:" fr "Swap :"}\
 		total {C "Total" fr "Total"}\
 		used {C "Used" fr "Utilisé"}\
 		free {C "Free" fr "Libre"}\
+		interface {C "Interface:" fr "Interface :"}\
 		ipv4 {C "IPv4:" fr "IPv4 :"}\
 		ipv6 {C "IPv6:" fr "IPv6 :"}\
 		trf {C "Transfers:" fr "Transferts :"}]
@@ -100,8 +100,6 @@ proc zstatus::system::set_theme_netstat { } {
 
 proc zstatus::system::set_loadavg {} {
 	variable loadavg
-	variable sysdict
-	variable locale
 	variable load_queue
 	variable load_length
 
@@ -110,7 +108,7 @@ proc zstatus::system::set_loadavg {} {
 	if {[llength $load_queue] > $load_length} {
 		set load_queue [lrange $load_queue 1 end]
 	}
-	set loadavg "[dict get $sysdict load $locale] $value"
+	set loadavg "$::unicode(bar-chart) $value"
 
 	variable loadgraph_visible
 	if {$loadgraph_visible} { update_loadgraph }
@@ -181,7 +179,7 @@ proc zstatus::system::update_loadgraph {} {
 
 proc zstatus::system::set_memused {} {
 	variable memused
-	set memused "M: [lindex [freebsd::getpercmemused] 0]"
+	set memused "$::unicode(ram) [lindex [freebsd::getpercmemused] 0]"
 
 	variable memstats_visible
 	if {$memstats_visible} { update_memstats }
@@ -304,6 +302,7 @@ proc zstatus::system::show_netstat {} {
 	variable locale
 	variable barwidget
 	variable netwidget
+	variable netstat_if
 
 	set netstat_visible 1
 	set netstat [toplevel .netstat -highlightthickness 0\
@@ -320,6 +319,14 @@ proc zstatus::system::show_netstat {} {
 
 	set row 0
 	pack [frame $netgrid -background $bgcolor] -padx 5 -pady 5 -side top -anchor w
+	label $netgrid.interface -font bold -text [dict get $sysdict interface $locale]\
+		-bg $bgcolor -fg $fgcolor
+	grid configure $netgrid.interface -row $row -column 0 -sticky w
+	label $netgrid.interface_val -font normal -text $netstat_if\
+		 -bg $bgcolor -fg $fgcolor
+	grid configure $netgrid.interface_val -row $row -column 1 -sticky e
+
+	incr row
 	label $netgrid.ipv4 -font bold -text [dict get $sysdict ipv4 $locale]\
 		-bg $bgcolor -fg $fgcolor
 	grid configure $netgrid.ipv4 -row $row -column 0 -sticky w
@@ -407,9 +414,8 @@ proc zstatus::system::setup {bar item} {
 
 		variable netstat_if
 		set netstat_if [dict get $::widgetdict netstat interface]
-		variable interface
-		#set interface "$::unicode(arrow-up-down) $netstat_if"
-		set interface "E: $netstat_if"
+		variable neticon
+		set neticon "$::unicode(arrow-up-down)"
 
 		bind $netwidget <Enter> { zstatus::system::show_netstat }
 		bind $netwidget <Leave> { zstatus::system::hide_netstat }

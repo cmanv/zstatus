@@ -55,7 +55,7 @@ namespace eval zstatus::config {
 			module system
 			interface em0
 			proc system::update_netstat
-			source zstatus::system::interface
+			source zstatus::system::neticon
 			settheme system::set_theme
 		} osversion {
 			type string

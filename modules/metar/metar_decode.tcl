@@ -58,8 +58,8 @@ namespace eval zstatus::metar::decode {
 			icon snowy}\
 		+SHSN	{C {heavy snow showers} fr {fortes averses de neige}\
 			icon snowy}\
-		DRSN	{C {low drifting snow} fr {chasse basse de neige} icon snowy}\
-		BLSN	{C {blowing snow} fr {chasse haute de neige} icon snowy}\
+		DRSN	{C {low drifting snow} fr {poudrerie} icon windy}\
+		BLSN	{C {blowing snow} fr {poudrerie élevée} icon windy}\
 		SG	{C {snow grains} fr {neige en grains} icon snowy}\
 		-SG	{C {light snow grains} fr {faible neige en grains} icon snowy}\
 		+SG	{C {heavy snow grains} fr {forte neige en grains} icon snowy}\
