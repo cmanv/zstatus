@@ -33,6 +33,7 @@ namespace eval zstatus::metar {
 
 	set station {}
 	variable  popup_visible 0
+	variable  metar_started 0
 	namespace export setup update set_theme show_tooltip hide_tooltip
 }
 
@@ -486,7 +487,11 @@ proc zstatus::metar::setup {bar widget} {
 	bind $metarwidget <Enter> { zstatus::metar::show_tooltip }
 	bind $metarwidget <Leave> { zstatus::metar::hide_tooltip }
 
-	set delay [expr [dict get $::widgetdict metar delay] * 60000]
-	after 1000 "every $delay zstatus::metar::update"
+	variable  metar_started
+	if {!$metar_started} {
+		set delay [expr [dict get $::widgetdict metar delay] * 60000]
+		after 1000 "every $delay zstatus::metar::update"
+		set metar_started 1
+	}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

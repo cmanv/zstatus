@@ -1,7 +1,7 @@
 namespace eval zstatus::zwm {
 	variable modes [dict create\
 		Monocle	$::unicode(rectangle)\
-		VTiled	$::unicode(layout)\
+		VTiled	$::unicode(layout-column)\
 		HTiled	$::unicode(layout-row)\
 		Stacked	$::unicode(file-copy)]
 
