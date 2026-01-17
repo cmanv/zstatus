@@ -71,7 +71,7 @@ proc zstatus::set_datetime {} {
 	variable locale
 
 	set datetime [clock format [clock seconds] \
-		-locale $locale  -format $datetime_format]
+		-locale $locale -format $datetime_format]
 }
 
 proc zstatus::set_theme {newtheme} {
@@ -318,7 +318,7 @@ proc zstatus::setup {} {
 # Treat command line options
 set options {
 	{config.arg "default" "user configuration file"}
-        {theme.arg  ""  "default theme"}
+	{theme.arg "" "default theme"}
 }
 set usage ": zstatus.tk -config <configfile> -theme <theme> \n"
 

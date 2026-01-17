@@ -184,7 +184,7 @@ proc zstatus::mail::update {} {
 				dict set ::mailboxes $index visible 1
 			}
 		} else {
-			if {!$inbox  && [dict get $::mailboxes $index visible]} {
+			if {!$inbox && [dict get $::mailboxes $index visible]} {
 				pack forget $mailframe.$index
 				if {![string length [pack slaves $mailframe]]} {
 					pack forget $mailframe $mailsep

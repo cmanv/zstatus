@@ -32,8 +32,8 @@ namespace eval zstatus::metar {
 		sunset {C "Sunset:" fr "Coucher :"}]
 
 	set station {}
-	variable  popup_visible 0
-	variable  metar_started 0
+	variable popup_visible 0
+	variable metar_started 0
 	namespace export setup update set_theme show_tooltip hide_tooltip
 }
 
@@ -314,7 +314,7 @@ proc zstatus::metar::setup_header { header } {
 	pack [frame $header.keys.station] -side top -anchor w
 	pack [label $header.keys.station.text -font [dict get $style label1 font]\
 			-text [dict get $labeldict station $locale]]
-	pack [frame $header.keys.date]  -side top -anchor w
+	pack [frame $header.keys.date] -side top -anchor w
 	pack [label $header.keys.date.text -font [dict get $style label1 font]\
 			-text [dict get $labeldict issued $locale]]
 	pack [frame $header.keys.status] -side top -anchor w
@@ -487,7 +487,7 @@ proc zstatus::metar::setup {bar widget} {
 	bind $metarwidget <Enter> { zstatus::metar::show_tooltip }
 	bind $metarwidget <Leave> { zstatus::metar::hide_tooltip }
 
-	variable  metar_started
+	variable metar_started
 	if {!$metar_started} {
 		set delay [expr [dict get $::widgetdict metar delay] * 60000]
 		after 1000 "every $delay zstatus::metar::update"

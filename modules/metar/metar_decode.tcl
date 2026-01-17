@@ -2,8 +2,8 @@ package require Tcl 9.0
 package require json
 
 namespace eval zstatus::metar::decode {
-	variable  metar_api 		https://aviationweather.gov/api/data/metar
-	variable  station_api 		https://aviationweather.gov/api/data/stationinfo
+	variable metar_api 		https://aviationweather.gov/api/data/metar
+	variable station_api 		https://aviationweather.gov/api/data/stationinfo
 
 	set pi			3.14159265358979
 	set obliquity 		23.4363
@@ -114,7 +114,7 @@ namespace eval zstatus::metar::decode {
 		TCU	{C {Towering cumulus} fr {Cumulus bourgeonnant}}]
 
 	set direction [dict create\
-		{000}	{C N fr N}  	{010}	{C N fr N}\
+		{000}	{C N fr N}	{010}	{C N fr N}\
 		{020}	{C NNE fr NNE} 	{030}	{C NNE fr NNE}\
 		{040}	{C NE fr NE}	{050}	{C NE fr NE}\
 		{060}	{C ENE fr ENE} 	{070}	{C ENE fr ENE}\

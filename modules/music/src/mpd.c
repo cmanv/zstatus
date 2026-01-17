@@ -113,9 +113,9 @@ int MPD_CurrentTitleObjCmd( ClientData clientData, Tcl_Interp *interp,
 
 	struct mpd_song *song = mpd_run_get_queue_song_id(conn, id);
 	if (song) {
-		const char *partist =  mpd_song_get_tag(song, MPD_TAG_ARTIST, 0);
-		const char *palbum =  mpd_song_get_tag(song, MPD_TAG_ALBUM, 0);
-		const char *ptitle  = mpd_song_get_tag(song, MPD_TAG_TITLE, 0);
+		const char *partist = mpd_song_get_tag(song, MPD_TAG_ARTIST, 0);
+		const char *palbum = mpd_song_get_tag(song, MPD_TAG_ALBUM, 0);
+		const char *ptitle = mpd_song_get_tag(song, MPD_TAG_TITLE, 0);
 
 		if (partist) strlcpy(artist, partist, 64);
 		if (palbum) strlcpy(album, palbum, 64);

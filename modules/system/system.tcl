@@ -157,6 +157,8 @@ proc zstatus::system::update_loadgraph {} {
 	variable load_length
 	variable load_height
 
+	$loadgraph create rectangle 0 0 $load_length $load_height -fill $bgcolor
+
 	set ymax 1
 	foreach value $load_queue {
 		if {$value > $ymax} { incr ymax }
@@ -219,7 +221,7 @@ proc zstatus::system::show_memstats {} {
 	label $memgrid.title -font bold -text [dict get $sysdict memstats $locale]\
 		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.title -row $row -column 0 -sticky w
-	label $memgrid.used -font bold  -text [dict get $sysdict used $locale]\
+	label $memgrid.used -font bold -text [dict get $sysdict used $locale]\
 		-bg $bgcolor -fg $fgcolor
 	grid configure $memgrid.used -row $row -column 1 -sticky e
 	label $memgrid.free -font bold -text [dict get $sysdict free $locale]\
