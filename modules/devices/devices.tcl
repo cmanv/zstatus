@@ -45,10 +45,10 @@ proc zstatus::devices::update {} {
 			if ![string length [pack slaves $devframe]] {
 				pack $devframe -after $devpos -side $devside
 				pack $devsep -after $devframe -fill y \
-					-padx 5 -side $devside
+					-side $devside
 			}
 			pack [label $devframe.$device -font $devicefont\
-				 -text "$device"] -side left
+				 -text "$device" -padx 5] -side $devside
 			$devframe.$device configure -fg $fgcolor\
 				 -bg $bgcolor
 		}
