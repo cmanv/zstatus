@@ -17,7 +17,7 @@ namespace eval zstatus::system {
 		arc {C "ARC:" fr "ARC :"}\
 		swap {C "Swao:" fr "Swap :"}\
 		total {C "Total" fr "Total"}\
-		used {C "Used" fr "Utilisé"}\
+		used {C "Used" fr "Utilisée"}\
 		free {C "Free" fr "Libre"}\
 		interface {C "Interface:" fr "Interface :"}\
 		ipv4 {C "IPv4:" fr "IPv4 :"}\

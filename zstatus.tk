@@ -1,5 +1,6 @@
 #!/usr/bin/env wish9.0
 package require cmdline
+package require fileutil
 package require unix_sockets
 package require zstatus::config
 package require zstatus::remixicon
@@ -341,7 +342,13 @@ if [string length $::params(theme)] {
 	set zstatus::theme $::params(theme)
 } elseif [dict exists $::config theme] {
 	set zstatus::theme [dict get $::config theme]
+} elseif [info exists ::env(THEME_STATE_FILE)] {
+	set themefile $env(THEME_STATE_FILE)
+	if [file exists $themefile] {
+		set zstatus::theme [lindex [split [fileutil::cat $themefile] "\n"] 0]
+	}
 }
+
 zstatus::setup
 every [dict get $::config delay] zstatus::update
 
