@@ -102,6 +102,7 @@ proc zstatus::zwm::set_wslist {value} {
 		set font normal
 		if {$first == "+"} {
 			set num [string range $name 1 end]
+			set name $num
 			set font bold
 			set active 1
 		} elseif {$first == "!"} {
@@ -112,7 +113,7 @@ proc zstatus::zwm::set_wslist {value} {
 		}
 
 		set slave $wslistframe.$num
-		pack [label $slave -font $font -text $num] -padx 0 -ipadx 4 -side left
+		pack [label $slave -font $font -text $name] -padx 0 -ipadx 4 -side left
 
 		if {$active} {
 			set activeslave $slave
