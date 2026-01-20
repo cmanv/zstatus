@@ -93,6 +93,7 @@ namespace eval zstatus::metar::decode {
 		HZ	{C haze fr {brume sèche} icon mist}\
 		PO	{C {dust whirls} fr {tourbillons de poussière} icon tornado}\
 		SQ	{C squalls fr grains icon cloud-windy}\
+		SNSQ	{C snow squall fr {bourrasque de neige} icon cloud-windy}\
 		+FC	{C tornadoes fr tornades icon tornado}\
 		FC	{C {funnel clouds} fr entonnoirs icon tornado}\
 		SS	{C {sand storm} fr {tempête de sable} icon mist}\
