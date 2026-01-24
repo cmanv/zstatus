@@ -129,8 +129,8 @@ Default theme.
 .RS
 .PP
 List of widgets in the statusbar starting from the left.
-(Default: \f[I]wsmode separator wslist separator wsname separator
-wintitle\f[R]) Note: \f[I]separator\f[R] can be abbreviated as
+(Default: \f[I]desklayout separator desklist separator deskname
+separator wintitle\f[R]) Note: \f[I]separator\f[R] can be abbreviated as
 \f[I]sep\f[R].
 .RE
 .IP \(bu 2
@@ -194,10 +194,11 @@ Line color in dark mode.
 The list of valid widgets are:
 .RS
 .PP
-\f[B]datetime\f[R], \f[B]devices\f[R], \f[B]loadavg\f[R],
-\f[B]mail\f[R], \f[B]memused\f[R], \f[B]metar\f[R], \f[B]mixer\f[R],
+\f[B]datetime\f[R], \f[B]desklayout\f[R], \f[B]desklist\f[R],
+\f[B]deskname\f[R], \f[B]devices\f[R], \f[B]loadavg\f[R],
+\f[B]mail\f[R], \f[B]memused\f[R], > \f[B]metar\f[R], \f[B]mixer\f[R],
 \f[B]music\f[R], \f[B]netstat\f[R], \f[B]separator\f[R],
-\f[B]wintitle\f[R], \f[B]wslist\f[R], \f[B]wsmode\f[R], \f[B]wsname\f[R]
+\f[B]wintitle\f[R]
 .RE
 .PP
 Each of these widgets can be customized with options:
@@ -215,7 +216,7 @@ bold).
 \- \f[I]fg.dark\f[R]: foreground color in dark mode.
 .RE
 .IP \(bu 2
-\f[B][wslist]\f[R]: List of workspaces currently in use.
+\f[B][desklayout]\f[R]: Mode of the active workspace.
 .RS
 .PP
 Options: \- \f[I]font\f[R]: font to use for text (normal, italic or
@@ -226,7 +227,7 @@ bold).
 \- \f[I]fg.dark\f[R]: foreground color in dark mode.
 .RE
 .IP \(bu 2
-\f[B][wsmode]\f[R]: Mode of the active workspace.
+\f[B][desklist]\f[R]: List of workspaces currently in use.
 .RS
 .PP
 Options: \- \f[I]font\f[R]: font to use for text (normal, italic or
@@ -237,7 +238,7 @@ bold).
 \- \f[I]fg.dark\f[R]: foreground color in dark mode.
 .RE
 .IP \(bu 2
-\f[B][wsname]\f[R]: Name of the active workspace.
+\f[B][deskname]\f[R]: Name of the active workspace.
 .RS
 .PP
 Options: \- \f[I]font\f[R]: font to use for text (normal, italic or

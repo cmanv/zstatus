@@ -93,7 +93,7 @@ These are the options can be specified in the __[main]__ section.
 
 * __leftside__
 
-> List of widgets in the statusbar starting from the left. (Default: _wsmode separator wslist separator wsname separator wintitle_)
+> List of widgets in the statusbar starting from the left. (Default: _desklayout separator desklist separator deskname separator wintitle_)
 > Note: _separator_ can be abbreviated as _sep_.
 
 * __rightside__
@@ -139,9 +139,9 @@ These are the options can be specified in the __[main]__ section.
 
 The list of valid widgets are:
 
-> __datetime__, __devices__, __loadavg__, __mail__, __memused__,
-> __metar__, __mixer__, __music__, __netstat__, __separator__,
-> __wintitle__, __wslist__, __wsmode__, __wsname__
+> __datetime__, __desklayout__, __desklist__, __deskname__, __devices__,
+>  __loadavg__, __mail__, __memused__, > __metar__, __mixer__, __music__,
+> __netstat__, __separator__, __wintitle__
 
 Each of these widgets can be customized with options:
 
@@ -155,7 +155,7 @@ Each of these widgets can be customized with options:
 > - _fg.light_: foreground color in light mode.
 > - _fg.dark_: foreground color in dark mode.
 
-- __[wslist]__: List of workspaces currently in use.
+- __[desklayout]__: Mode of the active workspace.
 
 > Options:
 > - _font_: font to use for text (normal, italic or bold).
@@ -164,7 +164,7 @@ Each of these widgets can be customized with options:
 > - _fg.light_: foreground color in light mode.
 > - _fg.dark_: foreground color in dark mode.
 
-- __[wsmode]__: Mode of the active workspace.
+- __[desklist]__: List of workspaces currently in use.
 
 > Options:
 > - _font_: font to use for text (normal, italic or bold).
@@ -173,7 +173,7 @@ Each of these widgets can be customized with options:
 > - _fg.light_: foreground color in light mode.
 > - _fg.dark_: foreground color in dark mode.
 
-- __[wsname]__: Name of the active workspace.
+- __[deskname]__: Name of the active workspace.
 
 > Options:
 > - _font_: font to use for text (normal, italic or bold).

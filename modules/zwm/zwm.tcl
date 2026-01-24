@@ -1,5 +1,5 @@
 namespace eval zstatus::zwm {
-	variable modes [dict create\
+	variable layouts [dict create\
 		Monocle	$::unicode(rectangle)\
 		VTiled	$::unicode(layout-column)\
 		HTiled	$::unicode(layout-row)\
@@ -8,14 +8,14 @@ namespace eval zstatus::zwm {
 	variable screen [lindex [split [winfo screen .] "."] 1]
 	variable zwmsocket "[dict get $::config cache_prefix]/zwm/socket"
 
-	variable wslist "+?"
-	variable wsmode "?"
+	variable desklist "+?"
+	variable desklayout "?"
 	variable wintext ""
 	variable winmaxlen [dict get $::widgetdict wintitle maxlength]
 	variable theme_defined 0
 
-	namespace export set_wintitle unset_wintitle set_wslist set_wsname\
-			set_wsmode set_theme
+	namespace export set_wintitle unset_wintitle set_desklist set_deskname\
+			set_desklayout set_theme
 }
 
 proc zstatus::zwm::send_message {msg} {
@@ -34,19 +34,19 @@ proc zstatus::zwm::set_theme {theme} {
 	variable bgcolor
 	variable fgcolor
 	variable hicolor
-	variable wslistbar
-	variable wslistframe
+	variable desklistbar
+	variable desklistframe
 	variable activeslave
 	variable theme_defined
 
-	set bgcolor [dict get $::widgetdict wslist bg $theme]
-	set fgcolor [dict get $::widgetdict wslist fg $theme]
+	set bgcolor [dict get $::widgetdict desklist bg $theme]
+	set fgcolor [dict get $::widgetdict desklist fg $theme]
 	set hicolor [dict get $::color hl $theme]
 	set theme_defined 1
 
-	$wslistbar configure -background $bgcolor
-	$wslistframe configure -background $bgcolor
-	foreach slave [pack slaves $wslistframe] {
+	$desklistbar configure -background $bgcolor
+	$desklistframe configure -background $bgcolor
+	foreach slave [pack slaves $desklistframe] {
 		if {$slave == $activeslave} {
 			$slave configure -bg $hicolor -fg $fgcolor
 		} else {
@@ -84,15 +84,15 @@ proc zstatus::zwm::unset_wintitle {value} {
 	$wintitle configure -state disabled
 }
 
-proc zstatus::zwm::set_wslist {value} {
-	variable wslist
-	variable wslistbar
-	variable wslistframe
+proc zstatus::zwm::set_desklist {value} {
+	variable desklist
+	variable desklistbar
+	variable desklistframe
 	variable activeslave
 
-	destroy $wslistframe
-	pack [frame $wslistframe]
-	set wslist $value
+	destroy $desklistframe
+	pack [frame $desklistframe]
+	set desklist $value
 	foreach name [split $value "|"] {
 		if {![string length $name]} {
 			continue
@@ -112,7 +112,7 @@ proc zstatus::zwm::set_wslist {value} {
 			set num $name
 		}
 
-		set slave $wslistframe.$num
+		set slave $desklistframe.$num
 		pack [label $slave -font $font -text $name] -padx 0 -ipadx 4 -side left
 
 		if {$active} {
@@ -130,9 +130,9 @@ proc zstatus::zwm::set_wslist {value} {
 	variable fgcolor
 	variable hicolor
 
-	$wslistbar configure -background $bgcolor
-	$wslistframe configure -background $bgcolor
-	foreach slave [pack slaves $wslistframe] {
+	$desklistbar configure -background $bgcolor
+	$desklistframe configure -background $bgcolor
+	foreach slave [pack slaves $desklistframe] {
 		if {$slave == $activeslave} {
 			$slave configure -bg $hicolor -fg $fgcolor
 		} else {
@@ -141,19 +141,19 @@ proc zstatus::zwm::set_wslist {value} {
 	}
 }
 
-proc zstatus::zwm::set_wsmode {value} {
-	variable modes
-	variable wsmode
-	if [dict exists $modes $value] {
-		set wsmode [dict get $modes $value]
+proc zstatus::zwm::set_desklayout {value} {
+	variable layouts
+	variable desklayout
+	if [dict exists $layouts $value] {
+		set desklayout [dict get $layouts $value]
 	} else {
-		set wsmode $value
+		set desklayout $value
 	}
 }
 
-proc zstatus::zwm::set_wsname {value} {
-	variable wsname
-	set wsname $value
+proc zstatus::zwm::set_deskname {value} {
+	variable deskname
+	set deskname $value
 }
 
 proc zstatus::zwm::setup {bar item} {
@@ -178,29 +178,29 @@ proc zstatus::zwm::setup {bar item} {
 		}
 		set_wintitle $wintext
 	}
-	wsmode {
-		dict set ::messagedict ws_mode {action zwm::set_wsmode arg 1}
-		bind $bar.wsmode <MouseWheel> {
+	desklayout {
+		dict set ::messagedict desklayout {action zwm::set_desklayout arg 1}
+		bind $bar.desklayout <MouseWheel> {
 			if {%D < 0} {
-				zstatus::zwm::send_message "desktop-mode-next"
+				zstatus::zwm::send_message "desktop-layout-next"
 			} else {
-				zstatus::zwm::send_message "desktop-mode-prev"
+				zstatus::zwm::send_message "desktop-layout-prev"
 			}
 		}
 	}
-	wslist {
-		dict set ::messagedict ws_list {action zwm::set_wslist arg 1}
-		variable wslist
-		variable wslistbar
-		variable wslistframe
-		set wslistbar [frame $bar.$item]
-		set wslistframe [frame $wslistbar.frame]
-		pack $wslistbar
-		pack $wslistframe
-		set_wslist $wslist
+	desklist {
+		dict set ::messagedict desklist {action zwm::set_desklist arg 1}
+		variable desklist
+		variable desklistbar
+		variable desklistframe
+		set desklistbar [frame $bar.$item]
+		set desklistframe [frame $desklistbar.frame]
+		pack $desklistbar
+		pack $desklistframe
+		set_desklist $desklist
 	}
-	wsname {
-		dict set ::messagedict ws_name {action zwm::set_wsname arg 1}
+	deskname {
+		dict set ::messagedict deskname {action zwm::set_deskname arg 1}
 	}}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

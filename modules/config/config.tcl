@@ -68,19 +68,19 @@ namespace eval zstatus::config {
 			module zwm
 			expand 0
 			maxlength 120
-		} wslist {
+		} desklist {
 			type widget
 			module zwm
 			settheme zwm::set_theme
 			font mono
-		} wsmode {
+		} desklayout {
 			type string
 			module zwm
-			source zstatus::zwm::wsmode
-		} wsname {
+			source zstatus::zwm::desklayout
+		} deskname {
 			type string
 			module zwm
-			source zstatus::zwm::wsname
+			source zstatus::zwm::deskname
 		}]
 
 	if [info exists ::env(XDG_CONFIG_HOME)] {
@@ -112,7 +112,7 @@ namespace eval zstatus::config {
 		dict set config lang C
 	}
 
-	dict set config leftside {deskmode separator desklist separator\
+	dict set config leftside {desklayout separator desklist separator\
 					deskname separator wintitle}
 	dict set config rightside datetime
 
@@ -161,9 +161,9 @@ proc zstatus::config::read {configfile} {
 	variable widgetdict
 
 	# List of valid contexts in config file
-	set contexts { main color datetime devices loadavg mail maildir\
-		memused metar mixer music netstat osversion separator\
-		wintitle wslist wsmode wsname}
+	set contexts { main color datetime desklayout desklist deskname\
+		devices loadavg mail maildir memused metar mixer music\
+		netstat osversion separator wintitle}
 
 	# Cant change these from config file
 	set immutables {type source proc setup settheme}
