@@ -14,10 +14,10 @@ set(TCL_INCLUDE_PATH "/usr/local/include/tcl9.0")
 set(PKG_INDEX pkgIndex.tcl)
 configure_file(${metar_SOURCE_DIR}/${PKG_INDEX} ${metar_BINARY_DIR}/${PKG_INDEX} @ONLY)
 configure_file(${metar_SOURCE_DIR}/metar.tcl ${metar_BINARY_DIR}/metar.tcl @ONLY)
-configure_file(${metar_SOURCE_DIR}/metar_decode.tcl ${metar_BINARY_DIR}/metar_decode.tcl @ONLY)
+configure_file(${metar_SOURCE_DIR}/metar_thread.tcl ${metar_BINARY_DIR}/metar_thread.tcl @ONLY)
 
 # Install files
 set(PACKAGE_LIB ${CMAKE_INSTALL_LIBDIR}/zstatus/metar)
 install(FILES ${metar_BINARY_DIR}/${PKG_INDEX} DESTINATION ${PACKAGE_LIB})
 install(FILES ${metar_BINARY_DIR}/metar.tcl DESTINATION ${PACKAGE_LIB})
-install(FILES ${metar_BINARY_DIR}/metar_decode.tcl DESTINATION ${PACKAGE_LIB})
+install(FILES ${metar_BINARY_DIR}/metar_thread.tcl DESTINATION ${PACKAGE_LIB})

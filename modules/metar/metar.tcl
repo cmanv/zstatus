@@ -1,5 +1,5 @@
 package require Tk
-package require zstatus::metar::decode
+package require Thread
 
 namespace eval zstatus::metar {
 	set style [dict create\
@@ -13,8 +13,6 @@ namespace eval zstatus::metar {
 
 	set metar_locales {C fr}
 	set labeldict [dict create\
-		nostation {C "METAR station invalid or missing"\
-			 fr "Station METAR non valide ou manquante"}\
 		weather {C "Weather conditions:" fr "Conditions météorologiques :"}\
 		station {C "Station:" fr "Station :"}\
 		issued {C "Issued on:" fr "Émis le :"}\
@@ -32,6 +30,7 @@ namespace eval zstatus::metar {
 		sunset {C "Sunset:" fr "Coucher :"}]
 
 	set station {}
+	variable fetch_time none
 	variable popup_visible 0
 	variable metar_started 0
 	namespace export setup update set_theme show_tooltip hide_tooltip
@@ -278,24 +277,14 @@ proc zstatus::metar::update_grid {grid} {
 }
 
 proc zstatus::metar::update {} {
-	variable metarcode
+	variable fetch_time
+	set last_fetch [tsv::get shared last_fetch]
+	if {$fetch_time == $last_fetch} { return }
+	set fetch_time $last_fetch
 	variable station
-	variable locale
-	variable labeldict
 	variable report
-
-	if ![dict exists $station icaoId] {
-		set station [decode::fetch_station $metarcode]
-		if ![dict size $station] {
-			set report(statusbar) "<?>"
-			set report(tooltip) [dict get $labeldict nostation $locale]
-			return
-		}
-	}
-
-	variable timezone
-	array set report [decode::get_report $locale $timezone]
-
+	set station [tsv::get shared station]
+	array set report [tsv::get shared report]
 	variable popup_visible
 	if {$popup_visible} {
 		variable popup
@@ -461,11 +450,11 @@ proc zstatus::metar::setup {bar widget} {
 		set report(tooltip) "-"
 		return
 	}
+
 	set barwidget $bar
 	set metarwidget $bar.$widget
 
 	set metarfont [dict get $::widgetdict metar font]
-	set metarcode [dict get $::widgetdict metar station]
 
 	variable metar_locales
 	variable timezone
@@ -483,14 +472,29 @@ proc zstatus::metar::setup {bar widget} {
 	dict set ::messagedict metar_update {action metar::update arg 0}
 
 	bind $metarwidget <1> { zstatus::metar::toggle_popup }
-	bind $metarwidget <2> { zstatus::metar::update }
 	bind $metarwidget <Enter> { zstatus::metar::show_tooltip }
 	bind $metarwidget <Leave> { zstatus::metar::hide_tooltip }
 
+	tsv::set shared last_fetch none
+	tsv::set shared unicode [array get ::unicode]
+	tsv::set shared metarcode [dict get $::widgetdict metar station]
+	tsv::set shared station {}
+	tsv::set shared locale $locale
+	tsv::set shared timezone $timezone
+
 	variable metar_started
 	if {!$metar_started} {
+		set metar_thread [thread::create {
+				package require zstatus::metar::thread
+				thread::wait
+			}]
+
+		set metar_task "thread::send -async $metar_thread\
+			zstatus::metar::thread::get_metar_report"
+		bind $metarwidget <2> $metar_task
+
 		set delay [expr [dict get $::widgetdict metar delay] * 60000]
-		after 1000 "every $delay zstatus::metar::update"
+		every $delay $metar_task
 		set metar_started 1
 	}
 }

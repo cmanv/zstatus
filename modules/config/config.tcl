@@ -36,7 +36,9 @@ namespace eval zstatus::config {
 			source zstatus::system::memused
 			settheme system::set_theme
 		} metar {
-			type string module metar
+			type string
+			module metar
+			proc metar::update
 			source zstatus::metar::report(statusbar)
 			settheme metar::set_theme
 			delay 10

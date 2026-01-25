@@ -1,9 +1,12 @@
 package require Tcl 9.0
+package require Thread
 package require json
 
-namespace eval zstatus::metar::decode {
+namespace eval zstatus::metar::thread {
 	variable metar_api 		https://aviationweather.gov/api/data/metar
 	variable station_api 		https://aviationweather.gov/api/data/stationinfo
+
+	array set unicode [tsv::get shared unicode]
 
 	set pi			3.14159265358979
 	set obliquity 		23.4363
@@ -16,6 +19,8 @@ namespace eval zstatus::metar::decode {
 	set kp_mmhg		0.133322
 
 	set labeldict [dict create\
+		nostation {C "METAR station invalid or missing"\
+			 fr "Station METAR non valide ou manquante"}\
 		windchill {C {Wind chill:} fr {Refroidissement éolien :}}\
 		humidex {C {Humidex:} fr {Humidex :}}\
 		success {C {Request completed at} fr {Requête complétée à}}\
@@ -135,10 +140,10 @@ namespace eval zstatus::metar::decode {
 		{340}	{C NNW fr NNO}	{350}	{C N fr N}\
 		{360}	{C N fr N}]
 
-	namespace export fetch_station get_report
+	namespace export get_metar_report
 }
 
-proc zstatus::metar::decode::current_day {} {
+proc zstatus::metar::thread::current_day {} {
 	variable timezone
 	set currenttime [clock seconds]
 
@@ -148,20 +153,20 @@ proc zstatus::metar::decode::current_day {} {
 			-timezone $timezone]/86400.0)]
 }
 
-proc zstatus::metar::decode::current_date {} {
+proc zstatus::metar::thread::current_date {} {
 	variable timezone
 	set currenttime [clock seconds]
 	set datetime [clock format $currenttime -format {%Y-%m-%d}\
 			-timezone $timezone]
 }
 
-proc zstatus::metar::decode::calc_seconds {datetime} {
+proc zstatus::metar::thread::calc_seconds {datetime} {
 	variable timezone
 	set currenttime [clock scan $datetime -format {%Y-%m-%d %H:%M:%S}\
 			-timezone $timezone]
 }
 
-proc zstatus::metar::decode::calc_timezone_offset {} {
+proc zstatus::metar::thread::calc_timezone_offset {} {
 	variable timezone
 	set currenttime [clock seconds]
 	set tzoffset [clock format $currenttime -format {%z} -timezone $timezone]
@@ -176,19 +181,7 @@ proc zstatus::metar::decode::calc_timezone_offset {} {
 	return $tzoffset
 }
 
-proc zstatus::metar::decode::fetch_station {code} {
-	variable station_api
-	variable station
-
-	set station {}
-	if [catch {set message [exec -ignorestderr -- curl --connect-timeout 10 -s \
-		$station_api?ids=$code]}] {return $station}
-	if ![string length $message] {return $station}
-	if [catch {set station {*}[json::json2dict $message]}] { set station {} }
-	return $station
-}
-
-proc zstatus::metar::decode::calc_daylight {} {
+proc zstatus::metar::thread::calc_daylight {} {
 	variable report
 	variable station
 	variable timezone
@@ -289,14 +282,15 @@ proc zstatus::metar::decode::calc_daylight {} {
 	return $report(daylight)
 }
 
-proc zstatus::metar::decode::get_weather_icon {daylight} {
+proc zstatus::metar::thread::get_weather_icon {daylight} {
 	variable latest
 	variable precip_codes
+	variable unicode
 
 	if {[dict exists $latest precip_code]} {
 		set code [dict get $latest precip_code]
 		set icon [dict get $precip_codes $code icon]
-		return $::unicode($icon)
+		return $unicode($icon)
 	}
 
 	if {$daylight == 1} {
@@ -311,12 +305,12 @@ proc zstatus::metar::decode::get_weather_icon {daylight} {
 		if {$icon != "overcast"} {
 			set icon "${prefix}-${icon}"
 		}
-		return $::unicode($icon)
+		return $unicode($icon)
 	}
-	return $::unicode(question-mark)
+	return $unicode(question-mark)
 }
 
-proc zstatus::metar::decode::calc_windchill {temperature windspeed} {
+proc zstatus::metar::thread::calc_windchill {temperature windspeed} {
 	if {$windspeed < 4.0} {
 		set windchill [expr $temperature + 0.2 * (0.1345 * $temperature -1.59)\
 				* $windspeed]
@@ -333,7 +327,7 @@ proc zstatus::metar::decode::calc_windchill {temperature windspeed} {
 	return $windchill
 }
 
-proc zstatus::metar::decode::calc_rel_humidity {temperature dew} {
+proc zstatus::metar::thread::calc_rel_humidity {temperature dew} {
 	# Utilise l'équation de Buck pour calculer les pressions saturantes de vapeur d'eau
 	set p1 [expr 0.01121 * exp((18.678 - $temperature/234.5) \
 		* ($temperature/(257.14 + $temperature)))]
@@ -341,7 +335,7 @@ proc zstatus::metar::decode::calc_rel_humidity {temperature dew} {
 	set rel_humidity [expr round(100 * $p2/$p1)]
 }
 
-proc zstatus::metar::decode::calc_humidex {temperature dew} {
+proc zstatus::metar::thread::calc_humidex {temperature dew} {
 	set humidex [expr $temperature + 0.5555 * (6.11 * exp( 5417.753 * \
 		(1/273.16 - 1/($dew + 273.16))) - 10.0)]
 	if {$humidex > 24} {
@@ -352,7 +346,7 @@ proc zstatus::metar::decode::calc_humidex {temperature dew} {
 	return $humidex
 }
 
-proc zstatus::metar::decode::decode_datetime {datetime} {
+proc zstatus::metar::thread::decode_datetime {datetime} {
 	variable latest
 	variable timezone
 	variable locale
@@ -371,7 +365,7 @@ proc zstatus::metar::decode::decode_datetime {datetime} {
 			 -locale $locale -timezone $timezone]
 }
 
-proc zstatus::metar::decode::decode_wind {wdir wspeed wgust} {
+proc zstatus::metar::thread::decode_wind {wdir wspeed wgust} {
 	variable latest
 	variable direction
 	variable locale
@@ -384,12 +378,12 @@ proc zstatus::metar::decode::decode_wind {wdir wspeed wgust} {
 	dict set latest direction [dict get $direction $wdir $locale]
 }
 
-proc zstatus::metar::decode::decode_lightwind {wspeed} {
+proc zstatus::metar::thread::decode_lightwind {wspeed} {
 	variable latest
 	dict set latest speed [expr round($wspeed * 1.852)]
 }
 
-proc zstatus::metar::decode::decode_temp {m1 tcode m2 dcode} {
+proc zstatus::metar::thread::decode_temp {m1 tcode m2 dcode} {
 	variable latest
 	if {[string length $m1]} {
 		dict set latest temp [expr round(-[scan $tcode %d])]
@@ -403,7 +397,7 @@ proc zstatus::metar::decode::decode_temp {m1 tcode m2 dcode} {
 	}
 }
 
-proc zstatus::metar::decode::decode_visibility {vcode} {
+proc zstatus::metar::thread::decode_visibility {vcode} {
 	variable km_mile
 	variable latest
 	set divider [expr [string first "/" $vcode]]
@@ -421,7 +415,7 @@ proc zstatus::metar::decode::decode_visibility {vcode} {
 	}
 }
 
-proc zstatus::metar::decode::decode_pressure {pcode} {
+proc zstatus::metar::thread::decode_pressure {pcode} {
 	variable latest
 	variable cm_inch
 	variable kp_mmhg
@@ -429,7 +423,7 @@ proc zstatus::metar::decode::decode_pressure {pcode} {
 				* $cm_inch * $kp_mmhg)/10.0]]
 }
 
-proc zstatus::metar::decode::decode_clouds {code alt type} {
+proc zstatus::metar::thread::decode_clouds {code alt type} {
 	variable cloud_codes
 	variable cloud_types
 	variable latest
@@ -459,7 +453,7 @@ proc zstatus::metar::decode::decode_clouds {code alt type} {
 	}
 }
 
-proc zstatus::metar::decode::decode_precips {intensity qualifier precips} {
+proc zstatus::metar::thread::decode_precips {intensity qualifier precips} {
 	variable precip_codes
 	variable precip_notes
 	variable locale
@@ -499,7 +493,7 @@ proc zstatus::metar::decode::decode_precips {intensity qualifier precips} {
 	}
 }
 
-proc zstatus::metar::decode::fetch_metar_report {} {
+proc zstatus::metar::thread::fetch_report {} {
 	variable station
 	variable metar_api
 
@@ -508,7 +502,7 @@ proc zstatus::metar::decode::fetch_metar_report {} {
 	return $message
 }
 
-proc zstatus::metar::decode::decode_metar_report {message} {
+proc zstatus::metar::thread::decode_report {message} {
 	variable station
 	if {![string length $message]} {return 0}
 	set tokens [split $message " "]
@@ -551,12 +545,13 @@ proc zstatus::metar::decode::decode_metar_report {message} {
 	return 1
 }
 
-proc zstatus::metar::decode::get_report {plocale ptimezone} {
+proc zstatus::metar::thread::make_report {plocale ptimezone} {
 	variable latest
 	variable report
 	variable locale
 	variable timezone
 	variable labeldict
+	variable unicode
 
 	set locale $plocale
 	set timezone $ptimezone
@@ -565,9 +560,9 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 			 -timezone $timezone]
 
 	set latest {}
-	if [decode_metar_report [fetch_metar_report]] {
+	if [decode_report [fetch_report]] {
 		if {![dict exists $latest date] || ![dict exists $latest temp]} {
-			set report(statusbar) $::unicode(code-s-slash)
+			set report(statusbar) $unicode(code-s-slash)
 			set report(request_message)\
 				"[dict get $labeldict failed $locale] $reporttime"
 			set report(tooltip) $report(request_message)
@@ -614,9 +609,9 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 				$latest_date != $report(prev_date)} {
 				set prev_pressure $report(prev_pressure)
 				if {$latest_pressure > $prev_pressure} {
-					set report(pressure_dir) $::unicode(arrow-up)
+					set report(pressure_dir) $unicode(arrow-up)
 				} elseif {$latest_pressure < $prev_pressure} {
-					set report(pressure_dir) $::unicode(arrow-down)
+					set report(pressure_dir) $unicode(arrow-down)
 				}
 			}
 			set report(prev_date) $latest_date
@@ -659,12 +654,51 @@ proc zstatus::metar::decode::get_report {plocale ptimezone} {
 		set report(request_message)\
 			"[dict get $labeldict success $locale] $reporttime"
 	} else {
-		set report(statusbar) $::unicode(code-s-slash)
+		set report(statusbar) $unicode(code-s-slash)
 		set report(request_message)\
 			"[dict get $labeldict failed $locale] $reporttime"
 		set report(tooltip) $report(request_message)
 	}
 
-	return [array get report]
+	tsv::set shared last_fetch $reporttime
 }
-package provide @PACKAGE_NAME@::decode @PACKAGE_VERSION@
+
+proc zstatus::metar::thread::fetch_station {code} {
+	variable station_api
+
+	set station {}
+	if [catch {set message [exec -ignorestderr -- curl --connect-timeout 10 -s \
+		$station_api?ids=$code]}] {return $station}
+	if ![string length $message] {return $station}
+	if [catch {set station {*}[json::json2dict $message]}] { set station {} }
+	return $station
+}
+
+proc zstatus::metar::thread::get_metar_report {} {
+	variable station
+	variable report
+	variable locale
+	variable timezone
+
+	set code [tsv::get shared metarcode]
+	set locale [tsv::get shared locale]
+	set timezone [tsv::get shared timezone]
+	set station [tsv::get shared station]
+
+	if ![dict exists $station icaoId] {
+		set station [fetch_station $code]
+		tsv::set shared station $station
+		if ![dict size $station] {
+			variable labeldict
+			set report(statusbar) "<?>"
+			set report(tooltip) [dict get $labeldict nostation $locale]
+			tsv::set shared report [array get report]
+			return
+		}
+	}
+
+	make_report $locale $timezone
+	tsv::set shared report [array get report]
+}
+
+package provide @PACKAGE_NAME@::thread @PACKAGE_VERSION@
