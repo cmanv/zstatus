@@ -475,12 +475,14 @@ proc zstatus::metar::setup {bar widget} {
 	bind $metarwidget <Enter> { zstatus::metar::show_tooltip }
 	bind $metarwidget <Leave> { zstatus::metar::hide_tooltip }
 
-	tsv::set shared last_fetch none
-	tsv::set shared unicode [array get ::unicode]
-	tsv::set shared metarcode [dict get $::widgetdict metar station]
-	tsv::set shared station {}
-	tsv::set shared locale $locale
-	tsv::set shared timezone $timezone
+	tsv::lock shared {
+		tsv::set shared last_fetch none
+		tsv::set shared unicode [array get ::unicode]
+		tsv::set shared metarcode [dict get $::widgetdict metar station]
+		tsv::set shared station {}
+		tsv::set shared locale $locale
+		tsv::set shared timezone $timezone
+	}
 
 	variable metar_started
 	if {!$metar_started} {
@@ -489,12 +491,12 @@ proc zstatus::metar::setup {bar widget} {
 				thread::wait
 			}]
 
-		set metar_task "thread::send -async $metar_thread\
+		set start_metar_task "thread::send -async $metar_thread\
 			zstatus::metar::thread::get_metar_report"
-		bind $metarwidget <2> $metar_task
+		bind $metarwidget <2> $start_metar_task
 
 		set delay [expr [dict get $::widgetdict metar delay] * 60000]
-		every $delay $metar_task
+		every $delay $start_metar_task
 		set metar_started 1
 	}
 }
