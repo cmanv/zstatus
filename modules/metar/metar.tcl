@@ -475,17 +475,15 @@ proc zstatus::metar::setup {bar widget} {
 	bind $metarwidget <Enter> { zstatus::metar::show_tooltip }
 	bind $metarwidget <Leave> { zstatus::metar::hide_tooltip }
 
-	tsv::lock shared {
+	variable metar_started
+	if {!$metar_started} {
 		tsv::set shared last_fetch none
 		tsv::set shared unicode [array get ::unicode]
 		tsv::set shared metarcode [dict get $::widgetdict metar station]
 		tsv::set shared station {}
 		tsv::set shared locale $locale
 		tsv::set shared timezone $timezone
-	}
 
-	variable metar_started
-	if {!$metar_started} {
 		set metar_thread [thread::create {
 				package require zstatus::metar::thread
 				thread::wait
