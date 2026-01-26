@@ -277,13 +277,13 @@ proc zstatus::metar::update_grid {grid} {
 
 proc zstatus::metar::update {} {
 	variable fetch_time
-	set last_fetch [tsv::get shared last_fetch]
+	set last_fetch [tsv::get metar last_fetch]
 	if {$fetch_time == $last_fetch} { return }
 	set fetch_time $last_fetch
 	variable station
 	variable report
-	set station [tsv::get shared station]
-	array set report [tsv::get shared report]
+	set station [tsv::get metar station]
+	array set report [tsv::get metar report]
 	variable popup_visible
 	if {$popup_visible} {
 		variable popup
@@ -487,12 +487,12 @@ proc zstatus::metar::setup {bar widget} {
 
 	variable fetch_time
 	set fetch_time 0
-	tsv::set shared last_fetch 0
-	tsv::set shared unicode [array get ::unicode]
-	tsv::set shared metarcode [dict get $::widgetdict metar station]
-	tsv::set shared station {}
-	tsv::set shared locale $locale
-	tsv::set shared timezone $timezone
+	tsv::set metar last_fetch 0
+	tsv::set metar unicode [array get ::unicode]
+	tsv::set metar metarcode [dict get $::widgetdict metar station]
+	tsv::set metar station {}
+	tsv::set metar locale $locale
+	tsv::set metar timezone $timezone
 
 	set delay [expr [dict get $::widgetdict metar delay] * 60000]
 	set metar_thread [thread::create "

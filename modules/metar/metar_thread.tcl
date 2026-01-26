@@ -6,7 +6,7 @@ namespace eval zstatus::metar::thread {
 	variable metar_api 		https://aviationweather.gov/api/data/metar
 	variable station_api 		https://aviationweather.gov/api/data/stationinfo
 
-	array set unicode [tsv::get shared unicode]
+	array set unicode [tsv::get metar unicode]
 
 	set pi			3.14159265358979
 	set obliquity 		23.4363
@@ -665,8 +665,8 @@ proc zstatus::metar::thread::make_report {plocale ptimezone} {
 		set report(tooltip) $report(request_message)
 	}
 
-	tsv::set shared report [array get report]
-	tsv::set shared last_fetch $reporttime
+	tsv::set metar report [array get report]
+	tsv::set metar last_fetch $reporttime
 }
 
 proc zstatus::metar::thread::fetch_station {code} {
@@ -686,19 +686,19 @@ proc zstatus::metar::thread::get_metar_report {} {
 	variable locale
 	variable timezone
 
-	set code [tsv::get shared metarcode]
-	set locale [tsv::get shared locale]
-	set timezone [tsv::get shared timezone]
-	set station [tsv::get shared station]
+	set code [tsv::get metar metarcode]
+	set locale [tsv::get metar locale]
+	set timezone [tsv::get metar timezone]
+	set station [tsv::get metar station]
 
 	if ![dict exists $station icaoId] {
 		set station [fetch_station $code]
-		tsv::set shared station $station
+		tsv::set metar station $station
 		if ![dict size $station] {
 			variable labeldict
 			set report(statusbar) "<?>"
 			set report(tooltip) [dict get $labeldict nostation $locale]
-			tsv::set shared report [array get report]
+			tsv::set metar report [array get report]
 			return
 		}
 	}
