@@ -30,9 +30,8 @@ namespace eval zstatus::metar {
 		sunset {C "Sunset:" fr "Coucher :"}]
 
 	set station {}
-	variable fetch_time none
 	variable popup_visible 0
-	variable metar_started 0
+	variable metar_thread ""
 	namespace export setup update set_theme show_tooltip hide_tooltip
 }
 
@@ -439,17 +438,28 @@ proc zstatus::metar::setup_grid { grid } {
 }
 
 proc zstatus::metar::setup {bar widget} {
-	variable barwidget
-	variable metarwidget
-	variable metarfont
-	variable metarcode
-
 	if ![dict exists $::widgetdict metar station] {
 		variable report
 		set report(statusbar) "-"
 		set report(tooltip) "-"
 		return
 	}
+
+	variable popup_visible
+	if {$popup_visible} {
+		variable popup
+		destroy $popup
+		set popup_visible 0
+	}
+
+	variable metar_thread
+	if [string length $metar_thread] {
+		thread::release -wait $metar_thread
+	}
+
+	variable barwidget
+	variable metarwidget
+	variable metarfont
 
 	set barwidget $bar
 	set metarwidget $bar.$widget
@@ -475,27 +485,23 @@ proc zstatus::metar::setup {bar widget} {
 	bind $metarwidget <Enter> { zstatus::metar::show_tooltip }
 	bind $metarwidget <Leave> { zstatus::metar::hide_tooltip }
 
-	variable metar_started
-	if {!$metar_started} {
-		tsv::set shared last_fetch none
-		tsv::set shared unicode [array get ::unicode]
-		tsv::set shared metarcode [dict get $::widgetdict metar station]
-		tsv::set shared station {}
-		tsv::set shared locale $locale
-		tsv::set shared timezone $timezone
+	variable fetch_time
+	set fetch_time 0
+	tsv::set shared last_fetch 0
+	tsv::set shared unicode [array get ::unicode]
+	tsv::set shared metarcode [dict get $::widgetdict metar station]
+	tsv::set shared station {}
+	tsv::set shared locale $locale
+	tsv::set shared timezone $timezone
 
-		set metar_thread [thread::create {
-				package require zstatus::metar::thread
-				thread::wait
-			}]
+	set delay [expr [dict get $::widgetdict metar delay] * 60000]
+	set metar_thread [thread::create "
+			package require zstatus::metar::thread
+			every $delay zstatus::metar::thread::get_metar_report
+			thread::wait"]
 
-		set start_metar_task "thread::send -async $metar_thread\
-			zstatus::metar::thread::get_metar_report"
-		bind $metarwidget <2> $start_metar_task
+	bind $metarwidget <2> "thread::send -async $metar_thread\
+				zstatus::metar::thread::get_metar_report"
 
-		set delay [expr [dict get $::widgetdict metar delay] * 60000]
-		every $delay $start_metar_task
-		set metar_started 1
-	}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

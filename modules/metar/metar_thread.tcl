@@ -143,6 +143,11 @@ namespace eval zstatus::metar::thread {
 	namespace export get_metar_report
 }
 
+proc every {ms cmd} {
+	after $ms [namespace code [info level 0]]
+	eval $cmd
+}
+
 proc zstatus::metar::thread::current_day {} {
 	variable timezone
 	set currenttime [clock seconds]
@@ -660,6 +665,7 @@ proc zstatus::metar::thread::make_report {plocale ptimezone} {
 		set report(tooltip) $report(request_message)
 	}
 
+	tsv::set shared report [array get report]
 	tsv::set shared last_fetch $reporttime
 }
 
@@ -698,7 +704,6 @@ proc zstatus::metar::thread::get_metar_report {} {
 	}
 
 	make_report $locale $timezone
-	tsv::set shared report [array get report]
 }
 
 package provide @PACKAGE_NAME@::thread @PACKAGE_VERSION@
