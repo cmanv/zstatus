@@ -5,9 +5,13 @@ namespace eval zstatus::zwm {
 		HTiled	$::unicode(layout-row)\
 		Stacked	$::unicode(file-copy)]
 
+	dict set ::messagedict clientlist {action zwm::set_clientlist arg 1}
+	dict set ::messagedict clientmenu {action zwm::clientmenu arg 0}
+
 	variable screen [lindex [split [winfo screen .] "."] 1]
 	variable zwmsocket "[dict get $::config cache_prefix]/zwm/socket"
 
+	variable clientlist {}
 	variable desklist "+?"
 	variable desklayout "?"
 	variable wintext ""
@@ -26,7 +30,7 @@ proc zstatus::zwm::send_message {msg} {
 		puts stderr "Could not open socket $zwmsocket!\n"
 		return
 	}
-	puts $channel "$screen;$msg"
+	puts $channel "$screen:$msg"
 	close $channel
 }
 
@@ -82,6 +86,43 @@ proc zstatus::zwm::unset_wintitle {value} {
 	$wintitle configure -state normal
 	$wintitle delete 1.0 end
 	$wintitle configure -state disabled
+}
+
+proc zstatus::zwm::clientmenu {} {
+	variable clientlist
+	variable bgcolor
+	variable fgcolor
+	variable hicolor
+
+	if [winfo exists .clientmenu] {
+		destroy .clientmenu
+	}
+
+	set menu [menu .clientmenu -title clients -font large -foreground $fgcolor\
+			-background $bgcolor -activebackground $hicolor\
+			-activeforeground $fgcolor -disabledforeground $fgcolor]
+
+	$menu add command -label "Clients X11" -state disabled\
+			-background $hicolor
+
+	foreach client $clientlist {
+		$menu add command\
+			-label [dict get $client name]\
+			-command "zstatus::zwm::send_message activate-client=[dict get $client id]"
+	}
+
+	$menu post [winfo pointerx $menu] [winfo pointery $menu]
+}
+
+proc zstatus::zwm::set_clientlist {value} {
+	variable clientlist
+	set clientlist {}
+	foreach w [split $value "\n"] {
+		regexp {^id=([0-9]+)\|res=(.+)\|name=(.+)$} $w -> id res name
+		set name [string range $name 0 227]
+		set client [dict create id $id res $res name $name]
+		lappend clientlist $client
+	}
 }
 
 proc zstatus::zwm::set_desklist {value} {

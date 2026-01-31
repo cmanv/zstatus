@@ -118,20 +118,17 @@ proc zstatus::set_theme {newtheme} {
 }
 
 proc zstatus::read_message {channel} {
-	if {[gets $channel line] < 0} {
-		close $channel
-		return
-	}
-	close $channel
+	set message [chan read $channel 4096]
+	chan close $channel
 
-	set line [string trimright $line]
-	set equal [string first "=" $line]
+	set message [string trimright $message "\n"]
+	set equal [string first "=" $message]
 	if {$equal == -1} {
-		set key $line
+		set key $message
 		set value ""
 	} elseif {$equal > 0} {
-		set key [string range $line 0 $equal-1]
-		set value [string range $line $equal+1 end]
+		set key [string range $message 0 $equal-1]
+		set value [string range $message $equal+1 end]
 	} else {
 		return
 	}
