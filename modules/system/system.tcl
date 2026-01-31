@@ -1,7 +1,7 @@
 package require zstatus::system::freebsd
 
 namespace eval zstatus::system {
-	namespace export set_loadavg set_memused set_mixer
+	namespace export set_loadavg set_memused set_mixer mixer_cmd
 
 	variable locale C
 	set syslocales {C fr}
@@ -373,6 +373,15 @@ proc zstatus::system::update_netstat {} {
 	$netgrid.transfer_val configure -text "$netin   $netout"
 }
 
+proc zstatus::system::mixer_cmd {action} {
+	if {$action == "raise"} {
+		exec mixer vol=+0.05
+	} elseif {$action == "lower"} {
+		exec mixer vol=-0.05
+	}
+	set_mixer
+}
+
 proc zstatus::system::set_mixer {} {
 	variable mixer
 	variable mixer_icon
@@ -410,7 +419,7 @@ proc zstatus::system::setup {bar item} {
 			}
 			zstatus::system::set_mixer
 		}
-		dict set ::messagedict mixer_volume {action system::set_mixer arg 0}
+		dict set ::messagedict volume {action system::mixer_cmd arg 1}
 	}
 	netstat {
 		set barwidget $bar

@@ -333,7 +333,7 @@ try {
 # Setup tk app
 tk appname "@PACKAGE_NAME@"
 wm title . "@PACKAGE_NAME@ @PACKAGE_VERSION@"
-wm attributes . -topmost 1 -type dock
+wm attributes . -type dock
 
 # Unicode mapping from remixicon v4.6.0
 array set unicode [zstatus::remixicon::get]

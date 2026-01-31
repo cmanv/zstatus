@@ -6,7 +6,7 @@ namespace eval zstatus::music {
 	variable tooltip_active 0
 	array set mpdstates { 2 play 3 pause }
 
-	namespace export setup update set_theme show_tooltip hide_tooltip
+	namespace export command setup update set_theme show_tooltip hide_tooltip
 }
 
 proc zstatus::music::set_theme { theme } {
@@ -28,6 +28,12 @@ proc zstatus::music::set_theme { theme } {
 	variable musicsep
 	$musicframe configure -bg $musicbg -fg $musicfg
 	$musicsep configure -background $sepcolor
+}
+
+proc zstatus::music::command {action} {
+	if {![catch {exec mpc $action}]} {
+		zstatus::music::update
+	}
 }
 
 proc zstatus::music::update {} {
@@ -85,7 +91,7 @@ proc zstatus::music::setup { bar position side } {
 	label $musicframe -font $musicfont
 	frame $musicsep -width 1
 
-	dict set ::messagedict music_update {action music::update arg 0}
+	dict set ::messagedict music {action music::command arg 1}
 	bind $musicframe <Enter> { zstatus::music::show_tooltip }
 	bind $musicframe <Leave> { zstatus::music::hide_tooltip }
 	bind $musicframe <1> {
