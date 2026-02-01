@@ -45,7 +45,7 @@ proc zstatus::zwm::set_theme {theme} {
 	variable hicolor
 	set bgcolor [dict get $::widgetdict desklist bg $theme]
 	set fgcolor [dict get $::widgetdict desklist fg $theme]
-	set hicolor [dict get $::color hl $theme]
+	set hicolor [dict get $::color bg2 $theme]
 
 	variable fgmenu
 	variable bgmenu
@@ -118,9 +118,10 @@ proc zstatus::zwm::clientmenu {} {
 			-background $bgmenu2
 
 	foreach client $clientlist {
-		$menu add command\
-			-label [dict get $client name]\
-			-command "zstatus::zwm::send_message activate-client=[dict get $client id]"
+		set entry "\[[dict get $client desk]\]  [dict get $client name]"
+		set id [dict get $client id]
+		$menu add command -label $entry\
+			-command "zstatus::zwm::send_message activate-client=$id"
 	}
 
 	$menu post [winfo pointerx $menu] [winfo pointery $menu]
@@ -130,9 +131,11 @@ proc zstatus::zwm::set_clientlist {value} {
 	variable clientlist
 	set clientlist {}
 	foreach w [split $value "\n"] {
-		regexp {^id=([0-9]+)\|res=(.+)\|name=(.+)$} $w -> id res name
+		regexp {^id=([0-9]+)\|res=(.+)\|desk=([0-9]+)\|name=(.+)$} $w\
+			-> id res desk name
+		if {$desk == 0} { set desk s}
 		set name [string range $name 0 227]
-		set client [dict create id $id res $res name $name]
+		set client [dict create id $id res $res desk $desk name $name]
 		lappend clientlist $client
 	}
 }
