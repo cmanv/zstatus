@@ -35,17 +35,27 @@ proc zstatus::zwm::send_message {msg} {
 }
 
 proc zstatus::zwm::set_theme {theme} {
-	variable bgcolor
-	variable fgcolor
-	variable hicolor
 	variable desklistbar
 	variable desklistframe
 	variable activeslave
 	variable theme_defined
 
+	variable fgcolor
+	variable bgcolor
+	variable hicolor
 	set bgcolor [dict get $::widgetdict desklist bg $theme]
 	set fgcolor [dict get $::widgetdict desklist fg $theme]
 	set hicolor [dict get $::color hl $theme]
+
+	variable fgmenu
+	variable bgmenu
+	variable fgmenu2
+	variable bgmenu2
+	set fgmenu [dict get $::color fg $theme]
+	set bgmenu [dict get $::color bg $theme]
+	set fgmenu2 [dict get $::color fg2 $theme]
+	set bgmenu2 [dict get $::color bg2 $theme]
+
 	set theme_defined 1
 
 	$desklistbar configure -background $bgcolor
@@ -90,20 +100,22 @@ proc zstatus::zwm::unset_wintitle {value} {
 
 proc zstatus::zwm::clientmenu {} {
 	variable clientlist
-	variable bgcolor
-	variable fgcolor
-	variable hicolor
+	variable fgmenu
+	variable bgmenu
+	variable fgmenu2
+	variable bgmenu2
 
 	if [winfo exists .clientmenu] {
 		destroy .clientmenu
 	}
 
-	set menu [menu .clientmenu -title clients -font large -foreground $fgcolor\
-			-background $bgcolor -activebackground $hicolor\
-			-activeforeground $fgcolor -disabledforeground $fgcolor]
+	set menu [menu .clientmenu -font large -relief flat -activerelief solid\
+			-foreground $fgmenu -background $bgmenu\
+			-activebackground $bgmenu2 -activeforeground $fgmenu2\
+			-disabledforeground $fgmenu]
 
 	$menu add command -label "Clients X11" -state disabled\
-			-background $hicolor
+			-background $bgmenu2
 
 	foreach client $clientlist {
 		$menu add command\
@@ -167,9 +179,9 @@ proc zstatus::zwm::set_desklist {value} {
 	variable theme_defined
 	if {!$theme_defined} { return }
 
+	variable hicolor
 	variable bgcolor
 	variable fgcolor
-	variable hicolor
 
 	$desklistbar configure -background $bgcolor
 	$desklistframe configure -background $bgcolor

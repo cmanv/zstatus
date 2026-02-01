@@ -3,7 +3,9 @@ package require fileutil
 namespace eval zstatus::config {
 	set color [dict create\
 		fg { light black dark LightGray }\
+		fg2 { light black dark seashell }\
 		bg { light seashell dark DarkSlateGray }\
+		bg2 { light SlateGray2 dark SkyBlue4 }\
 		hl { light LightSteelBlue dark SteelBlue4 }\
 		line { light DeepSkyBlue dark SeaGreen }]
 
