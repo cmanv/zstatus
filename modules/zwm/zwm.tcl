@@ -5,8 +5,11 @@ namespace eval zstatus::zwm {
 		HTiled	$::unicode(layout-row)\
 		Stacked	$::unicode(file-copy)]
 
+	variable locale [dict get $::config locale]
+
 	dict set ::messagedict clientlist {action zwm::set_clientlist arg 1}
 	dict set ::messagedict clientmenu {action zwm::clientmenu arg 0}
+	dict set labeldict clientmenu { C "X11 Clients" fr "Clients X11"}
 
 	variable screen [lindex [split [winfo screen .] "."] 1]
 	variable zwmsocket "[dict get $::config cache_prefix]/zwm/socket"
@@ -99,6 +102,7 @@ proc zstatus::zwm::unset_wintitle {value} {
 }
 
 proc zstatus::zwm::clientmenu {} {
+	variable labeldict
 	variable clientlist
 	variable fgmenu
 	variable bgmenu
@@ -114,8 +118,9 @@ proc zstatus::zwm::clientmenu {} {
 			-activebackground $bgmenu2 -activeforeground $fgmenu2\
 			-disabledforeground $fgmenu]
 
-	$menu add command -label "Clients X11" -state disabled\
-			-background $bgmenu2
+	variable locale
+	$menu add command -state disabled -background $bgmenu2\
+		-label [dict get $labeldict clientmenu $locale]
 
 	foreach client $clientlist {
 		set entry "\[[dict get $client desk]\]  [dict get $client name]"

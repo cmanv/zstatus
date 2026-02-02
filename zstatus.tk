@@ -308,7 +308,7 @@ proc zstatus::setup {} {
 	add_widgets right [dict get $::config rightside]
 
 	set datetime_format [dict get $::widgetdict datetime format]
-	set locale [dict get $::config lang]
+	set locale [dict get $::config locale]
 	set osversion [exec uname -rs]
 	set_theme $theme
 }

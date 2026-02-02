@@ -29,7 +29,7 @@ proc zstatus::mail::set_theme { theme } {
 proc zstatus::mail::convert_date { rfc822 } {
 	set ctime [clock scan $rfc822]
 	set timezone [dict get $::config timezone]
-	set locale [dict get $::config lang]
+	set locale [dict get $::config locale]
 	set date [clock format $ctime -format {%a %d %b %Y %T %Z} \
 			-timezone $timezone -locale $locale]
 	return $date

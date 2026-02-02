@@ -5,13 +5,13 @@ namespace eval zstatus::config {
 		fg { light black dark LightGray }\
 		fg2 { light black dark seashell }\
 		bg { light seashell dark DarkSlateGray }\
-		bg2 { light SlateGray2 dark SkyBlue4 }\
+		bg2 { light SlateGray2 dark SteelBlue4 }\
 		line { light DeepSkyBlue dark SeaGreen }]
 
 	set widgetdict [dict create\
 		datetime {
 			type string
-			format {%d %b %H:%M}
+			format {%e %b %H:%M}
 			proc set_datetime
 			source zstatus::datetime
 		} devices {
@@ -110,9 +110,17 @@ namespace eval zstatus::config {
 		cache_prefix	"$cache_prefix"]
 
 	if [info exists ::env(LANG)] {
-		dict set config lang $::env(LANG)
+		set lang $::env(LANG)
 	} else {
-		dict set config lang C
+		set lang C
+	}
+
+	set locales {C fr}
+	set index [lsearch $locales [lindex [split $lang "_"] 0]]
+	if {$index < 0} {
+		dict set config locale C
+	} else {
+		dict set config locale [lindex $locales $index]
 	}
 
 	dict set config leftside {desklayout separator desklist separator\
@@ -196,7 +204,7 @@ proc zstatus::config::read {configfile} {
 				continue
 			}
 			if ![string length $context] { continue }
-			if [regexp {^([a-z_]+)\.([a-z_]+)=(.+)} $line -> key1 key2 value] {
+			if [regexp {^([0-9a-z_]+)\.([a-z_]+)=(.+)} $line -> key1 key2 value] {
 				if {$context == "main"} {
 					dict set ::config $key1 $key2 $value
 				} elseif {$context == "color"} {

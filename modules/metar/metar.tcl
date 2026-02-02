@@ -11,7 +11,9 @@ namespace eval zstatus::metar {
 		icon {font remix2 light DarkGreen dark PaleGreen3}\
 		tooltip {font normal light black dark gray80}]
 
-	set metar_locales {C fr}
+	variable timezone [dict get $::config timezone]
+	variable locale [dict get $::config locale]
+
 	set labeldict [dict create\
 		weather {C "Weather conditions:" fr "Conditions météorologiques :"}\
 		station {C "Station:" fr "Station :"}\
@@ -466,18 +468,6 @@ proc zstatus::metar::setup {bar widget} {
 
 	set metarfont [dict get $::widgetdict metar font]
 
-	variable metar_locales
-	variable timezone
-	variable locale
-	set timezone [dict get $::config timezone]
-	set lang [dict get $::config lang]
-	set index [lsearch $metar_locales [lindex [split $lang "_"] 0]]
-	if {$index < 0} {
-		set locale C
-	} else {
-		set locale [lindex $metar_locales $index]
-	}
-
 	dict set ::messagedict metar_toggle {action metar::toggle_popup arg 0}
 	dict set ::messagedict metar_update {action metar::update arg 0}
 
@@ -485,7 +475,10 @@ proc zstatus::metar::setup {bar widget} {
 	bind $metarwidget <Enter> { zstatus::metar::show_tooltip }
 	bind $metarwidget <Leave> { zstatus::metar::hide_tooltip }
 
+	variable timezone
+	variable locale
 	variable fetch_time
+
 	set fetch_time 0
 	tsv::set metar last_fetch 0
 	tsv::set metar unicode [array get ::unicode]

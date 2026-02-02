@@ -3,13 +3,7 @@ package require zstatus::system::freebsd
 namespace eval zstatus::system {
 	namespace export set_loadavg set_memused set_mixer mixer_cmd
 
-	variable locale C
-	set syslocales {C fr}
-	set lang [dict get $::config lang]
-	set index [lsearch $syslocales [lindex [split $lang "_"] 0]]
-	if {$index >= 0} {
-		set locale [lindex $syslocales $index]
-	}
+	variable locale [dict get $::config locale]
 
 	set sysdict [dict create\
 		memstats {C "Memory" fr "Mémoire"}\
