@@ -18,7 +18,7 @@ namespace eval zstatus::zwm {
 	variable desklist "+?"
 	variable desklayout "?"
 	variable wintext ""
-	variable winmaxlen [dict get $::widgetdict wintitle maxlength]
+	variable textmaxlen [dict get $::widgetdict wintitle maxlength]
 	variable theme_defined 0
 
 	namespace export set_wintitle unset_wintitle set_desklist set_deskname\
@@ -74,10 +74,10 @@ proc zstatus::zwm::set_theme {theme} {
 
 proc zstatus::zwm::set_wintitle {value} {
 	variable wintext
-	variable winmaxlen
+	variable textmaxlen
 
 	set wintext $value
-	set length [tcl::mathfunc::min [string length $wintext] $winmaxlen]
+	set length [tcl::mathfunc::min [string length $wintext] $textmaxlen]
 	variable wintitle
 	$wintitle configure -state normal
 	$wintitle delete 1.0 end
@@ -139,7 +139,7 @@ proc zstatus::zwm::set_clientlist {value} {
 		regexp {^id=([0-9]+)\|res=(.+)\|desk=([0-9]+)\|name=(.+)$} $w\
 			-> id res desk name
 		if {$desk == 0} { set desk s}
-		set name [string range $name 0 227]
+		regsub -all {[\U1f000-\U1faff]+} $name { } name
 		set client [dict create id $id res $res desk $desk name $name]
 		lappend clientlist $client
 	}
