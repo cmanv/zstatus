@@ -79,12 +79,14 @@ proc zstatus::zwm::set_wintitle {value} {
 	variable active_title
 	variable textmaxlen
 
-	regexp {^id=([0-9]+)\|desk=([0-9]+)\|name=(.+)$} $value -> id desk name
+	regexp {^id=([0-9]+)\|desk=([0-9]+)\|name=(.*)$} $value -> id desk name
 
 	set active_client $id
 	set active_desk $desk
 	set active_title $name
-	set length [tcl::mathfunc::min [string length $active_title] $textmaxlen]
+
+	set length [tcl::mathfunc::min [string length $name] $textmaxlen]
+	incr length
 	variable wintitle
 	$wintitle configure -state normal
 	$wintitle delete 1.0 end
@@ -115,7 +117,6 @@ proc zstatus::zwm::unset_wintitle {} {
 
 proc zstatus::zwm::clientmenu {} {
 	variable labeldict
-	variable active_client
 	variable clientlist
 	variable fgmenu
 	variable bgmenu
@@ -135,9 +136,15 @@ proc zstatus::zwm::clientmenu {} {
 	$menu add command -state disabled -background $bgmenu2\
 		-label [dict get $labeldict clientmenu $locale]
 
+	variable active_client
+	variable active_desk
 	foreach client $clientlist {
-		set mark "  "
-		if {$active_client == [dict get $client id]} { set mark "+" }
+		set mark "_"
+		if {$active_client == [dict get $client id]} {
+			set mark "*"
+		} elseif {$active_desk == [dict get $client desk]} {
+			set mark "+"
+		}
 		set entry "\[[dict get $client desk]\] $mark [dict get $client name]"
 		set id [dict get $client id]
 		$menu add command -label $entry\
