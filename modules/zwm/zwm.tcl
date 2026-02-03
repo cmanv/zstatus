@@ -17,7 +17,8 @@ namespace eval zstatus::zwm {
 	variable clientlist {}
 	variable desklist "+?"
 	variable desklayout "?"
-	variable wintext ""
+	variable active_title ""
+	variable active_desk "?"
 	variable textmaxlen [dict get $::widgetdict wintitle maxlength]
 	variable theme_defined 0
 
@@ -73,16 +74,22 @@ proc zstatus::zwm::set_theme {theme} {
 }
 
 proc zstatus::zwm::set_wintitle {value} {
-	variable wintext
+	variable active_client
+	variable active_desk
+	variable active_title
 	variable textmaxlen
 
-	set wintext $value
-	set length [tcl::mathfunc::min [string length $wintext] $textmaxlen]
+	regexp {^id=([0-9]+)\|desk=([0-9]+)\|name=(.+)$} $value -> id desk name
+
+	set active_client $id
+	set active_desk $desk
+	set active_title $name
+	set length [tcl::mathfunc::min [string length $active_title] $textmaxlen]
 	variable wintitle
 	$wintitle configure -state normal
 	$wintitle delete 1.0 end
 	$wintitle configure -width $length
-	$wintitle insert 1.0 $wintext
+	$wintitle insert 1.0 $active_title
 
 	variable emojis
 	if {$emojis} {
@@ -94,8 +101,13 @@ proc zstatus::zwm::set_wintitle {value} {
 	$wintitle configure -state disabled
 }
 
-proc zstatus::zwm::unset_wintitle {value} {
+proc zstatus::zwm::unset_wintitle {} {
+	variable active_client
+	variable active_title
 	variable wintitle
+
+	set active_client 0
+	set active_title ""
 	$wintitle configure -state normal
 	$wintitle delete 1.0 end
 	$wintitle configure -state disabled
@@ -103,6 +115,7 @@ proc zstatus::zwm::unset_wintitle {value} {
 
 proc zstatus::zwm::clientmenu {} {
 	variable labeldict
+	variable active_client
 	variable clientlist
 	variable fgmenu
 	variable bgmenu
@@ -123,7 +136,9 @@ proc zstatus::zwm::clientmenu {} {
 		-label [dict get $labeldict clientmenu $locale]
 
 	foreach client $clientlist {
-		set entry "\[[dict get $client desk]\]  [dict get $client name]"
+		set mark "  "
+		if {$active_client == [dict get $client id]} { set mark "+" }
+		set entry "\[[dict get $client desk]\] $mark [dict get $client name]"
 		set id [dict get $client id]
 		$menu add command -label $entry\
 			-command "zstatus::zwm::send_message activate-client=$id"
@@ -153,35 +168,25 @@ proc zstatus::zwm::set_desklist {value} {
 
 	destroy $desklistframe
 	pack [frame $desklistframe]
-	set desklist $value
-	foreach name [split $value "|"] {
-		if {![string length $name]} {
-			continue
-		}
-		set active 0
-		set first [string index $name 0]
+	foreach d [split $value "\n"] {
+		regexp {^desk=([0-9]+)\|state=([a-z]+)$} $d -> desk state
+		set name $desk
 		set font normal
-		if {$first == "+"} {
-			set num [string range $name 1 end]
-			set name $num
+		if {$state == "active"} {
 			set font bold
-			set active 1
-		} elseif {$first == "!"} {
-			set num [string range $name 1 end]
-			set font italic
-		} else {
-			set num $name
+		} elseif {$state == "urgent"} {
+			set name "$desk!"
 		}
 
-		set slave $desklistframe.$num
+		set slave $desklistframe.$desk
 		pack [label $slave -font $font -text $name] -padx 0 -ipadx 4 -side left
 
-		if {$active} {
+		if {$state == "active"} {
 			set activeslave $slave
 			continue
 		}
 
-		bind $slave <1> "zstatus::zwm::send_message desktop-switch-$num"
+		bind $slave <1> "zstatus::zwm::send_message desktop-switch-$desk"
 	}
 
 	variable theme_defined
@@ -220,12 +225,11 @@ proc zstatus::zwm::set_deskname {value} {
 proc zstatus::zwm::setup {bar item} {
 	switch $item {
 	wintitle {
-		dict set ::messagedict window_active\
+		dict set ::messagedict active_client\
 				{action zwm::set_wintitle arg 1}
-		dict set ::messagedict no_window_active\
-				{action zwm::unset_wintitle arg 1}
+		dict set ::messagedict no_active_client\
+				{action zwm::unset_wintitle arg 0}
 		variable wintitle
-		variable wintext
 		set wintitle [text $bar.$item\
 			-font [dict get $::widgetdict wintitle font]\
 			-height 1 -borderwidth 0\
@@ -237,7 +241,6 @@ proc zstatus::zwm::setup {bar item} {
 			set emojis 1
 			$wintitle tag configure emoji -font emoji
 		}
-		set_wintitle $wintext
 	}
 	desklayout {
 		dict set ::messagedict desklayout {action zwm::set_desklayout arg 1}
@@ -258,7 +261,6 @@ proc zstatus::zwm::setup {bar item} {
 		set desklistframe [frame $desklistbar.frame]
 		pack $desklistbar
 		pack $desklistframe
-		set_desklist $desklist
 	}
 	deskname {
 		dict set ::messagedict deskname {action zwm::set_deskname arg 1}
