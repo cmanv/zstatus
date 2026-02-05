@@ -158,7 +158,7 @@ proc zstatus::zwm::set_clientlist {value} {
 	variable clientlist
 	set clientlist {}
 	foreach w [split $value "\n"] {
-		regexp {^id=([0-9]+)\|res=(.+)\|desk=([0-9]+)\|name=(.+)$} $w\
+		regexp {^id=([0-9]+)\|res=(.+)\|desk=([0-9]+)\|name=(.*)$} $w\
 			-> id res desk name
 		if {$desk == 0} { set desk s}
 		regsub -all {[\U1f000-\U1faff]+} $name { } name
