@@ -8,7 +8,7 @@ namespace eval zstatus::zwm {
 	variable locale [dict get $::config locale]
 
 	dict set ::messagedict clientlist {action zwm::set_clientlist arg 1}
-	dict set ::messagedict clientmenu {action zwm::clientmenu arg 0}
+	dict set ::messagedict client_menu {action zwm::client_menu arg 0}
 	dict set labeldict clientmenu { C "X11 Clients" fr "Clients X11"}
 
 	variable screen [lindex [split [winfo screen .] "."] 1]
@@ -115,7 +115,7 @@ proc zstatus::zwm::unset_wintitle {} {
 	$wintitle configure -state disabled
 }
 
-proc zstatus::zwm::clientmenu {} {
+proc zstatus::zwm::client_menu {} {
 	variable labeldict
 	variable clientlist
 	variable fgmenu
