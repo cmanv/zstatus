@@ -150,8 +150,7 @@ proc zstatus::zwm::clientmenu {} {
 		$menu add command -label $entry\
 			-command "zstatus::zwm::send_message activate-client=$id"
 	}
-
-	$menu post [winfo pointerx $menu] [winfo pointery $menu]
+	$menu post {*}[winfo pointerxy .] 1
 }
 
 proc zstatus::zwm::set_clientlist {value} {
@@ -161,7 +160,7 @@ proc zstatus::zwm::set_clientlist {value} {
 		regexp {^id=([0-9]+)\|res=(.+)\|desk=([0-9]+)\|name=(.*)$} $w\
 			-> id res desk name
 		if {$desk == 0} { set desk s}
-		regsub -all {[\U1f000-\U1faff]+} $name { } name
+		regsub -all {[\u2700-\u27bf\U1f000-\U1faff]+} $name {*} name
 		set client [dict create id $id res $res desk $desk name $name]
 		lappend clientlist $client
 	}

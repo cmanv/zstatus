@@ -1,6 +1,7 @@
 #!/usr/bin/env wish9.0
 package require cmdline
 package require fileutil
+package require json
 package require unix_sockets
 package require zstatus::config
 package require zstatus::remixicon
@@ -10,7 +11,13 @@ set messagedict [dict create\
 		action reload_config arg 0
 	} set_theme {
 		action set_theme arg 1
+	} launcher_menu {
+		action launcher_menu arg 0
 	}]
+
+proc char_count {str chr} {
+    expr {[string length $str]-[string length [string map "$chr {}" $str]]}
+};
 
 proc every {ms cmd} {
 	after $ms [namespace code [info level 0]]
@@ -19,7 +26,9 @@ proc every {ms cmd} {
 
 namespace eval zstatus {
 	variable theme	none
-	variable modlist	{}
+	variable modlist {}
+	variable menudef {}
+	variable rootmenu ""
 }
 
 proc zstatus::load_module {module} {
@@ -77,14 +86,23 @@ proc zstatus::set_datetime {} {
 
 proc zstatus::set_theme {newtheme} {
 	variable theme
+
 	set theme $newtheme
 	if {$theme != "light" && $theme != "dark"} {
 		set theme "light"
 	}
 
+	variable fgmenu
+	variable bgmenu
+	variable fgmenu2
+	variable bgmenu2
+	set fgmenu [dict get $::color fg $theme]
+	set bgmenu [dict get $::color bg $theme]
+	set fgmenu2 [dict get $::color fg2 $theme]
+	set bgmenu2 [dict get $::color bg2 $theme]
+
 	variable bar
 	variable widgetlist
-
 	set count 0
 	$bar configure -background [dict get $::color bg $theme]
 	foreach item $widgetlist {
@@ -114,6 +132,78 @@ proc zstatus::set_theme {newtheme} {
 				[dict get $::widgetdict $item settheme] $theme
 			}
 		}}
+	}
+}
+
+proc zstatus::setup_menu {} {
+	set menufile [dict get $::config menudef]
+	if ![file exists $menufile] {
+		return
+	}
+	variable menudef
+	set content [fileutil::cat $menufile]
+	if [catch {dict set menudef {*}[json::json2dict $content]}] {
+		puts "Invalid JSON format in \[$menufile\]"
+		return
+	}
+
+	variable rootmenu
+	if [string length $rootmenu] {
+		destroy $rootmenu
+		set rootmenu ""
+	}
+
+	variable fgmenu
+	variable bgmenu
+	variable fgmenu2
+	variable bgmenu2
+
+	set menulist [dict get $menudef menulist]
+	foreach menudict $menulist {
+		set path [dict get $menudict path]
+		if {[char_count $path .] == 1} {
+			set rootmenu $path
+		}
+
+		set label [dict get $menudict label]
+		set menu [menu $path -title $label -font large\
+			-relief flat -activerelief solid\
+			-foreground $fgmenu -background $bgmenu\
+			-activebackground $bgmenu2 -activeforeground $fgmenu2\
+			-disabledforeground $fgmenu]
+
+		$menu add command -label $label -state disabled\
+			 -background $bgmenu2
+
+		set itemlist [dict get $menudict entries]
+		foreach itemdict $itemlist {
+			set type ""
+			set icon ""
+			set label [dict get $itemdict label]
+			if [dict exists $itemdict cascade] {
+				set type cascade
+				set cascade [dict get $itemdict cascade]
+			}
+			if [dict exists $itemdict command] {
+				set type command
+				set command [dict get $itemdict command]
+			}
+			if [dict exists $itemdict icon] {
+				#set icon "-icon [dict get $itemdict icon]"
+			}
+			if {$type == "command"} {
+				$menu add $type -label $label -command $command
+			} elseif {$type == "cascade"} {
+				$menu add $type -label $label -menu $cascade
+			}
+		}
+	}
+}
+
+proc zstatus::launcher_menu {} {
+	variable rootmenu
+	if [string length $rootmenu] {
+		$rootmenu post {*}[winfo pointerxy .]
 	}
 }
 
@@ -311,6 +401,7 @@ proc zstatus::setup {} {
 	set locale [dict get $::config locale]
 	set osversion [exec uname -rs]
 	set_theme $theme
+	setup_menu
 }
 
 # Treat command line options

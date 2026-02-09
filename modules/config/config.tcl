@@ -93,6 +93,7 @@ namespace eval zstatus::config {
 	}
 
 	variable defaultfile "$config_prefix/zstatus/config"
+	variable menudef "$config_prefix/zstatus/menudef.json"
 
 	if [info exists ::env(XDG_CACHE_HOME)] {
 		set cache_prefix $::env(XDG_CACHE_HOME)
@@ -105,9 +106,9 @@ namespace eval zstatus::config {
 		delay		2000\
 		fontname	"Dejavu Sans"\
 		fontsize	11\
+		menudef		$menudef\
 		position	top\
-		bg		[dict get $color bg]\
-		cache_prefix	"$cache_prefix"]
+		cache_prefix	$cache_prefix]
 
 	if [info exists ::env(LANG)] {
 		set lang $::env(LANG)
