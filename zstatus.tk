@@ -144,9 +144,10 @@ proc zstatus::setup_menu {} {
 	set content [fileutil::cat $menufile]
 	if [catch {dict set menudef {*}[json::json2dict $content]}] {
 		puts "Invalid JSON format in \[$menufile\]"
-		return
 	}
+}
 
+proc zstatus::launcher_menu {} {
 	variable rootmenu
 	if [string length $rootmenu] {
 		destroy $rootmenu
@@ -158,6 +159,7 @@ proc zstatus::setup_menu {} {
 	variable fgmenu2
 	variable bgmenu2
 
+	variable menudef
 	set menulist [dict get $menudef menulist]
 	foreach menudict $menulist {
 		set path [dict get $menudict path]
@@ -198,10 +200,6 @@ proc zstatus::setup_menu {} {
 			}
 		}
 	}
-}
-
-proc zstatus::launcher_menu {} {
-	variable rootmenu
 	if [string length $rootmenu] {
 		$rootmenu post {*}[winfo pointerxy .]
 	}
