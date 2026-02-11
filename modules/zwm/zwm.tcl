@@ -231,9 +231,9 @@ proc zstatus::zwm::set_deskname {value} {
 proc zstatus::zwm::setup {bar item} {
 	switch $item {
 	wintitle {
-		dict set ::messagedict active_client\
+		dict set ::messagedict active_window\
 				{action zwm::set_wintitle arg 1}
-		dict set ::messagedict no_active_client\
+		dict set ::messagedict no_active_window\
 				{action zwm::unset_wintitle arg 0}
 		variable wintitle
 		set wintitle [text $bar.$item\
