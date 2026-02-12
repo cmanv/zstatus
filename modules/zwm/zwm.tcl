@@ -116,6 +116,11 @@ proc zstatus::zwm::unset_wintitle {} {
 }
 
 proc zstatus::zwm::client_menu {} {
+	set menu [gen_client_menu .x11clients]
+	$menu post {*}[winfo pointerxy .] 1
+}
+
+proc zstatus::zwm::gen_client_menu { path } {
 	variable labeldict
 	variable clientlist
 	variable fgmenu
@@ -123,13 +128,14 @@ proc zstatus::zwm::client_menu {} {
 	variable fgmenu2
 	variable bgmenu2
 
-	if [winfo exists .clientmenu] {
-		destroy .clientmenu
+	if [winfo exists $path] {
+		destroy $path
 	}
 
-	set menu [menu .clientmenu -font large -relief flat -activerelief solid\
+	set menu [menu $path -font large\
+			-relief flat -activerelief solid\
 			-foreground $fgmenu -background $bgmenu\
-			-activebackground $bgmenu2 -activeforeground $fgmenu2\
+			-activeforeground $fgmenu2 -activebackground $bgmenu2\
 			-disabledforeground $fgmenu]
 
 	variable locale
@@ -150,7 +156,7 @@ proc zstatus::zwm::client_menu {} {
 		$menu add command -label $entry\
 			-command "zstatus::zwm::send_message activate-client=$id"
 	}
-	$menu post {*}[winfo pointerxy .] 1
+	return $menu
 }
 
 proc zstatus::zwm::set_clientlist {value} {

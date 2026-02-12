@@ -185,18 +185,19 @@ proc zstatus::launcher_menu {} {
 			if [dict exists $itemdict cascade] {
 				set type cascade
 				set cascade [dict get $itemdict cascade]
+				set leaf [lindex [split $cascade .] end]
+				if {$leaf == "x11clients"} {
+					zstatus::zwm::gen_client_menu $cascade
+				}
 			}
 			if [dict exists $itemdict command] {
 				set type command
 				set command "[dict get $itemdict command] &"
 			}
-			if [dict exists $itemdict icon] {
-				#set icon "-icon [dict get $itemdict icon]"
-			}
 			if {$type == "command"} {
-				$menu add $type -label $label -command $command
+				$menu add $type -label " $label" -command $command
 			} elseif {$type == "cascade"} {
-				$menu add $type -label $label -menu $cascade
+				$menu add $type -label " $label" -menu $cascade
 			}
 		}
 	}
