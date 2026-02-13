@@ -132,18 +132,20 @@ proc zstatus::set_theme {newtheme} {
 }
 
 proc zstatus::startmenu {value} {
-	if {$value == "launchers"} {
+	switch $value {
+	launchers {
 		variable menudef
 		if [dict exist $menudef menulist] {
-			zstatus::launcher_menu
+			launcher_menu
 		}
-	} elseif {$value == "windows"} {
+	}
+	windows {
 		variable modlist
 		set index [lsearch $modlist zwm]
 		if {$index >= 0} {
 			zstatus::zwm::client_menu
 		}
-	}
+	}}
 }
 
 proc zstatus::load_menu {} {

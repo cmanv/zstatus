@@ -440,11 +440,17 @@ proc zstatus::metar::setup_grid { grid } {
 }
 
 proc zstatus::metar::command {command} {
-	if {$command == "update"} {
-		metar::update
-	} elseif {$command == "toggle"} {
-		metar::toggle_popup
+	switch $command {
+	update {
+		variable metar_thread
+		if [string length $metar_thread] {
+			thread::send -async $metar_thread\
+				zstatus::metar::thread::get_metar_report
+		}
 	}
+	toggle {
+		toggle_popup
+	}}
 }
 
 proc zstatus::metar::setup {bar widget} {
