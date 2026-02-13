@@ -2,7 +2,7 @@
 package require unix_sockets
 package require zstatus::config
 
-set action [split [lindex $::argv 0] =]
+set action [split [lindex $::argv 0] :]
 if {[llength $action] == 1} {
 	set key [lindex $action 0]
 	set value ""

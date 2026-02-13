@@ -7,8 +7,7 @@ namespace eval zstatus::zwm {
 
 	variable locale [dict get $::config locale]
 
-	dict set ::messagedict clientlist {action zwm::set_clientlist arg 1}
-	dict set ::messagedict client_menu {action zwm::client_menu arg 0}
+	dict set ::messagedict clientlist zwm::set_clientlist
 	dict set labeldict clientmenu { C "X11 Clients" fr "Clients X11"}
 
 	variable screen [lindex [split [winfo screen .] "."] 1]
@@ -96,7 +95,7 @@ proc zstatus::zwm::set_wintitle {value} {
 	$wintitle configure -state disabled
 }
 
-proc zstatus::zwm::unset_wintitle {} {
+proc zstatus::zwm::unset_wintitle {dummy} {
 	variable active_client
 	variable wintitle
 
@@ -234,10 +233,8 @@ proc zstatus::zwm::set_deskname {value} {
 proc zstatus::zwm::setup {bar item} {
 	switch $item {
 	wintitle {
-		dict set ::messagedict active_window\
-				{action zwm::set_wintitle arg 1}
-		dict set ::messagedict no_active_window\
-				{action zwm::unset_wintitle arg 0}
+		dict set ::messagedict active_window zwm::set_wintitle
+		dict set ::messagedict no_active_window zwm::unset_wintitle
 		variable wintitle
 		set wintitle [text $bar.$item\
 			-font [dict get $::widgetdict wintitle font]\
@@ -252,7 +249,7 @@ proc zstatus::zwm::setup {bar item} {
 		}
 	}
 	desklayout {
-		dict set ::messagedict desklayout {action zwm::set_desklayout arg 1}
+		dict set ::messagedict desklayout zwm::set_desklayout
 		bind $bar.desklayout <MouseWheel> {
 			if {%D < 0} {
 				zstatus::zwm::send_message "desktop-layout-next"
@@ -262,7 +259,7 @@ proc zstatus::zwm::setup {bar item} {
 		}
 	}
 	desklist {
-		dict set ::messagedict desklist {action zwm::set_desklist arg 1}
+		dict set ::messagedict desklist zwm::set_desklist
 		variable desklist
 		variable desklistbar
 		variable desklistframe
@@ -272,7 +269,7 @@ proc zstatus::zwm::setup {bar item} {
 		pack $desklistframe
 	}
 	deskname {
-		dict set ::messagedict deskname {action zwm::set_deskname arg 1}
+		dict set ::messagedict deskname zwm::set_deskname
 	}}
 }
 package provide @PACKAGE_NAME@ @PACKAGE_VERSION@

@@ -413,7 +413,7 @@ proc zstatus::system::setup {bar item} {
 			}
 			zstatus::system::set_mixer
 		}
-		dict set ::messagedict volume {action system::mixer_cmd arg 1}
+		dict set ::messagedict volume system::mixer_cmd
 	}
 	netstat {
 		set barwidget $bar

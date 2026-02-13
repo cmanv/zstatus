@@ -91,7 +91,7 @@ proc zstatus::music::setup { bar position side } {
 	label $musicframe -font $musicfont
 	frame $musicsep -width 1
 
-	dict set ::messagedict music {action music::command arg 1}
+	dict set ::messagedict music music::command
 	bind $musicframe <Enter> { zstatus::music::show_tooltip }
 	bind $musicframe <Leave> { zstatus::music::hide_tooltip }
 	bind $musicframe <1> {

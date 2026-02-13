@@ -7,13 +7,9 @@ package require zstatus::config
 package require zstatus::remixicon
 
 set messagedict [dict create\
-	reload_config {
-		action reload_config arg 0
-	} set_theme {
-		action set_theme arg 1
-	} launcher_menu {
-		action launcher_menu arg 0
-	}]
+	reload zstatus::reload_config\
+	theme zstatus::set_theme\
+	menu zstatus::startmenu ]
 
 proc char_count {str chr} {
     expr {[string length $str]-[string length [string map "$chr {}" $str]]}
@@ -135,7 +131,22 @@ proc zstatus::set_theme {newtheme} {
 	}
 }
 
-proc zstatus::setup_menu {} {
+proc zstatus::startmenu {value} {
+	if {$value == "launchers"} {
+		variable menudef
+		if [dict exist $menudef menulist] {
+			zstatus::launcher_menu
+		}
+	} elseif {$value == "windows"} {
+		variable modlist
+		set index [lsearch $modlist zwm]
+		if {$index >= 0} {
+			zstatus::zwm::client_menu
+		}
+	}
+}
+
+proc zstatus::load_menu {} {
 	set menufile [dict get $::config menudef]
 	if ![file exists $menufile] {
 		return
@@ -187,6 +198,9 @@ proc zstatus::launcher_menu {} {
 				set cascade [dict get $itemdict cascade]
 				set leaf [lindex [split $cascade .] end]
 				if {$leaf == "x11clients"} {
+					variable modlist
+					set index [lsearch $modlist zwm]
+					if {$index < 0} { continue }
 					zstatus::zwm::gen_client_menu $cascade
 				}
 			}
@@ -214,15 +228,8 @@ proc zstatus::read_message {channel} {
 		return
 	}
 	set key [lindex $keyval 0]
-	if ![dict exists $::messagedict $key] {
-		return
-	}
-	set action [dict get $::messagedict $key action]
-	set arg [dict get $::messagedict $key arg]
-	if {$arg == 1} {
-		$action [lindex $keyval 1]
-	} else {
-		$action
+	if [dict exists $::messagedict $key] {
+		[dict get $::messagedict $key] [lindex $keyval 1]
 	}
 }
 
@@ -354,7 +361,7 @@ proc zstatus::make_font {} {
 	return [expr $ascent + $descent]
 }
 
-proc zstatus::reload_config {} {
+proc zstatus::reload_config {dummy} {
 	variable bar
 	destroy $bar
 	config::read $::params(config)
@@ -395,7 +402,7 @@ proc zstatus::setup {} {
 	set locale [dict get $::config locale]
 	set osversion [exec uname -rs]
 	set_theme $theme
-	setup_menu
+	load_menu
 }
 
 # Treat command line options

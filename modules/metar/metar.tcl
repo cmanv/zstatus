@@ -439,6 +439,14 @@ proc zstatus::metar::setup_grid { grid } {
 	grid configure $grid.precips_val -row $row -column 1 -sticky w
 }
 
+proc zstatus::metar::command {command} {
+	if {$command == "update"} {
+		metar::update
+	} elseif {$command == "toggle"} {
+		metar::toggle_popup
+	}
+}
+
 proc zstatus::metar::setup {bar widget} {
 	if ![dict exists $::widgetdict metar station] {
 		variable report
@@ -468,8 +476,7 @@ proc zstatus::metar::setup {bar widget} {
 
 	set metarfont [dict get $::widgetdict metar font]
 
-	dict set ::messagedict metar_toggle {action metar::toggle_popup arg 0}
-	dict set ::messagedict metar_update {action metar::update arg 0}
+	dict set ::messagedict metar metar::command
 
 	bind $metarwidget <1> { zstatus::metar::toggle_popup }
 	bind $metarwidget <Enter> { zstatus::metar::show_tooltip }
