@@ -210,22 +210,17 @@ proc zstatus::read_message {channel} {
 	set message [chan read $channel 4096]
 	chan close $channel
 
-	set message [string trimright $message "\n"]
-	set equal [string first "=" $message]
-	if {$equal == -1} {
-		set key $message
-		set value ""
-	} elseif {$equal > 0} {
-		set key [string range $message 0 $equal-1]
-		set value [string range $message $equal+1 end]
-	} else {
+	if [catch {dict set keyval {*}[json::json2dict $message]}] {
 		return
 	}
-	if { ![dict exists $::messagedict $key] } { return }
+	set key [lindex $keyval 0]
+	if ![dict exists $::messagedict $key] {
+		return
+	}
 	set action [dict get $::messagedict $key action]
 	set arg [dict get $::messagedict $key arg]
 	if {$arg == 1} {
-		$action $value
+		$action [lindex $keyval 1]
 	} else {
 		$action
 	}

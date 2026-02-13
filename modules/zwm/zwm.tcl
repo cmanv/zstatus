@@ -15,10 +15,9 @@ namespace eval zstatus::zwm {
 	variable zwmsocket "[dict get $::config cache_prefix]/zwm/socket"
 
 	variable clientlist {}
-	variable desklist "+?"
+	variable desklist {}
 	variable desklayout "?"
-	variable active_title ""
-	variable active_desk "?"
+	variable active_client [dict create window 0 desk ? name "" ]
 	variable textmaxlen [dict get $::widgetdict wintitle maxlength]
 	variable theme_defined 0
 
@@ -75,23 +74,17 @@ proc zstatus::zwm::set_theme {theme} {
 
 proc zstatus::zwm::set_wintitle {value} {
 	variable active_client
-	variable active_desk
-	variable active_title
 	variable textmaxlen
 
-	regexp {^id=([0-9]+)\|desk=([0-9]+)\|name=(.*)$} $value -> id desk name
-
-	set active_client $id
-	set active_desk $desk
-	set active_title $name
-
+	set active_client $value
+	set name [dict get $active_client name]
 	set length [tcl::mathfunc::min [string length $name] $textmaxlen]
 	incr length
 	variable wintitle
 	$wintitle configure -state normal
 	$wintitle delete 1.0 end
 	$wintitle configure -width $length
-	$wintitle insert 1.0 $active_title
+	$wintitle insert 1.0 $name
 
 	variable emojis
 	if {$emojis} {
@@ -105,11 +98,10 @@ proc zstatus::zwm::set_wintitle {value} {
 
 proc zstatus::zwm::unset_wintitle {} {
 	variable active_client
-	variable active_title
 	variable wintitle
 
-	set active_client 0
-	set active_title ""
+	dict set active_client window 0
+	dict set active_client name ""
 	$wintitle configure -state normal
 	$wintitle delete 1.0 end
 	$wintitle configure -state disabled
@@ -143,36 +135,38 @@ proc zstatus::zwm::gen_client_menu { path } {
 		-label [dict get $labeldict clientmenu $locale]
 
 	variable active_client
-	variable active_desk
+	set active_window [dict get $active_client window]
+	set active_desknum [dict get $active_client desknum]
 	foreach client $clientlist {
 		set mark "_"
-		if {$active_client == [dict get $client id]} {
+		set window [dict get $client window]
+		set desknum [dict get $client desknum]
+		if {$active_window == $window} {
 			set mark "*"
-		} elseif {$active_desk == [dict get $client desk]} {
+		} elseif {$active_desknum == $desknum} {
 			set mark "+"
 		}
-		set entry "\[[dict get $client desk]\] $mark [dict get $client name]"
-		set id [dict get $client id]
+		set entry "\[$desknum\] $mark [dict get $client name]"
 		$menu add command -label $entry\
-			-command "zstatus::zwm::send_message activate-client=$id"
+			-command "zstatus::zwm::send_message activate-client=$window"
 	}
 	return $menu
 }
 
-proc zstatus::zwm::set_clientlist {value} {
+proc zstatus::zwm::set_clientlist {values} {
 	variable clientlist
-	set clientlist {}
-	foreach w [split $value "\n"] {
-		regexp {^id=([0-9]+)\|res=(.+)\|desk=([0-9]+)\|name=(.*)$} $w\
-			-> id res desk name
-		if {$desk == 0} { set desk s}
+	set clientlist $values
+	foreach client $clientlist {
+		if {[dict get $client desknum] == 0} {
+			dict set client desknum s
+		}
+		set name [dict get $client name]
 		regsub -all {[\u2700-\u27bf\U1f000-\U1faff]+} $name {*} name
-		set client [dict create id $id res $res desk $desk name $name]
-		lappend clientlist $client
+		dict set client name $name
 	}
 }
 
-proc zstatus::zwm::set_desklist {value} {
+proc zstatus::zwm::set_desklist {values} {
 	variable desklist
 	variable desklistbar
 	variable desklistframe
@@ -180,25 +174,28 @@ proc zstatus::zwm::set_desklist {value} {
 
 	destroy $desklistframe
 	pack [frame $desklistframe]
-	foreach d [split $value "\n"] {
-		regexp {^desk=([0-9]+)\|state=([a-z]+)$} $d -> desk state
-		set name $desk
+	set desklist $values
+	foreach desk $desklist {
+		set desknum [dict get $desk desknum]
+		set state [dict get $desk state]
+
+		set label $desknum
 		set font normal
 		if {$state == "active"} {
 			set font bold
 		} elseif {$state == "urgent"} {
-			set name "$desk!"
+			set label "$desknum!"
 		}
 
 		set slave $desklistframe.$desk
-		pack [label $slave -font $font -text $name] -padx 0 -ipadx 4 -side left
+		pack [label $slave -font $font -text $label] -padx 0 -ipadx 4 -side left
 
 		if {$state == "active"} {
 			set activeslave $slave
 			continue
 		}
 
-		bind $slave <1> "zstatus::zwm::send_message desktop-switch-$desk"
+		bind $slave <1> "zstatus::zwm::send_message desktop-switch-$desknum"
 	}
 
 	variable theme_defined
