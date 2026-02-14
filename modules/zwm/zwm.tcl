@@ -272,4 +272,4 @@ proc zstatus::zwm::setup {bar item} {
 		dict set ::messagedict deskname zwm::set_deskname
 	}}
 }
-package provide @PACKAGE_NAME@ @PACKAGE_VERSION@
+package provide @PROJECT_NAME@ @PROJECT_VERSION@

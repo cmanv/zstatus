@@ -431,4 +431,4 @@ proc zstatus::system::setup {bar item} {
 		bind $bar.$item <1> "exec $command >/dev/null 2>@1 &"
 	}
 }
-package provide @PACKAGE_NAME@ @PACKAGE_VERSION@
+package provide @PROJECT_NAME@ @PROJECT_VERSION@

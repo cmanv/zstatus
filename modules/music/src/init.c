@@ -14,7 +14,7 @@ Mpd_Init(Tcl_Interp *interp)
 		return TCL_ERROR;
 	}
 
-	if (Tcl_PkgProvide(interp, LIBRARY_PROVIDE, PACKAGE_VERSION) != TCL_OK) {
+	if (Tcl_PkgProvide(interp, LIBRARY_PROVIDE, PROJECT_VERSION) != TCL_OK) {
 		return TCL_ERROR;
 	}
 

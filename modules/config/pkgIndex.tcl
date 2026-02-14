@@ -1,1 +1,1 @@
-package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ [list source [file join $dir config.tcl]]
+package ifneeded @PROJECT_NAME@ @PROJECT_VERSION@ [list source [file join $dir config.tcl]]

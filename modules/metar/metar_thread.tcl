@@ -706,4 +706,4 @@ proc zstatus::metar::thread::get_metar_report {} {
 	make_report $locale $timezone
 }
 
-package provide @PACKAGE_NAME@::thread @PACKAGE_VERSION@
+package provide @PROJECT_NAME@::thread @PROJECT_VERSION@

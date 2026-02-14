@@ -95,4 +95,4 @@ proc zstatus::devices::setup { base position side } {
 		set searchlist [split $value]
 	}
 }
-package provide @PACKAGE_NAME@ @PACKAGE_VERSION@
+package provide @PROJECT_NAME@ @PROJECT_VERSION@

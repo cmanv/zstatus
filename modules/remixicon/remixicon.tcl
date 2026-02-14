@@ -54,4 +54,4 @@ proc zstatus::remixicon::get {} {
 	return $remixmap
 }
 
-package provide @PACKAGE_NAME@ @PACKAGE_VERSION@
+package provide @PROJECT_NAME@ @PROJECT_VERSION@

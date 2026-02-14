@@ -178,4 +178,4 @@ proc zstatus::music::update_tooltip { } {
 	$mpdtext configure -width $width -fg $fgcolor -bg $bgcolor
 }
 
-package provide @PACKAGE_NAME@ @PACKAGE_VERSION@
+package provide @PROJECT_NAME@ @PROJECT_VERSION@
