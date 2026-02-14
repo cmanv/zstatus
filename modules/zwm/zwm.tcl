@@ -16,7 +16,7 @@ namespace eval zstatus::zwm {
 	variable clientlist {}
 	variable desklist {}
 	variable desklayout "?"
-	variable active_client [dict create window 0 desk ? name "" ]
+	variable active_client [dict create window 0 desknum ? name ""]
 	variable textmaxlen [dict get $::widgetdict wintitle maxlength]
 	variable theme_defined 0
 

@@ -1,17 +1,12 @@
 cmake_minimum_required (VERSION 3.20)
 
-# Project identification
-project ("zstatus")
-set(PACKAGE_NAME "zstatus")
-set(PACKAGE_VERSION "alpha3")
-message (STATUS "*** Building ${PACKAGE_NAME} ${PACKAGE_VERSION} ***")
-
-# Tcl version
+project(zstatus VERSION 0.3)
 set(TCL_LIBRARY_VERSION "9.0")
 set(TCL_INCLUDE_PATH "/usr/local/include/tcl9.0")
-include(GNUInstallDirs)
+set(CMAKE_C_COMPILER "/usr/bin/cc")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Add modules
+include(GNUInstallDirs)
 add_subdirectory(modules/config)
 add_subdirectory(modules/devices)
 add_subdirectory(modules/mail)
@@ -21,16 +16,16 @@ add_subdirectory(modules/remixicon)
 add_subdirectory(modules/system)
 add_subdirectory(modules/zwm)
 
-# Substitute some variable names
 set(LIBDIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 set(LIBEXECDIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBEXECDIR})
-configure_file(${zstatus_SOURCE_DIR}/zstatus.tk ${zstatus_BINARY_DIR}/zstatus.tk @ONLY)
-configure_file(${zstatus_SOURCE_DIR}/zstatus-cmd ${zstatus_BINARY_DIR}/zstatus-cmd @ONLY)
-configure_file(${zstatus_SOURCE_DIR}/zstatus ${zstatus_BINARY_DIR}/zstatus @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/zstatus.tk ${CMAKE_BINARY_DIR}/zstatus.tk @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/zstatus-cmd ${CMAKE_BINARY_DIR}/zstatus-cmd @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/zstatus ${CMAKE_BINARY_DIR}/zstatus @ONLY)
 
-# Install files
-install(PROGRAMS ${zstatus_SOURCE_DIR}/zstatus-cmd.tcl DESTINATION ${CMAKE_INSTALL_LIBEXECDIR})
-install(PROGRAMS ${zstatus_BINARY_DIR}/zstatus.tk DESTINATION ${CMAKE_INSTALL_LIBEXECDIR})
-install(PROGRAMS ${zstatus_BINARY_DIR}/zstatus-cmd DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(PROGRAMS ${zstatus_BINARY_DIR}/zstatus DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(PROGRAMS ${CMAKE_SOURCE_DIR}/zstatus-cmd.tcl DESTINATION ${CMAKE_INSTALL_LIBEXECDIR})
+install(PROGRAMS ${CMAKE_BINARY_DIR}/zstatus.tk DESTINATION ${CMAKE_INSTALL_LIBEXECDIR})
+install(PROGRAMS ${CMAKE_BINARY_DIR}/zstatus-cmd DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(PROGRAMS ${CMAKE_BINARY_DIR}/zstatus DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES man/zstatus.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+
+message (STATUS "<<< ${PROJECT_NAME} version ${PROJECT_VERSION} is configured. >>>")
