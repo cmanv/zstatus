@@ -1,5 +1,4 @@
-project(zstatus::config VERSION 1.0)
-set(PKG_INDEX pkgIndex.tcl)
+project(zstatus::config VERSION ${PROJECT_VERSION})
 configure_file(${PROJECT_SOURCE_DIR}/${PKG_INDEX} ${PROJECT_BINARY_DIR}/${PKG_INDEX} @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/config.tcl ${PROJECT_BINARY_DIR}/config.tcl @ONLY)
 

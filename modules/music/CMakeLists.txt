@@ -1,4 +1,4 @@
-project(zstatus::music VERSION 1.0)
+project(zstatus::music VERSION ${PROJECT_VERSION})
 set(LIBRARY_PROVIDE "zstatus::music::mpd")
 
 include_directories(/usr/local/include/mpd ${TCL_INCLUDE_PATH})
@@ -9,7 +9,6 @@ add_library(${TARGET_LIB} SHARED)
 target_sources(${TARGET_LIB} PRIVATE src/init.c src/mpd.c)
 link_libraries(-L/usr/local/lib -lmpdclient)
 
-set(PKG_INDEX pkgIndex.tcl)
 configure_file(${PROJECT_SOURCE_DIR}/src/config.h.in ${PROJECT_BINARY_DIR}/src/config.h)
 configure_file(${PROJECT_SOURCE_DIR}/${PKG_INDEX} ${PROJECT_BINARY_DIR}/${PKG_INDEX} @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/music.tcl ${PROJECT_BINARY_DIR}/music.tcl @ONLY)
