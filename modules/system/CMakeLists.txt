@@ -1,7 +1,7 @@
 project(zstatus::system VERSION ${PROJECT_VERSION})
 set(LIBRARY_PROVIDE "zstatus::system::freebsd")
 
-include_directories(/usr/local/include ${TCL_INCLUDE_PATH})
+include_directories(${TCL_INCLUDE_PATH})
 include_directories(${PROJECT_BINARY_DIR}/src)
 
 set(TARGET_LIB freebsd${PROJECT_VERSION})

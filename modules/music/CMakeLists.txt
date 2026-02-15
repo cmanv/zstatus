@@ -1,13 +1,14 @@
 project(zstatus::music VERSION ${PROJECT_VERSION})
 set(LIBRARY_PROVIDE "zstatus::music::mpd")
 
-include_directories(/usr/local/include/mpd ${TCL_INCLUDE_PATH})
+include_directories(-I /usr/local/include)
+include_directories(${TCL_INCLUDE_PATH})
 include_directories(${PROJECT_BINARY_DIR}/src)
 
 set(TARGET_LIB mpd${PROJECT_VERSION})
 add_library(${TARGET_LIB} SHARED)
 target_sources(${TARGET_LIB} PRIVATE src/init.c src/mpd.c)
-link_libraries(-L/usr/local/lib -lmpdclient)
+link_libraries(-lmpdclient)
 
 configure_file(${PROJECT_SOURCE_DIR}/src/config.h.in ${PROJECT_BINARY_DIR}/src/config.h)
 configure_file(${PROJECT_SOURCE_DIR}/${PKG_INDEX} ${PROJECT_BINARY_DIR}/${PKG_INDEX} @ONLY)
