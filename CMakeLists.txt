@@ -17,6 +17,9 @@ add_subdirectory(modules/remixicon)
 add_subdirectory(modules/system)
 add_subdirectory(modules/zwm)
 
+set(LIBDIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+set(LIBEXECDIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBEXECDIR})
+
 configure_file(${PROJECT_SOURCE_DIR}/zstatus.tk ${PROJECT_BINARY_DIR}/zstatus.tk @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/zstatus-cmd ${PROJECT_BINARY_DIR}/zstatus-cmd @ONLY)
 configure_file(${PROJECT_SOURCE_DIR}/zstatus ${PROJECT_BINARY_DIR}/zstatus @ONLY)
