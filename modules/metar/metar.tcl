@@ -502,7 +502,7 @@ proc zstatus::metar::setup {bar widget} {
 
 	set delay [expr [dict get $::widgetdict metar delay] * 60000]
 	set metar_thread [thread::create "
-			package require zstatus::metar::thread
+			package require zstatus::metar::thread @PROJECT_VERSION@
 			every $delay zstatus::metar::thread::get_metar_report
 			thread::wait"]
 

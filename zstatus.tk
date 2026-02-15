@@ -3,8 +3,8 @@ package require cmdline
 package require fileutil
 package require json
 package require unix_sockets
-package require zstatus::config
-package require zstatus::remixicon
+package require zstatus::config @PROJECT_VERSION@
+package require zstatus::remixicon @PROJECT_VERSION@
 
 set messagedict [dict create\
 	reload zstatus::reload_config\
@@ -32,7 +32,7 @@ proc zstatus::load_module {module} {
 	set index [lsearch $modlist $module]
 	if {$index < 0} {
 		lappend modlist $module
-		package require zstatus::$module
+		package require zstatus::$module @PROJECT_VERSION@
 	}
 }
 
@@ -422,8 +422,8 @@ try {
 }
 
 # Setup tk app
-tk appname "@PACKAGE_NAME@"
-wm title . "@PACKAGE_NAME@ @PACKAGE_VERSION@"
+tk appname "@PROJECT_NAME@"
+wm title . "@PROJECT_NAME@ @PROJECT_VERSION@"
 wm attributes . -type dock
 
 # Unicode mapping from remixicon v4.6.0
