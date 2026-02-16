@@ -154,14 +154,15 @@ proc zstatus::zwm::gen_client_menu { path } {
 
 proc zstatus::zwm::set_clientlist {values} {
 	variable clientlist
-	set clientlist $values
-	foreach client $clientlist {
+	set clientlist {}
+	foreach client $values {
 		if {[dict get $client desknum] == 0} {
 			dict set client desknum s
 		}
 		set name [dict get $client name]
-		regsub -all {[\u2700-\u27bf\U1f000-\U1faff]+} $name {*} name
-		dict set client name $name
+		regsub -all {[\U1f000-\U1faff]+} $name {*} name
+		dict set client name [string range $name 0 127]
+		lappend clientlist $client
 	}
 }
 
