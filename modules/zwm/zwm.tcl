@@ -1,5 +1,5 @@
 namespace eval zstatus::zwm {
-	variable layouts [dict create\
+	variable layouticons [dict create\
 		Monocle	$::unicode(rectangle)\
 		VTiled	$::unicode(layout-column)\
 		HTiled	$::unicode(layout-row)\
@@ -217,13 +217,23 @@ proc zstatus::zwm::set_desklist {values} {
 }
 
 proc zstatus::zwm::set_desklayout {value} {
-	variable layouts
 	variable desklayout
-	if [dict exists $layouts $value] {
-		set desklayout [dict get $layouts $value]
-	} else {
-		set desklayout $value
+	variable layouticons
+	variable layouts
+
+	set layouts $value
+	foreach layout $layouts {
+		set name  [dict get $layout name]
+		if [dict get $layout active] {
+			if [dict exists $layouticons $name] {
+				set desklayout [dict get $layouticons $name]
+			} else {
+				set desklayout $name
+			}
+			break
+		}
 	}
+
 }
 
 proc zstatus::zwm::set_deskname {value} {
@@ -250,7 +260,7 @@ proc zstatus::zwm::setup {bar item} {
 		}
 	}
 	desklayout {
-		dict set ::messagedict desklayout zwm::set_desklayout
+		dict set ::messagedict layouts zwm::set_desklayout
 		bind $bar.desklayout <MouseWheel> {
 			if {%D < 0} {
 				zstatus::zwm::send_message "desktop-layout-next"
