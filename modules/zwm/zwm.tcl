@@ -1,9 +1,9 @@
 namespace eval zstatus::zwm {
 	variable layouticons [dict create\
-		Monocle	$::unicode(rectangle)\
-		VTiled	$::unicode(layout-column)\
-		HTiled	$::unicode(layout-row)\
-		Stacked	$::unicode(file-copy)]
+		Monocle	$::unicode(maximize)\
+		VTiled	$::unicode(vsplit)\
+		HTiled	$::unicode(hsplit)\
+		Stacked	$::unicode(floated)]
 
 	variable locale [dict get $::config locale]
 

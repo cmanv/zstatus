@@ -1,6 +1,18 @@
 package require fileutil
 
 namespace eval zstatus::config {
+	set unicode [list\
+		arrow-up	\u2191\
+		arrow-down	\u2193\
+		arrow-up-down	\u21c5\
+		play		\u25b6\
+		pause		\u23f8\
+		music		\u266b\
+		hsplit		\u23db\
+		vsplit		\u2385\
+		floated		\u2397\
+		maximize	\u25a1]
+
 	set color [dict create\
 		fg { light black dark LightGray }\
 		fg2 { light black dark seashell }\
@@ -128,7 +140,12 @@ namespace eval zstatus::config {
 					deskname separator wintitle}
 	dict set config rightside datetime
 
-	namespace export read get
+	namespace export read get unicode
+}
+
+proc zstatus::config::unicode {} {
+	variable unicode
+	return $unicode
 }
 
 proc zstatus::config::get {key configfile} {

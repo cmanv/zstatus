@@ -360,7 +360,7 @@ proc zstatus::make_font {} {
 
 	set ascent [font metrics large2 -ascent]
 	set descent [font metrics large2 -descent]
-	return [expr $ascent + $descent]
+	return [expr $ascent + $descent + 2]
 }
 
 proc zstatus::reload_config {dummy} {
@@ -427,7 +427,7 @@ wm title . "@PROJECT_NAME@ @PROJECT_VERSION@"
 wm attributes . -type dock
 
 # Unicode mapping from remixicon v4.6.0
-array set unicode [zstatus::remixicon::get]
+array set unicode [list {*}[zstatus::config::unicode] {*}[zstatus::remixicon::get]]
 zstatus::config::read $params(config)
 if [string length $::params(theme)] {
 	set zstatus::theme $::params(theme)
