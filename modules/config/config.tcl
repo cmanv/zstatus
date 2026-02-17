@@ -20,34 +20,34 @@ namespace eval zstatus::config {
 		memory		\U1d40c
 	}
 	set pua_map {
-		cloud-windy \ueba1
-		overcast \ueba5
-		drizzle \uec68
-		fog \ued50
-		hail \ueded
-		haze \uee00
-		heavy-showers \uee15
-		maximize \uf3d7
-		vsplit2 \uee7f
-		vsplit \uee8d
-		grid \uee90
-		hsplit \uee9d
-		mail \ueef3
-		mist \uef5d
-		night-clear \uef6f
-		night-cloudy \uef71
+		cloud-windy	\ueba1
+		overcast	\ueba5
+		drizzle		\uec68
+		fog		\ued50
+		hail		\ueded
+		haze		\uee00
+		heavy-showers	\uee15
+		maximize	\uf3d7
+		vsplit2		\uee7f
+		vsplit		\uee8d
+		grid		\uee90
+		hsplit		\uee9d
+		mail		\ueef3
+		mist		\uef5d
+		night-clear	\uef6f
+		night-cloudy	\uef71
 		night-few-clouds \uef74
-		ram \uf456
-		rain \uf056
-		showers \uf122
-		snowflake \uf513
-		snow \uf15e
-		day-cloudy \uf1bb
-		day-few-clouds \uf1be
-		day-clear \uf1bf
-		thunderstorm \uf209
-		tornado \uf21c
-		windy \uf2ca
+		ram		\uf456
+		rain		\uf056
+		showers		\uf122
+		snowflake	\uf513
+		snow		\uf15e
+		day-cloudy	\uf1bb
+		day-few-clouds	\uf1be
+		day-clear	\uf1bf
+		thunderstorm	\uf209
+		tornado		\uf21c
+		windy		\uf2ca
 	}
 	array set ::unicode [list {*}$std_map {*}$pua_map]
 
