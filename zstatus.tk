@@ -4,7 +4,6 @@ package require fileutil
 package require json
 package require unix_sockets
 package require zstatus::config @PROJECT_VERSION@
-package require zstatus::remixicon @PROJECT_VERSION@
 
 set messagedict [dict create\
 	reload zstatus::reload_config\
@@ -193,7 +192,6 @@ proc zstatus::launcher_menu {} {
 		set itemlist [dict get $menudict entries]
 		foreach itemdict $itemlist {
 			set type ""
-			set icon ""
 			set label [dict get $itemdict label]
 			if [dict exists $itemdict cascade] {
 				set type cascade
@@ -320,6 +318,7 @@ proc zstatus::add_widgets {side widgets} {
 proc zstatus::make_font {} {
 	set fontsize [dict get $::config fontsize]
 	set fontname [dict get $::config fontname]
+	set font_pua [dict get $::config font_pua]
 
 	regsub -all {\"} $fontname {} fontname
 	regsub -all {\-} $fontname {} fontname
@@ -327,7 +326,7 @@ proc zstatus::make_font {} {
 
 	set defined_fonts [font names]
 	set fonts { small normal italic italic2 bold bold2\
-				large large2 remix1 remix2 mono emoji }
+				large large2 pua1 pua2 mono emoji }
 
 	foreach f $fonts {
 		set index [lsearch $defined_fonts $f]
@@ -346,8 +345,8 @@ proc zstatus::make_font {} {
 		 -weight bold
 	font create large -family $fontname -size [expr $fontsize + 1]
 	font create large2 -family $fontname -size [expr $fontsize + 2]
-	font create remix1 -family remixicon -size [expr $fontsize]
-	font create remix2 -family remixicon -size [expr $fontsize + 1]
+	font create pua1 -family $font_pua -size [expr $fontsize]
+	font create pua2 -family $font_pua -size [expr $fontsize + 1]
 	font create mono -family "$fontname Mono" -size $fontsize
 
 	if {[dict exists $::config emojifont]} {
@@ -426,8 +425,6 @@ tk appname "@PROJECT_NAME@"
 wm title . "@PROJECT_NAME@ @PROJECT_VERSION@"
 wm attributes . -type dock
 
-# Unicode mapping from remixicon v4.6.0
-array set unicode [list {*}[zstatus::config::unicode] {*}[zstatus::remixicon::get]]
 zstatus::config::read $params(config)
 if [string length $::params(theme)] {
 	set zstatus::theme $::params(theme)

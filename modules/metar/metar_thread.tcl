@@ -40,34 +40,34 @@ namespace eval zstatus::metar::thread {
 		+FZDZ	{C {heavy freezing drizzle} fr {forte bruine verglaçante} icon drizzle}\
 		RA	{C rain fr pluie icon showers}\
 		+RA	{C {heavy rain} fr {forte pluie} icon heavy-showers}\
-		-RA	{C {light rain} fr {faible pluie} icon rainy}\
+		-RA	{C {light rain} fr {faible pluie} icon rain}\
 		SHRA	{C {rain showers} fr {averses de pluie} icon showers}\
 		-SHRA	{C {light rain showers} fr {faibles averses de pluie}\
-			icon rainy}\
+			icon rain}\
 		+SHRA	{C {heavy rain showers} fr {fortes averses de pluie}\
 			icon heavy-showers}\
-		TSRA	{C {thunderstorms} fr {orages} icon thunderstorms}\
+		TSRA	{C {thunderstorms} fr {orages} icon thunderstorm}\
 		-TSRA	{C {light thunderstorms} fr {orages faibles}\
-			icon thunderstorms}\
-		+TSRA	{C {heavy thunderstorms} fr {orages forts} icon thunderstorms}\
+			icon thunderstorm}\
+		+TSRA	{C {heavy thunderstorms} fr {orages forts} icon thunderstorm}\
 		FZRA	{C {freezing rain} fr {pluie verglacante} icon showers}\
 		-FZRA	{C {light freezing rain} fr {faible pluie verglaçante}\
-			icon rainy}\
+			icon rain}\
 		+FZRA	{C {heavy freezing rain} fr {forte pluie verglaçante}\
 			icon heavy-showers}\
-		SN	{C snow fr neige icon snowy}\
-		+SN	{C {heavy snow} fr {forte neige} icon snowy}\
-		-SN	{C {light snow} fr {faible neige} icon snowy}\
-		SHSN	{C {snow showers} fr {averses de neige} icon snowy}\
+		SN	{C snow fr neige icon snow}\
+		+SN	{C {heavy snow} fr {forte neige} icon snow}\
+		-SN	{C {light snow} fr {faible neige} icon snow}\
+		SHSN	{C {snow showers} fr {averses de neige} icon snow}\
 		-SHSN	{C {light snow showers} fr {faibles averses de neige}\
-			icon snowy}\
+			icon snow}\
 		+SHSN	{C {heavy snow showers} fr {fortes averses de neige}\
-			icon snowy}\
+			icon snow}\
 		DRSN	{C {low drifting snow} fr {poudrerie} icon windy}\
 		BLSN	{C {blowing snow} fr {poudrerie élevée} icon windy}\
-		SG	{C {snow grains} fr {neige en grains} icon snowy}\
-		-SG	{C {light snow grains} fr {faible neige en grains} icon snowy}\
-		+SG	{C {heavy snow grains} fr {forte neige en grains} icon snowy}\
+		SG	{C {snow grains} fr {neige en grains} icon snow}\
+		-SG	{C {light snow grains} fr {faible neige en grains} icon snow}\
+		+SG	{C {heavy snow grains} fr {forte neige en grains} icon snow}\
 		IC	{C {ice snowflakes} fr {cristaux de glace} icon snowflake}\
 		PL	{C {ice pellets} fr {granules de glace} icon hail}\
 		-PL	{C {light ice pellets} fr {faible granules de glace}\
@@ -81,11 +81,11 @@ namespace eval zstatus::metar::thread {
 		UP	{C {unknown precipitations} fr {précipitations inconnues}\
 			icon question-mark}\
 		BR	{C mist fr brume icon mist}\
-		FG	{C fog fr brouillard icon foggy}\
-		BCFG	{C {patches of fog} fr {bancs de brouillard} icon foggy}\
-		FZFG	{C {freezing fog} fr {brouillard verglaçant} icon foggy}\
-		MIFG	{C {shallow fog} fr {brouillard mince} icon foggy}\
-		PRFG	{C {partial fog} fr {brouillard partiel} icon foggy}\
+		FG	{C fog fr brouillard icon fog}\
+		BCFG	{C {patches of fog} fr {bancs de brouillard} icon fog}\
+		FZFG	{C {freezing fog} fr {brouillard verglaçant} icon fog}\
+		MIFG	{C {shallow fog} fr {brouillard mince} icon fog}\
+		PRFG	{C {partial fog} fr {brouillard partiel} icon fog}\
 		FU	{C smoke fr fumée icon mist}\
 		VA	{C {volcanic ash} fr {cendre volcanique} icon mist}\
 		DU	{C dust fr poussière icon mist}\
@@ -299,9 +299,9 @@ proc zstatus::metar::thread::get_weather_icon {daylight} {
 	}
 
 	if {$daylight == 1} {
-		set prefix "sun"
+		set prefix "day"
 	} else {
-		set prefix "moon"
+		set prefix "night"
 	}
 
 	if {[dict exists $latest cloud_code]} {
@@ -567,7 +567,7 @@ proc zstatus::metar::thread::make_report {plocale ptimezone} {
 	set latest {}
 	if [decode_report [fetch_report]] {
 		if {![dict exists $latest date] || ![dict exists $latest temp]} {
-			set report(statusbar) $unicode(code-s-slash)
+			set report(statusbar) $unicode(empty)
 			set report(request_message)\
 				"[dict get $labeldict failed $locale] $reporttime"
 			set report(tooltip) $report(request_message)
@@ -659,7 +659,7 @@ proc zstatus::metar::thread::make_report {plocale ptimezone} {
 		set report(request_message)\
 			"[dict get $labeldict success $locale] $reporttime"
 	} else {
-		set report(statusbar) $unicode(code-s-slash)
+		set report(statusbar) $unicode(empty)
 		set report(request_message)\
 			"[dict get $labeldict failed $locale] $reporttime"
 		set report(tooltip) $report(request_message)

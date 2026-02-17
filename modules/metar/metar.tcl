@@ -8,7 +8,7 @@ namespace eval zstatus::metar {
 		value1 {font large light DarkBlue dark CadetBlue3}\
 		value2 {font large light DarkGreen dark PaleGreen3}\
 		summary {font large2 light DarkGreen dark PaleGreen3}\
-		icon {font remix2 light DarkGreen dark PaleGreen3}\
+		icon {font pua2 light DarkGreen dark PaleGreen3}\
 		tooltip {font normal light black dark gray80}]
 
 	variable timezone [dict get $::config timezone]

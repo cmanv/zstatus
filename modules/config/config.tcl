@@ -1,17 +1,55 @@
 package require fileutil
 
 namespace eval zstatus::config {
-	set unicode [list\
-		arrow-up	\u2191\
-		arrow-down	\u2193\
-		arrow-up-down	\u21c5\
-		play		\u25b6\
-		pause		\u23f8\
-		music		\u266b\
-		hsplit		\u23db\
-		vsplit		\u2385\
-		floated		\u2397\
-		maximize	\u25a1]
+	set std_map {
+		arrow-up	\u2191
+		arrow-down	\u2193
+		arrow-up-down	\u21c5
+		bar-chart	\U1f4ca
+		empty		\u2205
+		question-mark	\u2753
+		play		\u2bc8
+		pause		\u23f8
+		music		\u266b
+		volume		\U1f50a
+		hsplit		\u2b12
+		vsplit		\u2385
+		floated		\u2bba
+		maximize	\u25a1
+		cpu		\U1d402
+		memory		\U1d40c
+	}
+	set pua_map {
+		cloud-windy \ueba1
+		overcast \ueba5
+		drizzle \uec68
+		fog \ued50
+		hail \ueded
+		haze \uee00
+		heavy-showers \uee15
+		maximize \uf3d7
+		vsplit2 \uee7f
+		vsplit \uee8d
+		grid \uee90
+		hsplit \uee9d
+		mail \ueef3
+		mist \uef5d
+		night-clear \uef6f
+		night-cloudy \uef71
+		night-few-clouds \uef74
+		ram \uf456
+		rain \uf056
+		showers \uf122
+		snowflake \uf513
+		snow \uf15e
+		day-cloudy \uf1bb
+		day-few-clouds \uf1be
+		day-clear \uf1bf
+		thunderstorm \uf209
+		tornado \uf21c
+		windy \uf2ca
+	}
+	array set ::unicode [list {*}$std_map {*}$pua_map]
 
 	set color [dict create\
 		fg { light black dark LightGray }\
@@ -55,7 +93,7 @@ namespace eval zstatus::config {
 			source zstatus::metar::report(statusbar)
 			settheme metar::set_theme
 			delay 10
-			font remix1
+			font pua1
 		} mixer {
 			type string
 			module system
@@ -120,6 +158,7 @@ namespace eval zstatus::config {
 		fontsize	11\
 		menudef		$menudef\
 		position	top\
+		font_pua	remixicon\
 		cache_prefix	$cache_prefix]
 
 	if [info exists ::env(LANG)] {
@@ -141,11 +180,6 @@ namespace eval zstatus::config {
 	dict set config rightside datetime
 
 	namespace export read get unicode
-}
-
-proc zstatus::config::unicode {} {
-	variable unicode
-	return $unicode
 }
 
 proc zstatus::config::get {key configfile} {

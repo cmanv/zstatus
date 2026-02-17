@@ -102,7 +102,7 @@ proc zstatus::system::set_loadavg {} {
 	if {[llength $load_queue] > $load_length} {
 		set load_queue [lrange $load_queue 1 end]
 	}
-	set loadavg "$::unicode(bar-chart) $value"
+	set loadavg "$::unicode(cpu): $value"
 
 	variable loadgraph_visible
 	if {$loadgraph_visible} { update_loadgraph }
@@ -175,7 +175,7 @@ proc zstatus::system::update_loadgraph {} {
 
 proc zstatus::system::set_memused {} {
 	variable memused
-	set memused "$::unicode(ram) [lindex [freebsd::getpercmemused] 0]"
+	set memused "$::unicode(memory): [lindex [freebsd::getpercmemused] 0]"
 
 	variable memstats_visible
 	if {$memstats_visible} { update_memstats }
@@ -403,7 +403,7 @@ proc zstatus::system::setup {bar item} {
 	}
 	mixer {
 		variable mixer_icon
-		set mixer_icon $::unicode(volume-up)
+		set mixer_icon $::unicode(volume)
 		set_mixer
 		bind $bar.mixer <MouseWheel> {
 			if {%D < 0} {
