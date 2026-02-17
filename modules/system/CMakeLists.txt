@@ -3,7 +3,6 @@ set(LIBRARY_PROVIDE "zstatus::system::freebsd")
 
 include_directories(${TCL_INCLUDE_PATH})
 include_directories(${PROJECT_BINARY_DIR}/src)
-
 set(TARGET_LIB freebsd${PROJECT_VERSION})
 add_library(${TARGET_LIB} SHARED)
 target_sources(${TARGET_LIB} PRIVATE src/init.c src/freebsd.c)

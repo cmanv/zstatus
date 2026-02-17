@@ -11,7 +11,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <ifaddrs.h>
-#include "config.h"
 #include "freebsd.h"
 int add_mem_value(char *, Tcl_Interp *, Tcl_Obj *);
 

@@ -1,12 +1,11 @@
 cmake_minimum_required (VERSION 3.20)
 
 project(zstatus VERSION 0.4)
-set(TCL_LIBRARY_VERSION "9.0")
-set(TCL_INCLUDE_PATH "/usr/local/include/tcl9.0")
-set(CMAKE_C_COMPILER "/usr/bin/cc")
+set(CMAKE_C_COMPILER /usr/bin/cc)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
+set(TCL_INCLUDE_PATH /usr/local/include/tcl9.0)
 set(PKG_INDEX pkgIndex.tcl)
+
 include(GNUInstallDirs)
 add_subdirectory(modules/config)
 add_subdirectory(modules/devices)

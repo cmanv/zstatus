@@ -1,7 +1,7 @@
 project(zstatus::music VERSION ${PROJECT_VERSION})
 set(LIBRARY_PROVIDE "zstatus::music::mpd")
 
-include_directories(-I /usr/local/include)
+include_directories(/usr/local/include)
 include_directories(${TCL_INCLUDE_PATH})
 include_directories(${PROJECT_BINARY_DIR}/src)
 

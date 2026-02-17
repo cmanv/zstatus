@@ -5,6 +5,7 @@
 #include <mpd/queue.h>
 #include <mpd/status.h>
 #include "mpd.h"
+
 static const int titlelength = 256;
 static char host[65] = "";
 static int port = 0;
