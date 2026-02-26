@@ -237,9 +237,16 @@ proc zstatus::zwm::set_desklayout {value} {
 		destroy $layoutpath
 	}
 
+	variable fgmenu
+	variable bgmenu
+	variable fgmenu2
+	variable bgmenu2
 	variable layoutmenu
 	set layoutmenu [menu $layoutpath -font large\
-			-relief flat -activerelief solid]
+			-relief flat -activerelief solid\
+			-foreground $fgmenu -background $bgmenu\
+			-activeforeground $fgmenu2 -activebackground $bgmenu2\
+			-disabledforeground $fgmenu -selectcolor $fgmenu2]
 
 	variable selected
 	variable desklayout
@@ -261,11 +268,6 @@ proc zstatus::zwm::set_desklayout {value} {
 			-value $num -variable zstatus::zwm::selected\
 			-command "zstatus::zwm::send_message desktop-layout-$num"
 		incr num
-	}
-
-	variable theme_defined
-	if {$theme_defined} {
-		set_theme_layoutmenu
 	}
 }
 
