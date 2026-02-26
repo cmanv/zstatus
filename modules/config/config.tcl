@@ -119,11 +119,11 @@ namespace eval zstatus::config {
 			type frame
 			module zwm
 			font mono
-		} desklayout {
+		} layoutmenu {
 			type menubutton
 			module zwm
-			menu layouts
-			source zstatus::zwm::desklayout
+			path layouts
+			source zstatus::zwm::layouttitle
 		} deskname {
 			type string
 			module zwm
@@ -169,7 +169,7 @@ namespace eval zstatus::config {
 		dict set config locale [lindex $locales $index]
 	}
 
-	dict set config leftside {desklayout separator desklist separator\
+	dict set config leftside {layoutmenu separator desklist separator\
 					deskname separator wintitle}
 	dict set config rightside datetime
 
@@ -218,7 +218,7 @@ proc zstatus::config::read {configfile} {
 	variable widgetdict
 
 	# List of valid contexts in config file
-	set contexts { main color datetime desklayout desklist deskname\
+	set contexts { main color datetime layoutmenu desklist deskname\
 		devices loadavg mail maildir memused metar mixer music\
 		netstat osversion separator wintitle}
 

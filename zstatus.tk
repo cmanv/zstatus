@@ -142,6 +142,13 @@ proc zstatus::startmenu {value} {
 			launcher_menu
 		}
 	}
+	layouts {
+		variable modlist
+		set index [lsearch $modlist zwm]
+		if {$index >= 0} {
+			zstatus::zwm::layout_menu
+		}
+	}
 	windows {
 		variable modlist
 		set index [lsearch $modlist zwm]
@@ -179,10 +186,6 @@ proc zstatus::launcher_menu {} {
 	set menulist [dict get $menudef menulist]
 	foreach menudict $menulist {
 		set path [dict get $menudict path]
-		if {[char_count $path .] == 1} {
-			set rootmenu $path
-		}
-
 		set label [dict get $menudict label]
 		set menu [menu $path -title $label -font large\
 			-relief flat -activerelief solid\
@@ -190,8 +193,12 @@ proc zstatus::launcher_menu {} {
 			-activebackground $bgmenu2 -activeforeground $fgmenu2\
 			-disabledforeground $fgmenu]
 
-		$menu add command -label $label -state disabled\
-			 -background $bgmenu2
+		if {[char_count $path .] == 1} {
+			set rootmenu $path
+			$menu add command -label $label\
+				-state disabled\
+				-background $bgmenu2
+		}
 
 		set itemlist [dict get $menudict entries]
 		foreach itemdict $itemlist {
@@ -206,6 +213,11 @@ proc zstatus::launcher_menu {} {
 					set index [lsearch $modlist zwm]
 					if {$index < 0} { continue }
 					zstatus::zwm::gen_client_menu $cascade
+				} elseif {$leaf == "layouts"} {
+					variable modlist
+					set index [lsearch $modlist zwm]
+					if {$index < 0} { continue }
+					zstatus::zwm::gen_layout_menu $cascade
 				}
 			}
 			if [dict exists $itemdict command] {
@@ -295,7 +307,7 @@ proc zstatus::add_widgets {side widgets} {
 			pack [menubutton $bar.$item\
 				-font [dict get $::widgetdict $item font]\
 				-textvar [dict get $::widgetdict $item source]\
-				-menu $bar.$item.[dict get $::widgetdict $item menu]\
+				-menu $bar.$item.[dict get $::widgetdict $item path]\
 				-padx 5] -side $side
 			if [dict exists $::widgetdict $item module] {
 				zstatus::${module}::setup $bar $item

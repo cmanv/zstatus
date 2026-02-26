@@ -11,19 +11,20 @@ namespace eval zstatus::zwm {
 	variable locale [dict get $::config locale]
 
 	dict set labeldict clientmenu { C "X11 Clients" fr "Clients X11"}
+	dict set labeldict layoutmenu { C "Layouts" fr "Dispositions"}
 
 	variable screen [lindex [split [winfo screen .] "."] 1]
 	variable zwmsocket "[dict get $::config cache_prefix]/zwm/socket"
 
 	variable clientlist {}
 	variable desklist {}
-	variable desklayout "?"
+	variable layouttitle "?"
 	variable active_client [dict create window 0 desknum ? name ""]
 	variable textmaxlen [dict get $::widgetdict wintitle maxlength]
 	variable theme_defined 0
 
 	namespace export set_wintitle unset_wintitle set_desklist set_deskname\
-			set_desklayout set_theme
+			set_layoutmenu set_theme
 }
 
 proc zstatus::zwm::send_message {msg} {
@@ -136,16 +137,14 @@ proc zstatus::zwm::client_menu {} {
 }
 
 proc zstatus::zwm::gen_client_menu { path } {
-	variable labeldict
-	variable clientlist
+	if [winfo exists $path] {
+		destroy $path
+	}
+
 	variable fgmenu
 	variable bgmenu
 	variable fgmenu2
 	variable bgmenu2
-
-	if [winfo exists $path] {
-		destroy $path
-	}
 
 	set menu [menu $path -font large\
 			-relief flat -activerelief solid\
@@ -153,13 +152,17 @@ proc zstatus::zwm::gen_client_menu { path } {
 			-activeforeground $fgmenu2 -activebackground $bgmenu2\
 			-disabledforeground $fgmenu]
 
-	variable locale
-	$menu add command -state disabled -background $bgmenu2\
-		-label [dict get $labeldict clientmenu $locale]
+	if {[char_count $path .] == 1} {
+		variable labeldict
+		variable locale
+		$menu add command -state disabled -background $bgmenu2\
+			-label [dict get $labeldict clientmenu $locale]
+	}
 
 	variable active_client
 	set active_window [dict get $active_client window]
 	set active_desknum [dict get $active_client desknum]
+	variable clientlist
 	foreach client $clientlist {
 		set mark "_"
 		set window [dict get $client window]
@@ -228,47 +231,62 @@ proc zstatus::zwm::set_desklist {values} {
 	}
 }
 
-proc zstatus::zwm::set_desklayout {value} {
+proc zstatus::zwm::set_layoutmenu {value} {
 	variable layoutlist
-	set layoutlist $value
-
 	variable layoutpath
-	if [winfo exists $layoutpath] {
-		destroy $layoutpath
+	set layoutlist $value
+	set layoutmenu [gen_layout_menu $layoutpath]
+}
+
+proc zstatus::zwm::layout_menu {} {
+	set menu [gen_layout_menu .layouts]
+	$menu post {*}[winfo pointerxy .]
+}
+
+proc zstatus::zwm::gen_layout_menu { path } {
+	if [winfo exists $path] {
+		destroy $path
 	}
 
 	variable fgmenu
 	variable bgmenu
 	variable fgmenu2
 	variable bgmenu2
-	variable layoutmenu
-	set layoutmenu [menu $layoutpath -font large\
+	set menu [menu $path -font large\
 			-relief flat -activerelief solid\
 			-foreground $fgmenu -background $bgmenu\
 			-activeforeground $fgmenu2 -activebackground $bgmenu2\
 			-disabledforeground $fgmenu -selectcolor $fgmenu2]
 
-	variable selected
-	variable desklayout
-	variable layouticons
+	if {[char_count $path .] == 1} {
+		variable labeldict
+		variable locale
+		$menu add command -state disabled -background $bgmenu2\
+			-label [dict get $labeldict layoutmenu $locale]
+	}
 
-	set selected 0
+	variable selected
+	variable layouttitle
+	variable layouticons
+	variable layoutlist
+
 	set num 1
 	foreach layout $layoutlist {
 		set name [dict get $layout name]
 		if [dict get $layout active] {
 			set selected $num
 			if [dict exists $layouticons $name] {
-				set desklayout [dict get $layouticons $name]
+				set layouttitle [dict get $layouticons $name]
 			} else {
-				set desklayout $name
+				set layouttitle $name
 			}
 		}
-		$layoutmenu add radiobutton -label $name\
+		$menu add radiobutton -label $name\
 			-value $num -variable zstatus::zwm::selected\
 			-command "zstatus::zwm::send_message desktop-layout-$num"
 		incr num
 	}
+	return $menu
 }
 
 proc zstatus::zwm::set_deskname {value} {
@@ -294,10 +312,10 @@ proc zstatus::zwm::setup {bar item} {
 			$wintitle tag configure emoji -font emoji
 		}
 	}
-	desklayout {
-		dict set ::messagedict layouts zwm::set_desklayout
+	layoutmenu {
+		dict set ::messagedict layouts zwm::set_layoutmenu
 		variable layoutpath
-		set layoutpath $bar.$item.[dict get $::widgetdict desklayout menu]
+		set layoutpath $bar.$item.[dict get $::widgetdict layoutmenu path]
 	}
 	desklist {
 		dict set ::messagedict desklist zwm::set_desklist
