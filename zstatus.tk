@@ -97,27 +97,16 @@ proc zstatus::set_theme {newtheme} {
 	set bgmenu2 [dict get $::color bg2 $theme]
 
 	variable bar
-	variable widgetlist
-	set count 0
 	$bar configure -background [dict get $::color bg $theme]
+	set count 0
+	variable widgetlist
 	foreach item $widgetlist {
 		switch [dict get $::widgetdict $item type] {
-		transient {
-			if [dict exists $::widgetdict $item settheme] {
-				[dict get $::widgetdict $item settheme] $theme
-			}
-		}
+		transient { }
 		separator {
 			incr count
 			$bar.$item$count configure\
 				-background [dict get $::widgetdict separator bg $theme]
-		}
-		widget {
-			$bar.$item configure\
-				-bg [dict get $::widgetdict $item bg $theme]
-			if [dict exists $::widgetdict $item settheme] {
-				[dict get $::widgetdict $item settheme] $theme
-			}
 		}
 		menubutton {
 			$bar.$item configure\
@@ -126,14 +115,22 @@ proc zstatus::set_theme {newtheme} {
 				-activebackground $bgmenu2\
 				-activeforeground $fgmenu2
 		}
+		frame {
+			$bar.$item configure\
+				-bg [dict get $::widgetdict $item bg $theme]
+		}
 		default {
 			$bar.$item configure\
 				-bg [dict get $::widgetdict $item bg $theme]\
 				-fg [dict get $::widgetdict $item fg $theme]
-			if [dict exists $::widgetdict $item settheme] {
-				[dict get $::widgetdict $item settheme] $theme
-			}
 		}}
+	}
+
+	variable modlist
+	foreach module $modlist {
+		if [dict exists $::moduledict $module themefunc] {
+			[dict get $::moduledict $module themefunc] $theme
+		}
 	}
 }
 
@@ -305,7 +302,7 @@ proc zstatus::add_widgets {side widgets} {
 			}
 			set last $item
 		}
-		widget {
+		frame {
 			if [dict exists $::widgetdict $item module] {
 				set module [dict get $::widgetdict $item module]
 				load_module $module

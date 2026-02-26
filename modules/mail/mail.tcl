@@ -3,6 +3,8 @@ package require fileutil
 package require mime
 
 namespace eval zstatus::mail {
+	dict set ::moduledict mail { themefunc mail::set_theme }
+
 	variable activepopup 0
 	namespace export setup update set_theme
 }

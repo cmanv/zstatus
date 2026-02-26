@@ -2,6 +2,8 @@ package require Tk
 package require zstatus::music::mpd
 
 namespace eval zstatus::music {
+	dict set ::moduledict music { themefunc music::set_theme }
+
 	variable socket_valid 0
 	variable tooltip_active 0
 	array set mpdstates { 2 play 3 pause }

@@ -68,7 +68,6 @@ namespace eval zstatus::config {
 			type transient
 			module devices
 			proc devices::update
-			settheme devices::set_theme
 			font bold\
 		} loadavg {\
 			type string
@@ -79,19 +78,16 @@ namespace eval zstatus::config {
 			type transient
 			module mail
 			proc mail::update
-			settheme mail::set_theme
 		} memused {
 			type string
 			module system
 			proc system::set_memused
 			source zstatus::system::memused
-			settheme system::set_theme
 		} metar {
 			type string
 			module metar
 			proc metar::update
 			source zstatus::metar::report(statusbar)
-			settheme metar::set_theme
 			delay 10
 			font pua1
 		} mixer {
@@ -102,14 +98,12 @@ namespace eval zstatus::config {
 			type transient
 			module music
 			proc music::update
-			settheme music::set_theme
 		} netstat {
 			type string
 			module system
 			interface em0
 			proc system::update_netstat
 			source zstatus::system::neticon
-			settheme system::set_theme
 		} osversion {
 			type string
 			source zstatus::osversion
@@ -122,9 +116,8 @@ namespace eval zstatus::config {
 			expand 0
 			maxlength 120
 		} desklist {
-			type widget
+			type frame
 			module zwm
-			settheme zwm::set_theme
 			font mono
 		} desklayout {
 			type menubutton
@@ -230,7 +223,7 @@ proc zstatus::config::read {configfile} {
 		netstat osversion separator wintitle}
 
 	# Cant change these from config file
-	set immutables {type source proc setup settheme}
+	set immutables {type source proc setup}
 
 	if {$configfile == {default}} {
 		set configfile $defaultfile

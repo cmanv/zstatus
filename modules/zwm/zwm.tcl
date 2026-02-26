@@ -1,4 +1,7 @@
 namespace eval zstatus::zwm {
+	dict set ::moduledict zwm { themefunc zwm::set_theme }
+	dict set ::messagedict clientlist zwm::set_clientlist
+
 	variable layouticons [dict create\
 		Monocle	$::unicode(maximize)\
 		VTiled	$::unicode(vsplit)\
@@ -7,7 +10,6 @@ namespace eval zstatus::zwm {
 
 	variable locale [dict get $::config locale]
 
-	dict set ::messagedict clientlist zwm::set_clientlist
 	dict set labeldict clientmenu { C "X11 Clients" fr "Clients X11"}
 
 	variable screen [lindex [split [winfo screen .] "."] 1]
@@ -37,11 +39,6 @@ proc zstatus::zwm::send_message {msg} {
 }
 
 proc zstatus::zwm::set_theme {theme} {
-	variable desklistbar
-	variable desklistframe
-	variable activeslave
-	variable theme_defined
-
 	variable fgcolor
 	variable bgcolor
 	variable hicolor
@@ -58,7 +55,19 @@ proc zstatus::zwm::set_theme {theme} {
 	set fgmenu2 [dict get $::color fg2 $theme]
 	set bgmenu2 [dict get $::color bg2 $theme]
 
+	variable theme_defined
 	set theme_defined 1
+	set_theme_desklist
+	set_theme_layoutmenu
+}
+
+proc zstatus::zwm::set_theme_desklist {} {
+	variable desklistbar
+	variable desklistframe
+	variable activeslave
+	variable hicolor
+	variable bgcolor
+	variable fgcolor
 
 	$desklistbar configure -background $bgcolor
 	$desklistframe configure -background $bgcolor
@@ -69,8 +78,15 @@ proc zstatus::zwm::set_theme {theme} {
 			$slave configure -bg $bgcolor -fg $fgcolor
 		}
 	}
+}
 
+proc zstatus::zwm::set_theme_layoutmenu {} {
+	variable fgmenu
+	variable bgmenu
+	variable fgmenu2
+	variable bgmenu2
 	variable layoutmenu
+
 	if [info exists layoutmenu] {
 		$layoutmenu configure\
 			-foreground $fgmenu -background $bgmenu\
@@ -207,29 +223,12 @@ proc zstatus::zwm::set_desklist {values} {
 	}
 
 	variable theme_defined
-	if {!$theme_defined} { return }
-
-	variable hicolor
-	variable bgcolor
-	variable fgcolor
-
-	$desklistbar configure -background $bgcolor
-	$desklistframe configure -background $bgcolor
-	foreach slave [pack slaves $desklistframe] {
-		if {$slave == $activeslave} {
-			$slave configure -bg $hicolor -fg $fgcolor
-		} else {
-			$slave configure -bg $bgcolor -fg $fgcolor
-		}
+	if {$theme_defined} {
+		set_theme_desklist
 	}
 }
 
 proc zstatus::zwm::set_desklayout {value} {
-	variable fgmenu
-	variable bgmenu
-	variable fgmenu2
-	variable bgmenu2
-
 	variable layoutlist
 	set layoutlist $value
 
@@ -240,17 +239,14 @@ proc zstatus::zwm::set_desklayout {value} {
 
 	variable layoutmenu
 	set layoutmenu [menu $layoutpath -font large\
-			-relief flat -activerelief solid\
-			-foreground $fgmenu -background $bgmenu\
-			-activeforeground $fgmenu2 -activebackground $bgmenu2\
-			-disabledforeground $fgmenu -selectcolor $fgmenu2]
+			-relief flat -activerelief solid]
 
 	variable selected
 	variable desklayout
 	variable layouticons
-	set num 1
 
 	set selected 0
+	set num 1
 	foreach layout $layoutlist {
 		set name [dict get $layout name]
 		if [dict get $layout active] {
@@ -265,6 +261,11 @@ proc zstatus::zwm::set_desklayout {value} {
 			-value $num -variable zstatus::zwm::selected\
 			-command "zstatus::zwm::send_message desktop-layout-$num"
 		incr num
+	}
+
+	variable theme_defined
+	if {$theme_defined} {
+		set_theme_layoutmenu
 	}
 }
 

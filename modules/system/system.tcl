@@ -1,10 +1,9 @@
 package require zstatus::system::freebsd
 
 namespace eval zstatus::system {
-	namespace export set_loadavg set_memused set_mixer mixer_cmd
+	dict set ::moduledict system { themefunc system::set_theme }
 
 	variable locale [dict get $::config locale]
-
 	set sysdict [dict create\
 		memstats {C "Memory" fr "Mémoire"}\
 		mem {C "RAM:" fr "RAM :"}\
@@ -25,6 +24,8 @@ namespace eval zstatus::system {
 	variable load_queue {}
 	variable load_length 210
 	variable load_height 80
+
+	namespace export set_loadavg set_memused set_mixer mixer_cmd
 }
 
 proc zstatus::system::set_theme {theme} {

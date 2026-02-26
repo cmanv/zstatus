@@ -1,6 +1,8 @@
 package require Tk
 
 namespace eval zstatus::devices {
+	dict set ::moduledict devices { themefunc devices::set_theme }
+
 	variable searchlist {{da[0-9]} {ulpt[0-9]}}
 	namespace export setup update set_theme
 }

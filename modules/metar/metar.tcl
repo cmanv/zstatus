@@ -2,6 +2,8 @@ package require Tk
 package require Thread
 
 namespace eval zstatus::metar {
+	dict set ::moduledict metar { themefunc metar::set_theme }
+
 	set style [dict create\
 		title1 {font large2 light black dark gray80}\
 		label1 {font italic2 light black dark gray80}\
