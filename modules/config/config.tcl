@@ -127,8 +127,9 @@ namespace eval zstatus::config {
 			settheme zwm::set_theme
 			font mono
 		} desklayout {
-			type string
+			type menubutton
 			module zwm
+			menu layouts
 			source zstatus::zwm::desklayout
 		} deskname {
 			type string

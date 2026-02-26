@@ -119,6 +119,13 @@ proc zstatus::set_theme {newtheme} {
 				[dict get $::widgetdict $item settheme] $theme
 			}
 		}
+		menubutton {
+			$bar.$item configure\
+				-background $bgmenu\
+				-foreground $fgmenu\
+				-activebackground $bgmenu2\
+				-activeforeground $fgmenu2
+		}
 		default {
 			$bar.$item configure\
 				-bg [dict get $::widgetdict $item bg $theme]\
@@ -277,6 +284,21 @@ proc zstatus::add_widgets {side widgets} {
 			pack [label $bar.$item\
 				-font [dict get $::widgetdict $item font]\
 				-textvar [dict get $::widgetdict $item source]\
+				-padx 5] -side $side
+			if [dict exists $::widgetdict $item module] {
+				zstatus::${module}::setup $bar $item
+			}
+			set last $item
+		}
+		menubutton {
+			if [dict exists $::widgetdict $item module] {
+				set module [dict get $::widgetdict $item module]
+				load_module $module
+			}
+			pack [menubutton $bar.$item\
+				-font [dict get $::widgetdict $item font]\
+				-textvar [dict get $::widgetdict $item source]\
+				-menu $bar.$item.[dict get $::widgetdict $item menu]\
 				-padx 5] -side $side
 			if [dict exists $::widgetdict $item module] {
 				zstatus::${module}::setup $bar $item

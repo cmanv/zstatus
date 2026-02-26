@@ -69,6 +69,14 @@ proc zstatus::zwm::set_theme {theme} {
 			$slave configure -bg $bgcolor -fg $fgcolor
 		}
 	}
+
+	variable layoutmenu
+	if [info exists layoutmenu] {
+		$layoutmenu configure\
+			-foreground $fgmenu -background $bgmenu\
+			-activeforeground $fgmenu2 -activebackground $bgmenu2\
+			-disabledforeground $fgmenu -selectcolor $fgmenu2
+	}
 }
 
 proc zstatus::zwm::set_wintitle {value} {
@@ -108,7 +116,7 @@ proc zstatus::zwm::unset_wintitle {dummy} {
 
 proc zstatus::zwm::client_menu {} {
 	set menu [gen_client_menu .x11clients]
-	$menu post {*}[winfo pointerxy .] 1
+	$menu post {*}[winfo pointerxy .]
 }
 
 proc zstatus::zwm::gen_client_menu { path } {
@@ -217,23 +225,47 @@ proc zstatus::zwm::set_desklist {values} {
 }
 
 proc zstatus::zwm::set_desklayout {value} {
+	variable fgmenu
+	variable bgmenu
+	variable fgmenu2
+	variable bgmenu2
+
+	variable layoutlist
+	set layoutlist $value
+
+	variable layoutpath
+	if [winfo exists $layoutpath] {
+		destroy $layoutpath
+	}
+
+	variable layoutmenu
+	set layoutmenu [menu $layoutpath -font large\
+			-relief flat -activerelief solid\
+			-foreground $fgmenu -background $bgmenu\
+			-activeforeground $fgmenu2 -activebackground $bgmenu2\
+			-disabledforeground $fgmenu -selectcolor $fgmenu2]
+
+	variable selected
 	variable desklayout
 	variable layouticons
-	variable layouts
+	set num 1
 
-	set layouts $value
-	foreach layout $layouts {
-		set name  [dict get $layout name]
+	set selected 0
+	foreach layout $layoutlist {
+		set name [dict get $layout name]
 		if [dict get $layout active] {
+			set selected $num
 			if [dict exists $layouticons $name] {
 				set desklayout [dict get $layouticons $name]
 			} else {
 				set desklayout $name
 			}
-			break
 		}
+		$layoutmenu add radiobutton -label $name\
+			-value $num -variable zstatus::zwm::selected\
+			-command "zstatus::zwm::send_message desktop-layout-$num"
+		incr num
 	}
-
 }
 
 proc zstatus::zwm::set_deskname {value} {
@@ -261,13 +293,8 @@ proc zstatus::zwm::setup {bar item} {
 	}
 	desklayout {
 		dict set ::messagedict layouts zwm::set_desklayout
-		bind $bar.desklayout <MouseWheel> {
-			if {%D < 0} {
-				zstatus::zwm::send_message "desktop-layout-next"
-			} else {
-				zstatus::zwm::send_message "desktop-layout-prev"
-			}
-		}
+		variable layoutpath
+		set layoutpath $bar.$item.[dict get $::widgetdict desklayout menu]
 	}
 	desklist {
 		dict set ::messagedict desklist zwm::set_desklist
