@@ -5,20 +5,20 @@ namespace eval zstatus::config {
 		arrow-up	\u2191
 		arrow-down	\u2193
 		arrow-up-down	\u21c5
-		bar-chart	\U1f4ca
-		empty		\u2205
-		question-mark	\u2753
-		play		\u2bc8
 		pause		\u23f8
-		music		\u266b
-		volume		\U1f50a
-		hsplit		\u2b12
-		vsplit		\u2385
-		floated		\u2bba
-		maximize	\u25a1
 		menu		\u2630
+		question-mark	\u2753
+		layout		\u29c9
+		empty		\u29b0
+		play		\u2bc8
+		window		\U1f5d6
+		windows		\U1f5d7
+		mail 		\U1f5be
 		cpu		\U1d402
 		memory		\U1d40c
+		bar-chart	\U1f4ca
+		music		\U1f39d
+		volume		\U1f50a
 	}
 
 	set pua_map {
@@ -29,17 +29,10 @@ namespace eval zstatus::config {
 		hail \ueded
 		haze \uee00
 		heavy-showers \uee15
-		maximize \uf3d7
-		vsplit2 \uee7f
-		vsplit \uee8d
-		grid \uee90
-		hsplit \uee9d
-		mail \ueef3
 		mist \uef5d
 		night-clear \uef6f
 		night-cloudy \uef71
 		night-few-clouds \uef74
-		ram \uf456
 		rain \uf056
 		showers \uf122
 		snowflake \uf513
@@ -50,7 +43,6 @@ namespace eval zstatus::config {
 		thunderstorm \uf209
 		tornado \uf21c
 		windy \uf2ca
-		window \uf2c6
 	}
 
 	array set ::unicode [list {*}$std_map {*}$pua_map]
