@@ -111,8 +111,8 @@ proc zstatus::set_theme {newtheme} {
 		}
 		menubutton {
 			$bar.$item configure\
-				-background $bgmenu\
-				-foreground $fgmenu\
+				-bg [dict get $::widgetdict $item bg $theme]\
+				-fg [dict get $::widgetdict $item fg $theme]\
 				-activebackground $bgmenu2\
 				-activeforeground $fgmenu2
 		}
