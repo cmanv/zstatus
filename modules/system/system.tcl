@@ -124,6 +124,7 @@ proc zstatus::system::show_loadgraph {} {
 	variable load_length
 	variable load_height
 
+	if {$loadgraph_visible} { return }
 	set loadgraph_visible 1
 	set loadframe [toplevel .loadframe -highlightthickness 0\
 				 -background $bgcolor]
@@ -198,6 +199,7 @@ proc zstatus::system::show_memstats {} {
 	variable memwidget
 	variable memgrid
 
+	if {$memstats_visible} { return }
 	set memstats_visible 1
 	set memstats [toplevel .memstats -highlightthickness 0\
 				 -background $bgcolor]
@@ -301,6 +303,7 @@ proc zstatus::system::show_netstat {} {
 	variable netwidget
 	variable netstat_if
 
+	if {$netstat_visible} { return }
 	set netstat_visible 1
 	set netstat [toplevel .netstat -highlightthickness 0\
 				 -background $bgcolor]

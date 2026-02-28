@@ -24,6 +24,7 @@ namespace eval zstatus {
 	variable modlist {}
 	variable menudef {}
 	variable rootmenu ""
+	variable launchertitle $::unicode(menu)
 }
 
 proc zstatus::load_module {module} {
@@ -158,7 +159,7 @@ proc zstatus::startmenu {value} {
 	}}
 }
 
-proc zstatus::load_menu {} {
+proc zstatus::load_menudef { } {
 	set menufile [dict get $::config menudef]
 	if ![file exists $menufile] {
 		return
@@ -171,31 +172,39 @@ proc zstatus::load_menu {} {
 }
 
 proc zstatus::launcher_menu {} {
-	variable rootmenu
-	if [string length $rootmenu] {
-		destroy $rootmenu
-		set rootmenu ""
+	set menu [gen_launcher_menu ""]
+	if [string length $menu] {
+		$menu post {*}[winfo pointerxy .]
 	}
+}
 
+proc zstatus::gen_launcher_menu { prefix } {
 	variable fgmenu
 	variable bgmenu
 	variable fgmenu2
 	variable bgmenu2
 
+	set basemenu ""
 	variable menudef
 	set menulist [dict get $menudef menulist]
 	foreach menudict $menulist {
-		set path [dict get $menudict path]
-		set label [dict get $menudict label]
-		set menu [menu $path -title $label -font large\
+		set leaf [dict get $menudict path]
+		set path "${prefix}.${leaf}"
+		if [winfo exists $path] {
+			$path delete 0 end
+		} else {
+			menu $path
+		}
+		$path configure -font large\
 			-relief flat -activerelief solid\
 			-foreground $fgmenu -background $bgmenu\
 			-activebackground $bgmenu2 -activeforeground $fgmenu2\
-			-disabledforeground $fgmenu]
+			-disabledforeground $fgmenu
 
-		if {[char_count $path .] == 1} {
-			set rootmenu $path
-			$menu add command -label $label\
+		if {![string length $prefix] && $leaf == "launchers"} {
+			set basemenu $path
+			set label [dict get $menudict label]
+			$path add command -label $label\
 				-state disabled\
 				-background $bgmenu2
 		}
@@ -206,18 +215,20 @@ proc zstatus::launcher_menu {} {
 			set label [dict get $itemdict label]
 			if [dict exists $itemdict cascade] {
 				set type cascade
-				set cascade [dict get $itemdict cascade]
+				set cascade "${prefix}.[dict get $itemdict cascade]"
 				set leaf [lindex [split $cascade .] end]
 				if {$leaf == "x11clients"} {
 					variable modlist
 					set index [lsearch $modlist zwm]
 					if {$index < 0} { continue }
-					zstatus::zwm::gen_client_menu $cascade
+					regsub "\.${leaf}$" $cascade {} prfx
+					zstatus::zwm::gen_client_menu $prfx
 				} elseif {$leaf == "layouts"} {
 					variable modlist
 					set index [lsearch $modlist zwm]
 					if {$index < 0} { continue }
-					zstatus::zwm::gen_layout_menu $cascade
+					regsub "\.${leaf}$" $cascade {} prfx
+					zstatus::zwm::gen_layout_menu $prfx
 				}
 			}
 			if [dict exists $itemdict command] {
@@ -225,15 +236,13 @@ proc zstatus::launcher_menu {} {
 				set command "[dict get $itemdict command] &"
 			}
 			if {$type == "command"} {
-				$menu add $type -label " $label" -command $command
+				$path add $type -label " $label" -command $command
 			} elseif {$type == "cascade"} {
-				$menu add $type -label " $label" -menu $cascade
+				$path add $type -label " $label" -menu $cascade
 			}
 		}
 	}
-	if [string length $rootmenu] {
-		$rootmenu post {*}[winfo pointerxy .]
-	}
+	return $basemenu
 }
 
 proc zstatus::read_message {channel} {
@@ -259,6 +268,7 @@ proc zstatus::add_widgets {side widgets} {
 	variable proclist
 	variable sepcount
 	variable widgetlist
+	variable rootmenu
 
 	# Sanitize the provided list
 	regsub -all {\"} $widgets {} widgets
@@ -304,11 +314,17 @@ proc zstatus::add_widgets {side widgets} {
 				set module [dict get $::widgetdict $item module]
 				load_module $module
 			}
-			pack [menubutton $bar.$item\
+			set prefix $bar.$item
+			set path $prefix.[dict get $::widgetdict $item path]
+			pack [menubutton $prefix\
 				-font [dict get $::widgetdict $item font]\
 				-textvar [dict get $::widgetdict $item source]\
-				-menu $bar.$item.[dict get $::widgetdict $item path]\
+				-menu $path\
 				-padx 5] -side $side
+
+			menu $path -postcommand\
+				"[dict get $::widgetdict $item post] $prefix"
+
 			if [dict exists $::widgetdict $item module] {
 				zstatus::${module}::setup $bar $item
 			}
@@ -434,7 +450,7 @@ proc zstatus::setup {} {
 	set locale [dict get $::config locale]
 	set osversion [exec uname -rs]
 	set_theme $theme
-	load_menu
+	load_menudef
 }
 
 # Treat command line options

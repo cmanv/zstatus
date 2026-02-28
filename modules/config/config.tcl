@@ -16,39 +16,43 @@ namespace eval zstatus::config {
 		vsplit		\u2385
 		floated		\u2bba
 		maximize	\u25a1
+		menu		\u2630
 		cpu		\U1d402
 		memory		\U1d40c
 	}
+
 	set pua_map {
-		cloud-windy	\ueba1
-		overcast	\ueba5
-		drizzle		\uec68
-		fog		\ued50
-		hail		\ueded
-		haze		\uee00
-		heavy-showers	\uee15
-		maximize	\uf3d7
-		vsplit2		\uee7f
-		vsplit		\uee8d
-		grid		\uee90
-		hsplit		\uee9d
-		mail		\ueef3
-		mist		\uef5d
-		night-clear	\uef6f
-		night-cloudy	\uef71
+		cloud-windy \ueba1
+		overcast \ueba5
+		drizzle \uec68
+		fog \ued50
+		hail \ueded
+		haze \uee00
+		heavy-showers \uee15
+		maximize \uf3d7
+		vsplit2 \uee7f
+		vsplit \uee8d
+		grid \uee90
+		hsplit \uee9d
+		mail \ueef3
+		mist \uef5d
+		night-clear \uef6f
+		night-cloudy \uef71
 		night-few-clouds \uef74
-		ram		\uf456
-		rain		\uf056
-		showers		\uf122
-		snowflake	\uf513
-		snow		\uf15e
-		day-cloudy	\uf1bb
-		day-few-clouds	\uf1be
-		day-clear	\uf1bf
-		thunderstorm	\uf209
-		tornado		\uf21c
-		windy		\uf2ca
+		ram \uf456
+		rain \uf056
+		showers \uf122
+		snowflake \uf513
+		snow \uf15e
+		day-cloudy \uf1bb
+		day-few-clouds \uf1be
+		day-clear \uf1bf
+		thunderstorm \uf209
+		tornado \uf21c
+		windy \uf2ca
+		window \uf2c6
 	}
+
 	array set ::unicode [list {*}$std_map {*}$pua_map]
 
 	set color [dict create\
@@ -119,15 +123,27 @@ namespace eval zstatus::config {
 			type frame
 			module zwm
 			font mono
+		} clientmenu {
+			type menubutton
+			module zwm
+			path x11clients
+			post zstatus::zwm::gen_client_menu
+			source zstatus::zwm::clienttitle
 		} layoutmenu {
 			type menubutton
 			module zwm
 			path layouts
+			post zstatus::zwm::gen_layout_menu
 			source zstatus::zwm::layouttitle
 		} deskname {
 			type string
 			module zwm
 			source zstatus::zwm::deskname
+		} launchermenu {
+			type menubutton
+			path launchers
+			post zstatus::gen_launcher_menu
+			source zstatus::launchertitle
 		}]
 
 	if [info exists ::env(XDG_CONFIG_HOME)] {
@@ -218,9 +234,9 @@ proc zstatus::config::read {configfile} {
 	variable widgetdict
 
 	# List of valid contexts in config file
-	set contexts { main color datetime layoutmenu desklist deskname\
-		devices loadavg mail maildir memused metar mixer music\
-		netstat osversion separator wintitle}
+	set contexts { main clientmenu color datetime layoutmenu desklist deskname\
+		devices launchermenu layoutmenu loadavg mail maildir memused metar\
+		mixer music netstat osversion separator wintitle}
 
 	# Cant change these from config file
 	set immutables {type source proc setup}

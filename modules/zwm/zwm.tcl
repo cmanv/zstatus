@@ -2,12 +2,6 @@ namespace eval zstatus::zwm {
 	dict set ::moduledict zwm { themefunc zwm::set_theme }
 	dict set ::messagedict clientlist zwm::set_clientlist
 
-	variable layouticons [dict create\
-		Monocle	$::unicode(maximize)\
-		VTiled	$::unicode(vsplit)\
-		HTiled	$::unicode(hsplit)\
-		Stacked	$::unicode(floated)]
-
 	variable locale [dict get $::config locale]
 
 	dict set labeldict clientmenu { C "X11 Clients" fr "Clients X11"}
@@ -18,7 +12,10 @@ namespace eval zstatus::zwm {
 
 	variable clientlist {}
 	variable desklist {}
-	variable layouttitle "?"
+	variable layoutlist {}
+	variable layouttitle	$::unicode(vsplit2)
+	variable clienttitle	$::unicode(window)
+
 	variable active_client [dict create window 0 desknum ? name ""]
 	variable textmaxlen [dict get $::widgetdict wintitle maxlength]
 	variable theme_defined 0
@@ -59,7 +56,6 @@ proc zstatus::zwm::set_theme {theme} {
 	variable theme_defined
 	set theme_defined 1
 	set_theme_desklist
-	set_theme_layoutmenu
 }
 
 proc zstatus::zwm::set_theme_desklist {} {
@@ -78,21 +74,6 @@ proc zstatus::zwm::set_theme_desklist {} {
 		} else {
 			$slave configure -bg $bgcolor -fg $fgcolor
 		}
-	}
-}
-
-proc zstatus::zwm::set_theme_layoutmenu {} {
-	variable fgmenu
-	variable bgmenu
-	variable fgmenu2
-	variable bgmenu2
-	variable layoutmenu
-
-	if [info exists layoutmenu] {
-		$layoutmenu configure\
-			-foreground $fgmenu -background $bgmenu\
-			-activeforeground $fgmenu2 -activebackground $bgmenu2\
-			-disabledforeground $fgmenu -selectcolor $fgmenu2
 	}
 }
 
@@ -132,27 +113,28 @@ proc zstatus::zwm::unset_wintitle {dummy} {
 }
 
 proc zstatus::zwm::client_menu {} {
-	set menu [gen_client_menu .x11clients]
+	set menu [gen_client_menu ""]
 	$menu post {*}[winfo pointerxy .]
 }
 
-proc zstatus::zwm::gen_client_menu { path } {
-	if [winfo exists $path] {
-		destroy $path
+proc zstatus::zwm::gen_client_menu { prefix } {
+	set menu "${prefix}.x11clients"
+	if [winfo exists $menu] {
+		$menu delete 0 end
+	} else {
+		menu $menu
 	}
 
 	variable fgmenu
 	variable bgmenu
 	variable fgmenu2
 	variable bgmenu2
+	$menu configure -font large -relief flat -activerelief solid\
+		-foreground $fgmenu -background $bgmenu\
+		-activeforeground $fgmenu2 -activebackground $bgmenu2\
+		-disabledforeground $fgmenu
 
-	set menu [menu $path -font large\
-			-relief flat -activerelief solid\
-			-foreground $fgmenu -background $bgmenu\
-			-activeforeground $fgmenu2 -activebackground $bgmenu2\
-			-disabledforeground $fgmenu]
-
-	if {[char_count $path .] == 1} {
+	if ![string length $prefix] {
 		variable labeldict
 		variable locale
 		$menu add command -state disabled -background $bgmenu2\
@@ -233,55 +215,46 @@ proc zstatus::zwm::set_desklist {values} {
 
 proc zstatus::zwm::set_layoutmenu {value} {
 	variable layoutlist
-	variable layoutpath
 	set layoutlist $value
-	set layoutmenu [gen_layout_menu $layoutpath]
 }
 
 proc zstatus::zwm::layout_menu {} {
-	set menu [gen_layout_menu .layouts]
+	set menu [gen_layout_menu ""]
 	$menu post {*}[winfo pointerxy .]
 }
 
-proc zstatus::zwm::gen_layout_menu { path } {
-	if [winfo exists $path] {
-		destroy $path
+proc zstatus::zwm::gen_layout_menu { prefix } {
+	set menu "${prefix}.layouts"
+	if [winfo exists $menu] {
+		$menu delete 0 end
+	} else {
+		menu $menu
 	}
 
 	variable fgmenu
 	variable bgmenu
 	variable fgmenu2
 	variable bgmenu2
-	set menu [menu $path -font large\
-			-relief flat -activerelief solid\
-			-foreground $fgmenu -background $bgmenu\
-			-activeforeground $fgmenu2 -activebackground $bgmenu2\
-			-disabledforeground $fgmenu -selectcolor $fgmenu2]
+	$menu configure -font large -relief flat -activerelief solid\
+		-foreground $fgmenu -background $bgmenu\
+		-activeforeground $fgmenu2 -activebackground $bgmenu2\
+		-disabledforeground $fgmenu -selectcolor $fgmenu2
 
-	if {[char_count $path .] == 1} {
+	if ![string length $prefix] {
 		variable labeldict
 		variable locale
 		$menu add command -state disabled -background $bgmenu2\
 			-label [dict get $labeldict layoutmenu $locale]
 	}
 
-	variable selected
-	variable layouttitle
-	variable layouticons
-	variable layoutlist
-
 	set num 1
+	variable selected
+	variable layoutlist
 	foreach layout $layoutlist {
-		set name [dict get $layout name]
 		if [dict get $layout active] {
 			set selected $num
-			if [dict exists $layouticons $name] {
-				set layouttitle [dict get $layouticons $name]
-			} else {
-				set layouttitle $name
-			}
 		}
-		$menu add radiobutton -label $name\
+		$menu add radiobutton -label [dict get $layout name]\
 			-value $num -variable zstatus::zwm::selected\
 			-command "zstatus::zwm::send_message desktop-layout-$num"
 		incr num
@@ -314,8 +287,6 @@ proc zstatus::zwm::setup {bar item} {
 	}
 	layoutmenu {
 		dict set ::messagedict layouts zwm::set_layoutmenu
-		variable layoutpath
-		set layoutpath $bar.$item.[dict get $::widgetdict layoutmenu path]
 	}
 	desklist {
 		dict set ::messagedict desklist zwm::set_desklist

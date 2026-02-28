@@ -7,7 +7,7 @@ set iconlist {
 	layout-grid-line layout-row-line mail-fill mist-line moon-clear-line\
 	moon-cloudy-line moon-foggy-line ram-line rainy-line showers-line\
 	snowflake-line snowy-line sun-cloudy-line sun-foggy-line sun-line\
-	thunderstorms-line tornado-fill windy-line}
+	thunderstorms-line tornado-fill windy-line window-line }
 
 set file "$::env(HOME)/.local/share/fonts/remixicon.css"
 
