@@ -1,6 +1,7 @@
 namespace eval zstatus::zwm {
 	dict set ::moduledict zwm { themefunc zwm::set_theme }
 	dict set ::messagedict clientlist zwm::set_clientlist
+	dict set ::messagedict layouts zwm::set_layoutmenu
 
 	variable locale [dict get $::config locale]
 
@@ -284,9 +285,6 @@ proc zstatus::zwm::setup {bar item} {
 			set emojis 1
 			$wintitle tag configure emoji -font emoji
 		}
-	}
-	layoutmenu {
-		dict set ::messagedict layouts zwm::set_layoutmenu
 	}
 	desklist {
 		dict set ::messagedict desklist zwm::set_desklist
