@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.20)
 
-project(zstatus VERSION 0.4)
+project(zstatus VERSION 0.5)
 set(CMAKE_C_COMPILER /usr/bin/cc)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(TCL_INCLUDE_PATH /usr/local/include/tcl9.0)

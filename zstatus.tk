@@ -292,7 +292,7 @@ proc zstatus::add_widgets {side widgets} {
 			load_module $module
 			set expand [dict get $::widgetdict $item expand]
 			zstatus::${module}::setup $bar $item
-			pack $bar.$item -side $side -expand $expand
+			pack $bar.$item -side $side -padx 8 -expand $expand
 			set last $item
 		}
 		string {

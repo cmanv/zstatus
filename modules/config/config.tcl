@@ -38,7 +38,7 @@ namespace eval zstatus::config {
 			module devices
 			proc devices::update
 			font bold\
-		} loadavg {\
+		} loadavg {
 			type string
 			module system
 			proc system::set_loadavg
@@ -119,7 +119,7 @@ namespace eval zstatus::config {
 	}
 
 	variable defaultfile "$config_prefix/zstatus/config"
-	variable menudef "$config_prefix/zstatus/menudef.json"
+	variable menudef "$config_prefix/zstatus/launcher.json"
 
 	if [info exists ::env(XDG_CACHE_HOME)] {
 		set cache_prefix $::env(XDG_CACHE_HOME)
