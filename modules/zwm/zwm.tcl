@@ -60,14 +60,12 @@ proc zstatus::zwm::set_theme {theme} {
 }
 
 proc zstatus::zwm::set_theme_desklist {} {
-	variable desklistbar
 	variable desklistframe
 	variable activeslave
 	variable hicolor
 	variable bgcolor
 	variable fgcolor
 
-	$desklistbar configure -background $bgcolor
 	$desklistframe configure -background $bgcolor
 	foreach slave [pack slaves $desklistframe] {
 		if {$slave == $activeslave} {
@@ -178,13 +176,11 @@ proc zstatus::zwm::set_clientlist {values} {
 
 proc zstatus::zwm::set_desklist {values} {
 	variable desklist
-	variable desklistbar
 	variable desklistframe
 	variable activeslave
 
-	destroy $desklistframe
-	pack [frame $desklistframe]
 	set desklist $values
+	destroy {*}[winfo children $desklistframe]
 	foreach desk $desklist {
 		set desknum [dict get $desk desknum]
 		set state [dict get $desk state]
@@ -288,12 +284,8 @@ proc zstatus::zwm::setup {bar item} {
 	}
 	desklist {
 		dict set ::messagedict desklist zwm::set_desklist
-		variable desklist
-		variable desklistbar
 		variable desklistframe
-		set desklistbar [frame $bar.$item]
-		set desklistframe [frame $desklistbar.frame]
-		pack $desklistbar
+		set desklistframe [frame $bar.$item]
 		pack $desklistframe
 	}
 	deskname {
