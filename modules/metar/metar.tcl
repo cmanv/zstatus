@@ -329,6 +329,7 @@ proc zstatus::metar::setup_summary { summary } {
 	variable locale
 	variable labeldict
 	variable report
+	variable timezone
 
 	pack [frame $summary] -padx 10 -side top -anchor w
 	pack [frame $summary.temp] -side left
@@ -346,7 +347,7 @@ proc zstatus::metar::setup_summary { summary } {
 
 	pack [frame $summary.sun] -anchor w -side left
 	label $summary.sun.text -font [dict get $style label1 font]\
-		-text [dict get $labeldict sun $locale]
+		-text "[dict get $labeldict sun $locale]  ($timezone)"
 	label $summary.sun.sunrise_text -font [dict get $style label1 font]\
 		-text [dict get $labeldict sunrise $locale]
 	label $summary.sun.sunrise_hour -font [dict get $style value1 font]\
@@ -496,7 +497,6 @@ proc zstatus::metar::setup {bar widget} {
 
 	set fetch_time 0
 	tsv::set metar last_fetch 0
-	tsv::set metar unicode [array get ::unicode]
 	tsv::set metar metarcode [dict get $::widgetdict metar station]
 	tsv::set metar station {}
 	tsv::set metar locale $locale

@@ -6,7 +6,37 @@ namespace eval zstatus::metar::thread {
 	variable metar_api 		https://aviationweather.gov/api/data/metar
 	variable station_api 		https://aviationweather.gov/api/data/stationinfo
 
-	array set unicode [tsv::get metar unicode]
+	set weather_icon_map {
+		cloud-windy 	\ueba1
+		overcast 	\ueba5
+		drizzle 	\uec68
+		fog 		\ued50
+		hail		\ueded
+		haze 		\uee00
+		heavy-showers 	\uee15
+		mist 		\uef5d
+		night-clear 	\uef6f
+		night-cloudy 	\uef71
+		night-few-clouds \uef74
+		rain 		\uf056
+		showers 	\uf122
+		snowflake 	\uf513
+		snow 		\uf15e
+		day-cloudy 	\uf1bb
+		day-few-clouds 	\uf1be
+		day-clear 	\uf1bf
+		thunderstorm 	\uf209
+		tornado 	\uf21c
+		windy 		\uf2ca
+		question-mark	?
+	}
+	array set weather $weather_icon_map
+
+	set arrow_map {
+		up		\u2191
+		down		\u2193
+	}
+	array set arrow $arrow_map
 
 	set pi			3.14159265358979
 	set obliquity 		23.4363
@@ -290,12 +320,12 @@ proc zstatus::metar::thread::calc_daylight {} {
 proc zstatus::metar::thread::get_weather_icon {daylight} {
 	variable latest
 	variable precip_codes
-	variable unicode
+	variable weather
 
 	if {[dict exists $latest precip_code]} {
 		set code [dict get $latest precip_code]
 		set icon [dict get $precip_codes $code icon]
-		return $unicode($icon)
+		return $weather($icon)
 	}
 
 	if {$daylight == 1} {
@@ -310,9 +340,9 @@ proc zstatus::metar::thread::get_weather_icon {daylight} {
 		if {$icon != "overcast"} {
 			set icon "${prefix}-${icon}"
 		}
-		return $unicode($icon)
+		return $weather($icon)
 	}
-	return $unicode(question-mark)
+	return "?"
 }
 
 proc zstatus::metar::thread::calc_windchill {temperature windspeed} {
@@ -556,7 +586,7 @@ proc zstatus::metar::thread::make_report {plocale ptimezone} {
 	variable locale
 	variable timezone
 	variable labeldict
-	variable unicode
+	variable arrow
 
 	set locale $plocale
 	set timezone $ptimezone
@@ -567,7 +597,7 @@ proc zstatus::metar::thread::make_report {plocale ptimezone} {
 	set latest {}
 	if [decode_report [fetch_report]] {
 		if {![dict exists $latest date] || ![dict exists $latest temp]} {
-			set report(statusbar) $unicode(empty)
+			set report(statusbar) {</>}
 			set report(request_message)\
 				"[dict get $labeldict failed $locale] $reporttime"
 			set report(tooltip) $report(request_message)
@@ -614,9 +644,9 @@ proc zstatus::metar::thread::make_report {plocale ptimezone} {
 				$latest_date != $report(prev_date)} {
 				set prev_pressure $report(prev_pressure)
 				if {$latest_pressure > $prev_pressure} {
-					set report(pressure_dir) $unicode(arrow-up)
+					set report(pressure_dir) $arrow(up)
 				} elseif {$latest_pressure < $prev_pressure} {
-					set report(pressure_dir) $unicode(arrow-down)
+					set report(pressure_dir) $arrow(down)
 				}
 			}
 			set report(prev_date) $latest_date
@@ -659,7 +689,7 @@ proc zstatus::metar::thread::make_report {plocale ptimezone} {
 		set report(request_message)\
 			"[dict get $labeldict success $locale] $reporttime"
 	} else {
-		set report(statusbar) $unicode(empty)
+		set report(statusbar) {</>}
 		set report(request_message)\
 			"[dict get $labeldict failed $locale] $reporttime"
 		set report(tooltip) $report(request_message)
@@ -696,7 +726,7 @@ proc zstatus::metar::thread::get_metar_report {} {
 		tsv::set metar station $station
 		if ![dict size $station] {
 			variable labeldict
-			set report(statusbar) "<?>"
+			set report(statusbar) {<?>}
 			set report(tooltip) [dict get $labeldict nostation $locale]
 			tsv::set metar report [array get report]
 			return

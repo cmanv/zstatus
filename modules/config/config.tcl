@@ -1,15 +1,13 @@
 package require fileutil
 
 namespace eval zstatus::config {
-	set std_map {
+	set unicode_map {
 		arrow-up	\u2191
 		arrow-down	\u2193
 		arrow-up-down	\u21c5
 		pause		\u23f8
 		menu		\u2630
-		question-mark	\u2753
 		layout		\u29c9
-		empty		\u29b0
 		play		\u2bc8
 		window		\U1f5d6
 		windows		\U1f5d7
@@ -20,32 +18,7 @@ namespace eval zstatus::config {
 		music		\U1f39d
 		volume		\U1f50a
 	}
-
-	set pua_map {
-		cloud-windy \ueba1
-		overcast \ueba5
-		drizzle \uec68
-		fog \ued50
-		hail \ueded
-		haze \uee00
-		heavy-showers \uee15
-		mist \uef5d
-		night-clear \uef6f
-		night-cloudy \uef71
-		night-few-clouds \uef74
-		rain \uf056
-		showers \uf122
-		snowflake \uf513
-		snow \uf15e
-		day-cloudy \uf1bb
-		day-few-clouds \uf1be
-		day-clear \uf1bf
-		thunderstorm \uf209
-		tornado \uf21c
-		windy \uf2ca
-	}
-
-	array set ::unicode [list {*}$std_map {*}$pua_map]
+	array set ::unicode $unicode_map
 
 	set color [dict create\
 		fg { light black dark LightGray }\
