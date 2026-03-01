@@ -73,6 +73,7 @@ namespace eval zstatus::config {
 		} mail {
 			type transient
 			module mail
+			font bold
 			proc mail::update
 		} memused {
 			type string

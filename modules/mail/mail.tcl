@@ -174,7 +174,7 @@ proc zstatus::mail::update {} {
 		set inbox [llength [glob -nocomplain -dir "$path/new" *]]
 		if {$inbox && $newmail != $inbox} {
 			dict set ::mailboxes $index newmail $inbox
-			$mailframe.$index configure -text "$mailicon ($inbox)"
+			$mailframe.$index configure -text "$mailicon ($inbox) "
 			if ![dict get $::mailboxes $index visible] {
 				if {![string length [pack slaves $mailframe]]} {
 					pack $mailframe -after $mailpos \
