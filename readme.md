@@ -1,10 +1,10 @@
 % zstatus(1) zstatus version 0.5 | zstatus user's manual
 % cmanv
-% March 2027
+% March 2026
 
 # NAME
 
-zstatus — a tcl/tk status bar for the zwm window manager
+zstatus — a Tcl/Tk status bar for the zwm window manager
 
 # SYNOPSIS
 
@@ -148,6 +148,7 @@ Each of these widgets can be customized with options:
 - __[datetime]__: Shows current date and time in the defined _timezone_
 
 > Options:
+
 > >  - _format_: Format of the date and time (as defined in strftime(3))
 
 > >  - _font_: font to use for text (normal, italic or bold).
@@ -163,6 +164,7 @@ Each of these widgets can be customized with options:
 - __[clientmenu]__: Open menu of X11 clients.
 
 > Options:
+
 > > - _font_: font to use for text (normal, italic or bold).
 
 > > - _bg.light_: background color in light mode.
@@ -176,6 +178,7 @@ Each of these widgets can be customized with options:
 - __[desklist]__: List of workspaces currently in use.
 
 > Options:
+
 > > - _font_: font to use for text (normal, italic or bold).
 
 > > - _bg.light_: background color in light mode.
@@ -189,6 +192,7 @@ Each of these widgets can be customized with options:
 - __[deskname]__: Name of the active workspace.
 
 > Options:
+
 > > - _font_: font to use for text (normal, italic or bold).
 
 > > - _bg.light_: background color in light mode.
@@ -202,6 +206,7 @@ Each of these widgets can be customized with options:
 - __[devices]__: Show some devices present under /dev.
 
 > Options:
+
 > > - _searchlist_: List of devices to watch. (Default: _da[0-9] ulpt[0-9]_)
 
 > > - _font_: font to use for text (normal, italic or bold).
@@ -218,6 +223,7 @@ Each of these widgets can be customized with options:
 by the _launcher.json_ file in the configuration directory.
 
 > Options:
+
 > > - _font_: font to use for text (normal, italic or bold).
 
 > > - _bg.light_: background color in light mode.
@@ -232,6 +238,7 @@ by the _launcher.json_ file in the configuration directory.
 the configuration file of the _zwm_ window manager.
 
 > Options:
+
 > > - _font_: font to use for text (normal, italic or bold).
 
 > > - _bg.light_: background color in light mode.
@@ -245,6 +252,7 @@ the configuration file of the _zwm_ window manager.
 - __[loadavg]__: Shows current CPU load average.
 
 > Options:
+
 > > - _exec_: Command to execute on mouse click.
 
 > > - _font_: font to use for text (normal, italic or bold).
@@ -260,6 +268,7 @@ the configuration file of the _zwm_ window manager.
 - __[mail]__: Shows icons of new mail. There must be at least one maildir section defined.
 
 > Options:
+
 > > - _exec_: Command to execute on mouse click.
 
 > > - _font_: font to use for text (normal, italic or bold).
@@ -275,6 +284,7 @@ the configuration file of the _zwm_ window manager.
 - __[memused]__: Shows percentage of used memory.
 
 > Options:
+
 > > - _exec_: Command to execute on mouse click.
 
 > > - _font_: font to use for text (normal, italic or bold).
@@ -291,6 +301,7 @@ the configuration file of the _zwm_ window manager.
 Clicking on it opens a window showing current weather conditions.
 
 > Options:
+
 > > - _code_: The 4 characters code of the METAR station. (required)
 
 > > - _delay_: Time between updates in minutes. (Default 10)
@@ -308,6 +319,7 @@ Clicking on it opens a window showing current weather conditions.
 - __[mixer]__: Shows an icon and the volume level of _/dev/mixer_.
 
 > Options:
+
 > > - _exec_: Command to execute on mouse click.
 
 > > - _font_: font to use for text (normal, italic or bold).
@@ -324,6 +336,7 @@ Clicking on it opens a window showing current weather conditions.
 it shows the currently playing track.
 
 > Options:
+
 > > - _socket_: Unix or tcp socket for connecting to mpd. If not defined, the value
 > > of _MPD\_HOST_ is used instead.
 
@@ -340,6 +353,7 @@ it shows the currently playing track.
 - __[netstat]__: Shows net statistics the given network interface.
 
 > Options:
+
 > > - _interface_: Network interface to monitor. (required)
 
 > > - _exec_: Command to execute on mouse click.
@@ -357,6 +371,7 @@ it shows the currently playing track.
 - __[separator]__: Widget acting as vertical separators between two widgets.
 
 > Options:
+
 > > - _bg_:_light_: color in light mode.
 
 > > - _bg_:_dark_: color in dark mode.
@@ -364,6 +379,7 @@ it shows the currently playing track.
 - __[wintitle]__: Displays the title of the currently active window.
 
 > Options:
+
 > > - _expand_: The widget expands to occupy all available space.
 
 > > - _maxlength_: Maximum length of text to display. (Default 100 characters)
@@ -385,6 +401,7 @@ The mailbox __must__ be in the _maildir_ format. Multiple _maildir_ sections
 are allowed for multiple mailboxes.
 
 > Options:
+
 > > - _name_: Name of the maildir (required)
 
 > > - _path_: Path of the maildir (required)
