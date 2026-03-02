@@ -203,16 +203,14 @@ proc zstatus::gen_launcher_menu { prefix } {
 
 		if {![string length $prefix] && $leaf == "launchers"} {
 			set basemenu $path
-			set label [dict get $menudict label]
-			$path add command -label $label\
-				-state disabled\
+			$path add command -state disabled\
+				-label [dict get $menudict label]\
 				-background $bgmenu2
 		}
 
 		set itemlist [dict get $menudict entries]
 		foreach itemdict $itemlist {
 			set type ""
-			set label [dict get $itemdict label]
 			if [dict exists $itemdict cascade] {
 				set type cascade
 				set cascade "${prefix}.[dict get $itemdict cascade]"
@@ -235,6 +233,7 @@ proc zstatus::gen_launcher_menu { prefix } {
 				set type command
 				set command "[dict get $itemdict command] &"
 			}
+			set label [dict get $itemdict label]
 			if {$type == "command"} {
 				$path add $type -label " $label" -command $command
 			} elseif {$type == "cascade"} {
@@ -269,6 +268,7 @@ proc zstatus::add_widgets {side widgets} {
 	variable sepcount
 	variable widgetlist
 	variable rootmenu
+	variable menupos
 
 	# Sanitize the provided list
 	regsub -all {\"} $widgets {} widgets
@@ -292,7 +292,7 @@ proc zstatus::add_widgets {side widgets} {
 			load_module $module
 			set expand [dict get $::widgetdict $item expand]
 			zstatus::${module}::setup $bar $item
-			pack $bar.$item -side $side -padx 8 -expand $expand
+			pack $bar.$item -side $side -padx 4 -expand $expand
 			set last $item
 		}
 		string {
@@ -319,7 +319,7 @@ proc zstatus::add_widgets {side widgets} {
 			pack [menubutton $prefix\
 				-font [dict get $::widgetdict $item font]\
 				-textvar [dict get $::widgetdict $item source]\
-				-menu $path\
+				-direction $menupos -menu $path\
 				-padx 5] -side $side
 
 			menu $path -postcommand\
@@ -423,6 +423,7 @@ proc zstatus::setup {} {
 	variable widgetlist
 	variable datetime_format
 	variable locale
+	variable menupos
 	variable osversion
 	variable sepcount
 
@@ -432,8 +433,10 @@ proc zstatus::setup {} {
 	set wheight [make_font]
 	if {[dict get $::config position] == "bottom"} {
 		set position "+0-0"
+		set menupos above
 	} else {
 		set position "+0+0"
+		set menupos below
 	}
 	if ![dict exists $::config geometry] {
 		dict set ::config geometry "[winfo vrootwidth .]x${wheight}${position}"

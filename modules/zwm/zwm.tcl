@@ -14,7 +14,7 @@ namespace eval zstatus::zwm {
 	variable clientlist {}
 	variable desklist {}
 	variable layoutlist {}
-	variable layouttitle	$::unicode(layout)
+	variable layouttitle	$::unicode(vsplit)
 	variable clienttitle	$::unicode(window)
 
 	variable active_client [dict create window 0 desknum ? name ""]

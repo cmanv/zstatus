@@ -5,9 +5,13 @@ namespace eval zstatus::config {
 		arrow-up	\u2191
 		arrow-down	\u2193
 		arrow-up-down	\u21c5
+		hsplit		\u229f
 		pause		\u23f8
+		floated		\u2397
+		square		\u25a1
+		vsplit		\u25eb
 		menu		\u2630
-		layout		\u29c9
+		maximize	\u26f6
 		play		\u2bc8
 		window		\U1f5d6
 		windows		\U1f5d7
