@@ -67,7 +67,7 @@ namespace eval zstatus::config {
 		} mixer {
 			type string
 			module system
-			source zstatus::system::mixer
+			source zstatus::system::mixer_icon
 		} music {
 			type transient
 			module music

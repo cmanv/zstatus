@@ -20,12 +20,13 @@ namespace eval zstatus::system {
 	variable loadgraph_visible 0
 	variable memstats_visible 0
 	variable netstat_visible 0
+	variable volume_visible 0
 
 	variable load_queue {}
 	variable load_length 210
 	variable load_height 80
 
-	namespace export set_loadavg set_memused set_mixer mixer_cmd
+	namespace export set_loadavg set_memused update_volume mixer_cmd
 }
 
 proc zstatus::system::set_theme {theme} {
@@ -43,6 +44,8 @@ proc zstatus::system::set_theme {theme} {
 	if {$memstats_visible} { set_theme_memstats }
 	variable netstat_visible
 	if {$netstat_visible} { set_theme_netstat }
+	variable volume_visible
+	if {$volume_visible} { set_theme_volume }
 }
 
 proc zstatus::system::set_theme_loadgraph { } {
@@ -77,7 +80,7 @@ proc zstatus::system::set_theme_memstats { } {
 	$memgrid.swap_total configure -bg $bgcolor -fg $fgcolor
 }
 
-proc zstatus::system::set_theme_netstat { } {
+proc zstatus::system::set_theme_netstat {} {
 	variable bgcolor
 	variable fgcolor
 	variable netgrid
@@ -91,6 +94,13 @@ proc zstatus::system::set_theme_netstat { } {
 	$netgrid.ipv6_addr configure -bg $bgcolor -fg $fgcolor
 	$netgrid.transfer configure -bg $bgcolor -fg $fgcolor
 	$netgrid.transfer_val configure -bg $bgcolor -fg $fgcolor
+}
+
+proc zstatus::system::set_theme_volume {} {
+	variable bgcolor
+	variable fgcolor
+	.volume configure -background $bgcolor
+	.volume.label configure -bg $bgcolor -fg $fgcolor
 }
 
 proc zstatus::system::set_loadavg {} {
@@ -377,50 +387,81 @@ proc zstatus::system::mixer_cmd {action} {
 	} elseif {$action == "lower"} {
 		exec mixer vol=-0.05
 	}
-	set_mixer
+	update_volume
 }
 
-proc zstatus::system::set_mixer {} {
-	variable mixer
-	variable mixer_icon
-	set mixer "$mixer_icon [freebsd::getmixervol]"
+proc zstatus::system::hide_volume {} {
+	variable volume_visible
+	set volume_visible 0
+	destroy .volume
+}
+
+proc zstatus::system::show_volume {} {
+	variable bgcolor
+	variable fgcolor
+	variable barwidget
+	variable mixerwidget
+	variable volume_visible
+	variable mixer_volume
+
+	if {$volume_visible} { return }
+	set volume_visible 1
+	set vframe [toplevel .volume -highlightthickness 0 -background $bgcolor]
+	pack [label .volume.label -font normal -textvar zstatus::system::mixer_volume\
+		 -bg $bgcolor -fg $fgcolor ] -padx 5
+
+	set xpos [winfo rootx $mixerwidget]
+	set ypos [expr [winfo rooty $barwidget] + [winfo height $barwidget] + 1]
+	wm title $vframe "Mixer volume"
+	wm attributes $vframe -type dialog
+	wm overrideredirect $vframe 1
+	wm geometry $vframe +$xpos+$ypos
+
+	bind $vframe <Map> { zstatus::map_window .volume }
+	update_volume
+}
+
+proc zstatus::system::update_volume {} {
+	variable mixer_volume
+	set mixer_volume "volume: [freebsd::getmixervol]"
 }
 
 proc zstatus::system::setup {bar item} {
 	variable barwidget
-	variable loadwidget
-	variable memwidget
-	variable netwidget
+	set barwidget $bar
 
 	switch $item {
 	loadavg {
-		set barwidget $bar
+		variable loadwidget
 		set loadwidget $bar.$item
 		bind $loadwidget <Enter> { zstatus::system::show_loadgraph }
 		bind $loadwidget <Leave> { zstatus::system::hide_loadgraph }
 	}
 	memused {
-		set barwidget $bar
+		variable memwidget
 		set memwidget $bar.$item
 		bind $memwidget <Enter> { zstatus::system::show_memstats }
 		bind $memwidget <Leave> { zstatus::system::hide_memstats }
 	}
 	mixer {
+		variable mixerwidget
+		set mixerwidget $bar.$item
 		variable mixer_icon
 		set mixer_icon $::unicode(volume)
-		set_mixer
-		bind $bar.mixer <MouseWheel> {
+		bind $mixerwidget <Enter> { zstatus::system::show_volume }
+		bind $mixerwidget <Leave> { zstatus::system::hide_volume }
+		bind $mixerwidget <MouseWheel> {
 			if {%D < 0} {
 				exec mixer vol=-0.05
 			} else {
 				exec mixer vol=+0.05
 			}
-			zstatus::system::set_mixer
+			zstatus::system::update_volume
 		}
 		dict set ::messagedict volume system::mixer_cmd
 	}
 	netstat {
-		set barwidget $bar
+		variable netwidget
 		set netwidget $bar.$item
 
 		variable netstat_if
