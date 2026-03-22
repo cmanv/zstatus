@@ -423,7 +423,7 @@ proc zstatus::system::show_volume {} {
 
 proc zstatus::system::update_volume {} {
 	variable mixer_volume
-	set mixer_volume "volume: [freebsd::getmixervol]"
+	set mixer_volume "Volume: [freebsd::getmixervol]"
 }
 
 proc zstatus::system::setup {bar item} {
