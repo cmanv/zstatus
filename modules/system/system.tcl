@@ -187,7 +187,7 @@ proc zstatus::system::update_loadgraph {} {
 
 proc zstatus::system::set_memused {} {
 	variable memused
-	set memused "$::unicode(memory): [lindex [freebsd::getpercmemused] 0]"
+	set memused "$::unicode(memory): [lindex [freebsd::getmemused] 0]"
 
 	variable memstats_visible
 	if {$memstats_visible} { update_memstats }
@@ -282,14 +282,14 @@ proc zstatus::system::update_memstats {} {
 	variable bgcolor
 	variable fgcolor
 
-	set memstats [freebsd::getmemused]
-	$memgrid.mem_total configure -text [lindex $memstats 0]
-	$memgrid.mem_used configure -text [lindex $memstats 1]
-	$memgrid.mem_free configure -text [lindex $memstats 2]
-	set arcstats [freebsd::getarcstats]
-	$memgrid.arc_total configure -text [lindex $arcstats 0]
-	$memgrid.arc_used configure -text [lindex $arcstats 1]
-	$memgrid.arc_free configure -text [lindex $arcstats 2]
+	set meminfo [freebsd::getmeminfo]
+	$memgrid.mem_total configure -text [lindex $meminfo 0]
+	$memgrid.mem_used configure -text [lindex $meminfo 1]
+	$memgrid.mem_free configure -text [lindex $meminfo 2]
+	set arcinfo [freebsd::getarcinfo]
+	$memgrid.arc_total configure -text [lindex $arcinfo 0]
+	$memgrid.arc_used configure -text [lindex $arcinfo 1]
+	$memgrid.arc_free configure -text [lindex $arcinfo 2]
 	set swapinfo [freebsd::getswapinfo]
 	$memgrid.swap_total configure -text [lindex $swapinfo 0]
 	$memgrid.swap_used configure -text [lindex $swapinfo 1]
@@ -367,7 +367,7 @@ proc zstatus::system::show_netstat {} {
 proc zstatus::system::update_netstat {} {
 	variable neticon
 	variable netstat_if
-	set netinfo [freebsd::getnetstat $netstat_if]
+	set netinfo [freebsd::getnetinfo $netstat_if]
 	set neticon "$::unicode(arrow-down)[lindex $netinfo 2]"
 
 	variable netstat_visible
